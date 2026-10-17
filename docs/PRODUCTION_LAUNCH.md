@@ -8,12 +8,12 @@ Scope includes all Rust instructions/accounts, CPI/token account constraints, in
 
 Known findings to resolve before launch:
 
-1. `InitializePlatform` currently accepts the first signing administrator without binding that signer to the program upgrade authority. Deploying then immediately initializing is not an adequate security control. Require an authority-bound initializer and negative tests for initialization takeover; preserve an upgrade/migration strategy for existing test deployment accounts.
+1. **Resolved in source (October 18, 2026):** `InitializePlatform` now requires the program's `ProgramData` account and only accepts the signer recorded as its upgrade authority (`NotUpgradeAuthority` otherwise); immutable programs cannot initialize. Negative tests cover a racing stranger and an authority-less program, and a fresh local validator rejected a real takeover attempt. Existing test deployments were already initialized and are unaffected; any new deployment must use this build. Localnet scripts now load the program as upgradeable with the localnet authority. See [audit/AUDIT_PACKET.md](audit/AUDIT_PACKET.md).
 2. `ChainService` currently loads JSON operational signing keys from environment variables. Implement an agreed remote signer/KMS design for verifier/crank; administrator, treasury and dispute authorities must use the selected multisigs and documented recovery owners.
 3. API and verification orchestration share the MVP host. Production needs separate worker-host isolation; Docker process isolation alone is not host separation.
 4. Audit report, remediation evidence and retest must refer to the exact source revision and deployed binary hash. Internal tests and assistant review are not an independent audit.
 
-Source evidence: 31 Rust tests, 83 unit/security tests, 10 Python tests and live mock-USDC flows are recorded in `MVP_ACCEPTANCE.md`. Include protocol spec, threat model, IDL, reproducible build instructions, deployment configuration with secrets removed, and final binary/source hashes in the auditor packet. Do not share credentials or private keys.
+Source evidence: 33 Rust tests, 83 unit/security tests, 10 Python tests and live mock-USDC flows are recorded in `MVP_ACCEPTANCE.md`. Include protocol spec, threat model, IDL, reproducible build instructions, deployment configuration with secrets removed, and final binary/source hashes in the auditor packet. Do not share credentials or private keys.
 
 ## Mainnet prerequisites
 

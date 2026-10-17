@@ -66,4 +66,6 @@ pub enum EdgeBountyError {
     InvalidResolution,
     #[msg("Attestation already revoked")]
     AlreadyRevoked,
+    #[msg("Only the program upgrade authority can initialize the platform")]
+    NotUpgradeAuthority,
 }

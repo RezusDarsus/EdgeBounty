@@ -24,7 +24,8 @@ import { runSandboxed } from './sandbox.js';
 import { aiProvider, assessRelevance, explainReport } from './l3.js';
 import { runModelJob } from './model-jobs.js';
 import { VERIFICATION_POLICY_VERSION } from '../lib/verification-policy.js';
-import { checkTextDuplicates } from './semantic.js';
+import { checkImageDuplicates, checkTextDuplicates, IMAGE_DUPLICATE_SAMPLES } from './semantic.js';
+import { assessMedia, mediaKind, MEDIA_PROMPT_VERSION } from './media-review.js';
 
 export const DATASET_VALIDATOR = { name: 'edgebounty-dataset-validator', version: '1.4.0' };
 type Job = typeof schema.verificationJobs.$inferSelect;
@@ -33,8 +34,9 @@ type Job = typeof schema.verificationJobs.$inferSelect;
 export function specFor(level: AnalysisLevel, criteria: unknown, benchmarkId?: string | null, cfg?: Config) {
   const provider = cfg ? aiProvider(cfg) : null;
   const ai = level === 'L3' && cfg ? { provider, model: provider === 'gemini' ? cfg.GEMINI_MODEL : provider === 'nvidia' ? cfg.L3_VISION_MODEL : cfg.L3_MODEL, promptVersion: 'image-review-2026-10-17', sampleItems: RATES.sampledAiItems } : null;
-  const semantic = level === 'L3' && cfg?.SEMANTIC_DUPLICATES === 'on' ? { model: cfg.NVIDIA_EMBEDDING_MODEL, policy: 'owner-text-prefix-8192-v1' } : null;
-  const spec = { schema: 'edgebounty.spec/1', level, criteria: criteria ?? null, validator: DATASET_VALIDATOR, benchmarkId: benchmarkId ?? null, ai, ...(semantic ? { semantic } : {}) };
+  const semantic = level === 'L3' && cfg?.SEMANTIC_DUPLICATES === 'on' ? { model: cfg.NVIDIA_EMBEDDING_MODEL, policy: 'owner-text-prefix-8192-v1', imageModel: cfg.NVIDIA_IMAGE_EMBEDDING_MODEL, imagePolicy: `owner-image-sample-${IMAGE_DUPLICATE_SAMPLES}-v1` } : null;
+  const media = level === 'L3' && cfg && provider === 'nvidia' ? { model: cfg.L3_MEDIA_MODEL, promptVersion: MEDIA_PROMPT_VERSION, maxClips: cfg.L3_MEDIA_MAX_CLIPS, maxClipBytes: cfg.L3_MEDIA_MAX_BYTES } : null;
+  const spec = { schema: 'edgebounty.spec/1', level, criteria: criteria ?? null, validator: DATASET_VALIDATOR, benchmarkId: benchmarkId ?? null, ai, ...(semantic ? { semantic } : {}), ...(media ? { media } : {}) };
   return { spec, specHash: bytesToHex(hashDocument(DOMAIN.spec, spec)) };
 }
 
@@ -49,7 +51,10 @@ export async function quoteVersion(ctx: AppContext, versionId: string, level: An
     const [bv] = bm?.assetVersionId ? await ctx.db.select().from(schema.assetVersions).where(eq(schema.assetVersions.id, bm.assetVersionId)) : [];
     if (bv) items = Math.max(items, bv.fileCount);
   }
-  return processingQuote(ctx.cfg, verificationQuote({ items, bytes: v.totalSize, level: level === 'L4' ? 'L2' : level, sampleSize: level === 'L3' ? RATES.sampledAiItems : undefined, modelBenchmark: asset.kind === 'model' && level !== 'L1' ? { computeSeconds: 60, gpu: false } : undefined }));
+  const q = processingQuote(ctx.cfg, verificationQuote({ items, bytes: v.totalSize, level: level === 'L4' ? 'L2' : level, sampleSize: level === 'L3' ? RATES.sampledAiItems : undefined, modelBenchmark: asset.kind === 'model' && level !== 'L1' ? { computeSeconds: 60, gpu: false } : undefined }));
+  // L3 auxiliary calls (duplicate embeddings, report explanation) get their own allowance so they do not shrink the review sample
+  if (level === 'L3') q.budget.maxApiCalls += 1 + (ctx.cfg.SEMANTIC_DUPLICATES === 'on' ? IMAGE_DUPLICATE_SAMPLES + 1 : 0);
+  return q;
 }
 
 export async function createJob(
@@ -292,6 +297,8 @@ async function runDatasetJob(ctx: AppContext, job: Job, version: typeof schema.a
   const usage: JobUsage = { computeMs: r.elapsedMs, apiCalls: 0, provider: null };
   const tools = [...doc.tools];
 
+  const task = img?.relevancePrompt ?? `${asset.name}${asset.category ? ` (${asset.category})` : ''}`;
+  const remainingCalls = () => job.budget.maxApiCalls - usage.apiCalls;
   if (wantL3) {
     const provider = aiProvider(ctx.cfg);
     if (!provider) {
@@ -300,8 +307,8 @@ async function runDatasetJob(ctx: AppContext, job: Job, version: typeof schema.a
       const rel = await assessRelevance(
         ctx.cfg,
         doc.samples.map((s: any) => ({ path: join(outDir, 'samples', s.file), source: s.source, label: s.label })),
-        img?.relevancePrompt ?? `${asset.name}${asset.category ? ` (${asset.category})` : ''}`,
-        job.budget.maxApiCalls,
+        task,
+        Math.min(RATES.sampledAiItems, job.budget.maxApiCalls),
       );
       metrics.relevance = { estimateBps: rel.estimateBps, lowBps: rel.lowBps, highBps: rel.highBps, sampleSize: rel.sampleSize, method: rel.method };
       if (rel.irrelevant.length) findings.push({ severity: 'suspected', code: 'irrelevant_content', message: `${rel.irrelevant.length} of ${rel.sampleSize} sampled items judged irrelevant`, files: rel.irrelevant });
@@ -318,15 +325,59 @@ async function runDatasetJob(ctx: AppContext, job: Job, version: typeof schema.a
     }
   }
 
+  const versionFiles = wantL3 ? await ctx.db.select().from(schema.assetFiles).where(eq(schema.assetFiles.versionId, version.id)) : [];
+  const mediaPaths = versionFiles.map((f) => f.path).filter((p) => mediaKind(p));
+  if (wantL3 && mediaPaths.length) {
+    const provider = aiProvider(ctx.cfg);
+    if (provider !== 'nvidia') {
+      limitations.push('Audio/video AI review currently runs on the NVIDIA omni model only; clip relevance is untested.');
+    } else if (remainingCalls() <= 0) {
+      limitations.push('The AI call budget was used by image review; audio/video clips were not reviewed.');
+    } else {
+      const media = await assessMedia(ctx.cfg, inDir, mediaPaths, task, parseInt(job.id.slice(0, 8), 16), remainingCalls());
+      usage.apiCalls += media.apiCalls;
+      usage.provider = 'nvidia';
+      usage.inputTokens = (usage.inputTokens ?? 0) + media.inputTokens;
+      usage.outputTokens = (usage.outputTokens ?? 0) + media.outputTokens;
+      if (media.apiCalls || media.skipped.length) {
+        metrics.mediaRelevance = { estimateBps: media.estimateBps, lowBps: media.lowBps, highBps: media.highBps, sampleSize: media.sampleSize, method: media.method, skipped: media.skipped.length };
+        if (media.irrelevant.length) findings.push({ severity: 'suspected', code: 'irrelevant_media', message: `${media.irrelevant.length} of ${media.sampleSize} sampled audio/video clips judged irrelevant`, files: media.irrelevant });
+        if (media.labelMismatches.length) findings.push({ severity: 'suspected', code: 'media_label_mismatch', message: `${media.labelMismatches.length} sampled clips do not appear to match their folder label`, files: media.labelMismatches });
+        limitations.push(`Audio/video review examined ${media.sampleSize} of ${mediaPaths.length} clips (seeded random sample) with ${ctx.cfg.L3_MEDIA_MODEL}; it is an AI estimate with a 95% interval, not proof of quality.`);
+        if (media.truncated) limitations.push(`${media.truncated} long WAV clips were reviewed from their first ${Math.round(ctx.cfg.L3_MEDIA_MAX_BYTES / 1024 ** 2)} MiB only.`);
+        if (media.skipped.length) limitations.push(`${media.skipped.length} sampled clips were skipped: ${[...new Set(media.skipped.map((s) => s.reason))].join('; ')}.`);
+        if (media.undetermined) limitations.push(`${media.undetermined} sampled clips could not be judged by the AI reviewer and were excluded.`);
+        tools.push({ name: ctx.cfg.L3_MEDIA_MODEL, version: 'nvidia' });
+        costMicro += processingAmount(ctx.cfg, BigInt(media.sampleSize) * RATES.l3PerItemCost);
+      }
+    }
+  }
+
+  let imagesCompared = 0;
+  if (wantL3 && ctx.cfg.SEMANTIC_DUPLICATES === 'on' && doc.samples.length && remainingCalls() > 0) {
+    try {
+      const similar = await checkImageDuplicates(ctx, version.id, asset.ownerId, doc.samples.map((s: any) => join(outDir, 'samples', s.file)), remainingCalls());
+      usage.apiCalls += similar.calls;
+      usage.inputTokens = (usage.inputTokens ?? 0) + similar.inputTokens;
+      if (similar.calls) usage.provider = 'nvidia';
+      imagesCompared = similar.compared;
+      if (similar.matches.length) findings.push({ severity: 'suspected', code: 'semantic_image_overlap', message: `Sampled images closely resemble images in ${similar.matches.length} previously checked versions in your account. Similarity is a heuristic, not proof of duplicate content.`, files: similar.matches.map((m) => m.version_id) });
+      if (similar.compared) limitations.push(`Image near-duplicate check compared ${similar.compared} downscaled samples with earlier versions in the owner's account only, using ${ctx.cfg.NVIDIA_IMAGE_EMBEDDING_MODEL}.`);
+    } catch {
+      usage.apiCalls += 1; usage.provider = 'nvidia';
+      limitations.push('Image near-duplicate check was unavailable; no image similarity conclusion was made.');
+    }
+  }
+
   if (wantL3 && ctx.cfg.SEMANTIC_DUPLICATES === 'on' && usage.apiCalls < job.budget.maxApiCalls) {
-    const files = await ctx.db.select().from(schema.assetFiles).where(eq(schema.assetFiles.versionId, version.id));
+    const files = versionFiles;
     try {
       const similar = await checkTextDuplicates(ctx, version.id, asset.ownerId, inDir, files.map(f => f.path));
       usage.apiCalls += similar.calls;
       usage.inputTokens = (usage.inputTokens ?? 0) + similar.inputTokens;
       if (similar.calls) usage.provider = 'nvidia';
       if (similar.matches.length) findings.push({ severity: 'suspected', code: 'semantic_text_overlap', message: `Text prefixes resemble ${similar.matches.length} previously checked versions in your account. Similarity is a heuristic, not proof of duplicate content.`, files: similar.matches.map(m => m.version_id) });
-      if (similar.sampledBytes) limitations.push(`Semantic duplicate check compared at most 8 text prefixes (${similar.sampledBytes} bytes) within the owner's account using ${ctx.cfg.NVIDIA_EMBEDDING_MODEL}. Images, audio and video are excluded.`);
+      if (similar.sampledBytes) limitations.push(`Semantic duplicate check compared at most 8 text prefixes (${similar.sampledBytes} bytes) within the owner's account using ${ctx.cfg.NVIDIA_EMBEDDING_MODEL}. ${imagesCompared ? 'Audio and video are' : 'Images, audio and video are'} excluded.`);
     } catch {
       // A failed provider attempt still consumes the authorized call budget.
       usage.apiCalls += 1; usage.provider = 'nvidia';

@@ -60,6 +60,7 @@ export function ReportView({ report, reportHash, attestation }: { report: any; r
             ...(d.labels ? ([['Labels', Object.entries(d.labels).map(([k, v]) => `${k}: ${v}`).join(', ')]] as [string, string][]) : []),
             ...(d.rows !== null ? ([['Rows / columns', `${d.rows} / ${d.columns?.length}`], ['Duplicate rows', d.duplicateRows], ['Null cells', d.nullCells]] as [string, any][]) : []),
             ...(d.relevance ? ([['Relevance (estimate)', `${pct(d.relevance.estimateBps)} (95% CI ${pct(d.relevance.lowBps)}–${pct(d.relevance.highBps)}, n=${d.relevance.sampleSize})`]] as [string, string][]) : []),
+            ...(d.mediaRelevance ? ([['Audio/video relevance (estimate)', d.mediaRelevance.sampleSize ? `${pct(d.mediaRelevance.estimateBps)} (95% CI ${pct(d.mediaRelevance.lowBps)}–${pct(d.mediaRelevance.highBps)}, n=${d.mediaRelevance.sampleSize}${d.mediaRelevance.skipped ? `, ${d.mediaRelevance.skipped} skipped` : ''})` : `not judged (${d.mediaRelevance.skipped} clips skipped)`]] as [string, string][]) : []),
           ]}
         />
       )}

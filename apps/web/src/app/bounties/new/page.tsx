@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { BountyDraft } from '@/components/bounty-draft';
 import { useRouter } from 'next/navigation';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { api } from '@/lib/api';
@@ -97,6 +98,7 @@ export default function NewBounty() {
   return (
     <RequireSession>
       <Page kicker="New funded request" title="Fund a custom request" subtitle="Set a fixed USDC reward and the requirements. Contributors accept the stated reward; the platform does not set the price of their work. Funds stay in escrow until settlement.">
+        <BountyDraft apply={draft => setF(current => ({ ...current, title: draft.title, description: draft.description, deliverables: draft.deliverables.join('\n') }))} />
         <div className="grid gap-4 lg:grid-cols-2">
           <Card title="The work">
             <div className="space-y-3">

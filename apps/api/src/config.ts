@@ -52,13 +52,22 @@ const Env = z.object({
   ANTHROPIC_API_KEY: z.string().optional(),
   L3_MODEL: z.string().default('claude-opus-5-5'),
   NVIDIA_API_KEY: z.string().optional(),
+  /** Enable only after approving the provider spend budget. Drafts never perform financial actions. */
+  AI_DRAFTS_ENABLED: z.enum(['0', '1']).default('0'),
   NVIDIA_BASE_URL: z.string().default('https://integrate.api.nvidia.com/v1'),
   SEMANTIC_DUPLICATES: z.enum(['on', 'off']).default('off'),
   NVIDIA_EMBEDDING_MODEL: z.string().default('nvidia/nemotron-3-embed-1b'),
-  /** must accept images */
-  L3_VISION_MODEL: z.string().default('meta/llama-3.2-11b-vision-instruct'),
+  /** must accept images; the omni model beat llama-3.2-11b-vision on docs/benchmarks/L3_BENCHMARK_2026-10-18.md */
+  L3_VISION_MODEL: z.string().default('nvidia/nemotron-3-nano-omni-30b-a3b-reasoning'),
   /** text-only model used for plain-English report explanations */
   L3_TEXT_MODEL: z.string().default('nvidia/nemotron-3.5-lightning-30b-a3b'),
+  /** omni model for sampled audio/video review (NVIDIA catalog; takes audio_url / video_url data URLs) */
+  L3_MEDIA_MODEL: z.string().default('nvidia/nemotron-3-nano-omni-30b-a3b-reasoning'),
+  L3_MEDIA_MAX_CLIPS: z.coerce.number().int().min(0).max(64).default(16),
+  /** per-clip upload cap; longer PCM WAV is cut to this size, other oversized clips are skipped */
+  L3_MEDIA_MAX_BYTES: z.coerce.number().int().positive().default(6 * 1024 ** 2),
+  /** image embeddings for cross-version near-duplicate checks (2048-d, accepts image data URLs) */
+  NVIDIA_IMAGE_EMBEDDING_MODEL: z.string().default('nvidia/llama-nemotron-embed-vl-1b-v2'),
   MAX_UPLOAD_BYTES: z.coerce.number().default(10 * 1024 ** 3),
   MAX_FILE_BYTES: z.coerce.number().default(10 * 1024 ** 3),
   UPLOAD_PART_BYTES: z.coerce.number().default(16 * 1024 ** 2),
@@ -76,6 +85,12 @@ const Env = z.object({
   LISTING_MIN_COVERAGE_DAYS: z.coerce.number().int().min(1).default(30),
   // ---- cost reporting (all micro-USD; unset = unknown, never guessed) ----
   EC2_MONTHLY_USD_MICRO: z.coerce.bigint().optional(),
+  /** read-only token with Account Analytics: Read, used to reconcile R2/Worker usage; never the deploy/admin token */
+  CLOUDFLARE_ANALYTICS_TOKEN: z.string().optional(),
+  /** defaults to the account in an R2 S3_ENDPOINT */
+  CLOUDFLARE_ACCOUNT_ID: z.string().regex(/^[0-9a-f]{32}$/).optional(),
+  CLOUDFLARE_WORKER_NAME: z.string().default('edgebounty-downloads'),
+  CLOUDFLARE_WORKERS_PLAN: z.enum(['free', 'paid']).default('free'),
   EBS_MONTHLY_USD_MICRO: z.coerce.bigint().optional(),
   OTHER_FIXED_MONTHLY_USD_MICRO: z.coerce.bigint().default(0n),
   /** AWS data transfer out, micro-USD per GB (ESTIMATE) */

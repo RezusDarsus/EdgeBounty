@@ -1,0 +1,338 @@
+{
+  "summary": {
+    "ranAt": "2026-10-17T20:34:41.900Z",
+    "models": {
+      "image": "nvidia/nemotron-3.5-super-vl-120b-a12b",
+      "media": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "imageEmbedding": "nvidia/llama-nemotron-embed-vl-1b-v2"
+    },
+    "apiCalls": 24,
+    "costNote": "NVIDIA free tier: $0 per call; token counts recorded for future pricing",
+    "relevance": [
+      {
+        "kind": "image",
+        "items": 24,
+        "undetermined": 8,
+        "relevanceAccuracy": 100,
+        "mislabelRecall": 50,
+        "mislabelPrecision": 100,
+        "meanLatencyMs": 17155,
+        "meanInputTokens": 389,
+        "meanOutputTokens": 245
+      },
+      {
+        "kind": "audio",
+        "items": 0,
+        "undetermined": 0,
+        "relevanceAccuracy": null,
+        "mislabelRecall": null,
+        "mislabelPrecision": null,
+        "meanLatencyMs": null,
+        "meanInputTokens": null,
+        "meanOutputTokens": null
+      },
+      {
+        "kind": "video",
+        "items": 0,
+        "undetermined": 0,
+        "relevanceAccuracy": null,
+        "mislabelRecall": null,
+        "mislabelPrecision": null,
+        "meanLatencyMs": null,
+        "meanInputTokens": null,
+        "meanOutputTokens": null
+      }
+    ],
+    "duplicates": {
+      "threshold": 0.97,
+      "duplicateSimilarity": [],
+      "distinctSimilarity": [],
+      "correctAtThreshold": 0,
+      "pairs": 0
+    },
+    "errors": []
+  },
+  "rows": [
+    {
+      "path": "images/circle/00.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": true,
+      "gotLabel": true,
+      "ms": 96341,
+      "inTok": 389,
+      "outTok": 197,
+      "reason": "The image shows a single filled red circle on a white background, matching the assigned label."
+    },
+    {
+      "path": "images/square/01.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": true,
+      "gotLabel": true,
+      "ms": 6958,
+      "inTok": 389,
+      "outTok": 213,
+      "reason": "The image shows a single filled blue square, which matches the assigned label and task requirements."
+    },
+    {
+      "path": "images/circle/02.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": true,
+      "gotLabel": true,
+      "ms": 3364,
+      "inTok": 389,
+      "outTok": 268,
+      "reason": "The image shows a single filled green circle, which matches the assigned label and task criteria."
+    },
+    {
+      "path": "images/square/03.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": null,
+      "expectLabel": true,
+      "gotLabel": null,
+      "ms": 26303,
+      "inTok": 389,
+      "outTok": 300
+    },
+    {
+      "path": "images/circle/04.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": true,
+      "gotLabel": true,
+      "ms": 2343,
+      "inTok": 389,
+      "outTok": 221,
+      "reason": "The image shows a single filled red circle on a white background, which matches the assigned label and task requirements."
+    },
+    {
+      "path": "images/square/05.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": true,
+      "gotLabel": true,
+      "ms": 3430,
+      "inTok": 389,
+      "outTok": 213,
+      "reason": "Image shows a single filled blue square on a white background, matching the assigned label."
+    },
+    {
+      "path": "images/circle/06.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": true,
+      "gotLabel": true,
+      "ms": 17456,
+      "inTok": 389,
+      "outTok": 211,
+      "reason": "The image shows a single filled green circle, which matches the assigned label and task requirements."
+    },
+    {
+      "path": "images/square/07.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": true,
+      "gotLabel": true,
+      "ms": 3433,
+      "inTok": 389,
+      "outTok": 196,
+      "reason": "The image shows a single filled yellow square on a white background, matching the assigned label."
+    },
+    {
+      "path": "images/circle/08.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": true,
+      "gotLabel": true,
+      "ms": 98700,
+      "inTok": 389,
+      "outTok": 222,
+      "reason": "The image shows a single filled red circle on a white background, which matches the assigned label and task requirements."
+    },
+    {
+      "path": "images/square/09.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": null,
+      "expectLabel": true,
+      "gotLabel": null,
+      "ms": 3191,
+      "inTok": 389,
+      "outTok": 300
+    },
+    {
+      "path": "images/circle/10.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": true,
+      "gotLabel": true,
+      "ms": 2037,
+      "inTok": 389,
+      "outTok": 193,
+      "reason": "Image shows a single filled green circle, matching the assigned label and task."
+    },
+    {
+      "path": "images/square/11.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": true,
+      "gotLabel": true,
+      "ms": 2940,
+      "inTok": 389,
+      "outTok": 268,
+      "reason": "The image shows a single filled yellow square, which matches the assigned label and task criteria."
+    },
+    {
+      "path": "images/circle/12.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": true,
+      "gotLabel": true,
+      "ms": 1724,
+      "inTok": 389,
+      "outTok": 194,
+      "reason": "Image shows a single filled red circle, matching the assigned label and task."
+    },
+    {
+      "path": "images/square/13.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": true,
+      "gotLabel": true,
+      "ms": 10747,
+      "inTok": 389,
+      "outTok": 214,
+      "reason": "The image shows a single filled blue square, which matches the assigned label and task requirements."
+    },
+    {
+      "path": "images/circle/14.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": true,
+      "gotLabel": true,
+      "ms": 2775,
+      "inTok": 389,
+      "outTok": 201,
+      "reason": "The image shows a single filled green circle on a white background, matching the assigned label."
+    },
+    {
+      "path": "images/square/15.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": true,
+      "gotLabel": true,
+      "ms": 1629,
+      "inTok": 389,
+      "outTok": 192,
+      "reason": "The image shows a single filled yellow square, matching the assigned label and task."
+    },
+    {
+      "path": "images/square/mis_00.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": false,
+      "gotLabel": false,
+      "ms": 78614,
+      "inTok": 389,
+      "outTok": 217,
+      "reason": "Image shows a filled red circle, not a square."
+    },
+    {
+      "path": "images/circle/mis_01.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": false,
+      "gotLabel": false,
+      "ms": 11005,
+      "inTok": 389,
+      "outTok": 265,
+      "reason": "Image shows a filled blue square, not a circle."
+    },
+    {
+      "path": "images/square/mis_02.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": null,
+      "expectLabel": false,
+      "gotLabel": null,
+      "ms": 9209,
+      "inTok": 389,
+      "outTok": 300
+    },
+    {
+      "path": "images/circle/mis_03.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": null,
+      "expectLabel": false,
+      "gotLabel": null,
+      "ms": 2592,
+      "inTok": 389,
+      "outTok": 300
+    },
+    {
+      "path": "images/circle/junk_00.png",
+      "kind": "image",
+      "expectRelevant": false,
+      "gotRelevant": null,
+      "expectLabel": null,
+      "gotLabel": null,
+      "ms": 11086,
+      "inTok": 389,
+      "outTok": 300
+    },
+    {
+      "path": "images/square/junk_01.png",
+      "kind": "image",
+      "expectRelevant": false,
+      "gotRelevant": null,
+      "expectLabel": null,
+      "gotLabel": null,
+      "ms": 5382,
+      "inTok": 389,
+      "outTok": 300
+    },
+    {
+      "path": "images/circle/junk_02.png",
+      "kind": "image",
+      "expectRelevant": false,
+      "gotRelevant": null,
+      "expectLabel": null,
+      "gotLabel": null,
+      "ms": 7786,
+      "inTok": 389,
+      "outTok": 300
+    },
+    {
+      "path": "images/square/junk_03.png",
+      "kind": "image",
+      "expectRelevant": false,
+      "gotRelevant": null,
+      "expectLabel": null,
+      "gotLabel": null,
+      "ms": 2679,
+      "inTok": 389,
+      "outTok": 300
+    }
+  ],
+  "dupRows": []
+}

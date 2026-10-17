@@ -6,5 +6,6 @@ Type=oneshot
 User=ubuntu
 WorkingDirectory=/home/ubuntu/edgebounty-usdc-20261017-master
 ExecStart=/usr/bin/env node scripts/health-check.mjs
+ExecStopPost=/usr/bin/env node scripts/send-security-alert.mjs
 Environment=PATH=/usr/local/bin:/usr/bin:/bin
 TimeoutStartSec=30

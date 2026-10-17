@@ -1,4 +1,7 @@
 import { paymentMint } from './lib/payments.js';
+import { agentRoutes } from './routes/agents.js';
+import { infringementRoutes } from './routes/infringement.js';
+import { growthRoutes } from './routes/growth.js';
 import { notificationRoutes } from './routes/notifications.js';
 import { sql } from 'drizzle-orm';
 import Fastify, { type FastifyInstance } from 'fastify';
@@ -116,5 +119,8 @@ export async function buildApp(ctx: AppContext, opts: { logger?: boolean } = {})
   encryptedDeliveryRoutes(app, ctx);
   devRoutes(app, ctx);
   notificationRoutes(app, ctx);
+  infringementRoutes(app, ctx);
+  growthRoutes(app, ctx);
+  agentRoutes(app, ctx);
   return app;
 }

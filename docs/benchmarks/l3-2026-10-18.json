@@ -1,0 +1,585 @@
+{
+  "summary": {
+    "ranAt": "2026-10-17T20:17:17.226Z",
+    "models": {
+      "image": "meta/llama-3.2-11b-vision-instruct",
+      "media": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "imageEmbedding": "nvidia/llama-nemotron-embed-vl-1b-v2"
+    },
+    "apiCalls": 50,
+    "costNote": "NVIDIA free tier: $0 per call; token counts recorded for future pricing",
+    "relevance": [
+      {
+        "kind": "image",
+        "items": 24,
+        "undetermined": 0,
+        "relevanceAccuracy": 83.3,
+        "mislabelRecall": 25,
+        "mislabelPrecision": 100,
+        "meanLatencyMs": 6955,
+        "meanInputTokens": 1719,
+        "meanOutputTokens": 28
+      },
+      {
+        "kind": "audio",
+        "items": 8,
+        "undetermined": 0,
+        "relevanceAccuracy": 87.5,
+        "mislabelRecall": 100,
+        "mislabelPrecision": 100,
+        "meanLatencyMs": 2718,
+        "meanInputTokens": 180,
+        "meanOutputTokens": 46
+      },
+      {
+        "kind": "video",
+        "items": 6,
+        "undetermined": 0,
+        "relevanceAccuracy": 100,
+        "mislabelRecall": null,
+        "mislabelPrecision": null,
+        "meanLatencyMs": 1548,
+        "meanInputTokens": 423,
+        "meanOutputTokens": 40
+      }
+    ],
+    "duplicates": {
+      "threshold": 0.97,
+      "duplicateSimilarity": [
+        0.9958,
+        0.9938,
+        0.9918
+      ],
+      "distinctSimilarity": [
+        0.9348,
+        0.9397,
+        0.9276
+      ],
+      "correctAtThreshold": 6,
+      "pairs": 6
+    },
+    "errors": [
+      {
+        "path": "images/circle/junk_00.png",
+        "expected": false,
+        "reason": "The image is too pixelated to determine the shape."
+      },
+      {
+        "path": "images/square/junk_01.png",
+        "expected": false,
+        "reason": "The image shows a filled square."
+      },
+      {
+        "path": "images/circle/junk_02.png",
+        "expected": false,
+        "reason": "The image shows a filled circle."
+      },
+      {
+        "path": "images/square/junk_03.png",
+        "expected": false,
+        "reason": "clearly a square"
+      },
+      {
+        "path": "audio/sun/clip6.wav",
+        "expected": false,
+        "reason": "The audio contains a financial statement, not weather information."
+      }
+    ]
+  },
+  "rows": [
+    {
+      "path": "images/circle/00.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": true,
+      "gotLabel": true,
+      "ms": 15466,
+      "inTok": 1719,
+      "outTok": 28,
+      "reason": "clearly visible filled circle"
+    },
+    {
+      "path": "images/square/01.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": true,
+      "gotLabel": true,
+      "ms": 2536,
+      "inTok": 1719,
+      "outTok": 25,
+      "reason": "clear square"
+    },
+    {
+      "path": "images/circle/02.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": true,
+      "gotLabel": true,
+      "ms": 2287,
+      "inTok": 1719,
+      "outTok": 27,
+      "reason": "clearly a circle"
+    },
+    {
+      "path": "images/square/03.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": true,
+      "gotLabel": true,
+      "ms": 16100,
+      "inTok": 1719,
+      "outTok": 30,
+      "reason": "The image shows a filled square."
+    },
+    {
+      "path": "images/circle/04.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": true,
+      "gotLabel": true,
+      "ms": 5950,
+      "inTok": 1719,
+      "outTok": 27,
+      "reason": "clearly a circle"
+    },
+    {
+      "path": "images/square/05.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": true,
+      "gotLabel": true,
+      "ms": 5824,
+      "inTok": 1719,
+      "outTok": 25,
+      "reason": "clear square"
+    },
+    {
+      "path": "images/circle/06.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": true,
+      "gotLabel": true,
+      "ms": 1838,
+      "inTok": 1719,
+      "outTok": 27,
+      "reason": "clearly a circle"
+    },
+    {
+      "path": "images/square/07.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": true,
+      "gotLabel": true,
+      "ms": 2037,
+      "inTok": 1719,
+      "outTok": 25,
+      "reason": "clear square"
+    },
+    {
+      "path": "images/circle/08.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": true,
+      "gotLabel": true,
+      "ms": 1778,
+      "inTok": 1719,
+      "outTok": 28,
+      "reason": "clearly visible filled circle"
+    },
+    {
+      "path": "images/square/09.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": true,
+      "gotLabel": true,
+      "ms": 2169,
+      "inTok": 1719,
+      "outTok": 25,
+      "reason": "clear square"
+    },
+    {
+      "path": "images/circle/10.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": true,
+      "gotLabel": true,
+      "ms": 2261,
+      "inTok": 1719,
+      "outTok": 27,
+      "reason": "clearly visible circle"
+    },
+    {
+      "path": "images/square/11.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": true,
+      "gotLabel": true,
+      "ms": 1826,
+      "inTok": 1719,
+      "outTok": 25,
+      "reason": "clear square"
+    },
+    {
+      "path": "images/circle/12.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": true,
+      "gotLabel": true,
+      "ms": 1692,
+      "inTok": 1719,
+      "outTok": 27,
+      "reason": "clearly visible circle"
+    },
+    {
+      "path": "images/square/13.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": true,
+      "gotLabel": true,
+      "ms": 1419,
+      "inTok": 1719,
+      "outTok": 25,
+      "reason": "clear square"
+    },
+    {
+      "path": "images/circle/14.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": true,
+      "gotLabel": true,
+      "ms": 2250,
+      "inTok": 1719,
+      "outTok": 27,
+      "reason": "clearly a circle"
+    },
+    {
+      "path": "images/square/15.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": true,
+      "gotLabel": true,
+      "ms": 1950,
+      "inTok": 1719,
+      "outTok": 25,
+      "reason": "clear square"
+    },
+    {
+      "path": "images/square/mis_00.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": false,
+      "gotLabel": null,
+      "ms": 64280,
+      "inTok": 1719,
+      "outTok": 30,
+      "reason": "The image shows a filled circle."
+    },
+    {
+      "path": "images/circle/mis_01.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": false,
+      "gotLabel": null,
+      "ms": 23062,
+      "inTok": 1719,
+      "outTok": 30,
+      "reason": "The image shows a filled square."
+    },
+    {
+      "path": "images/square/mis_02.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": false,
+      "gotLabel": false,
+      "ms": 1978,
+      "inTok": 1719,
+      "outTok": 27,
+      "reason": "circle in the image"
+    },
+    {
+      "path": "images/circle/mis_03.png",
+      "kind": "image",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": false,
+      "gotLabel": null,
+      "ms": 1760,
+      "inTok": 1719,
+      "outTok": 30,
+      "reason": "The image shows a filled square."
+    },
+    {
+      "path": "images/circle/junk_00.png",
+      "kind": "image",
+      "expectRelevant": false,
+      "gotRelevant": true,
+      "expectLabel": null,
+      "gotLabel": null,
+      "ms": 2248,
+      "inTok": 1719,
+      "outTok": 34,
+      "reason": "The image is too pixelated to determine the shape."
+    },
+    {
+      "path": "images/square/junk_01.png",
+      "kind": "image",
+      "expectRelevant": false,
+      "gotRelevant": true,
+      "expectLabel": null,
+      "gotLabel": null,
+      "ms": 1969,
+      "inTok": 1719,
+      "outTok": 30,
+      "reason": "The image shows a filled square."
+    },
+    {
+      "path": "images/circle/junk_02.png",
+      "kind": "image",
+      "expectRelevant": false,
+      "gotRelevant": true,
+      "expectLabel": null,
+      "gotLabel": null,
+      "ms": 2702,
+      "inTok": 1719,
+      "outTok": 30,
+      "reason": "The image shows a filled circle."
+    },
+    {
+      "path": "images/square/junk_03.png",
+      "kind": "image",
+      "expectRelevant": false,
+      "gotRelevant": true,
+      "expectLabel": null,
+      "gotLabel": null,
+      "ms": 1532,
+      "inTok": 1719,
+      "outTok": 27,
+      "reason": "clearly a square"
+    },
+    {
+      "path": "audio/rain/clip0.wav",
+      "kind": "audio",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": true,
+      "gotLabel": true,
+      "ms": 2556,
+      "inTok": 190,
+      "outTok": 49,
+      "reason": "The audio explicitly mentions 'Heavy rain is expected this afternoon', which directly relates to the 'rain' label."
+    },
+    {
+      "path": "audio/rain/clip1.wav",
+      "kind": "audio",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": true,
+      "gotLabel": true,
+      "ms": 1729,
+      "inTok": 177,
+      "outTok": 44,
+      "reason": "The audio mentions 'showers and thunderstorms', which are related to rain."
+    },
+    {
+      "path": "audio/sun/clip2.wav",
+      "kind": "audio",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": true,
+      "gotLabel": true,
+      "ms": 1798,
+      "inTok": 177,
+      "outTok": 47,
+      "reason": "The audio describes sunny and warm weather with clear blue skies, which matches the 'sun' label."
+    },
+    {
+      "path": "audio/sun/clip3.wav",
+      "kind": "audio",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": true,
+      "gotLabel": true,
+      "ms": 2153,
+      "inTok": 184,
+      "outTok": 53,
+      "reason": "The audio explicitly mentions 'bright sunshine' and 'no clouds at all', which directly aligns with the 'sun' label."
+    },
+    {
+      "path": "audio/sun/clip4.wav",
+      "kind": "audio",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": false,
+      "gotLabel": false,
+      "ms": 5289,
+      "inTok": 179,
+      "outTok": 48,
+      "reason": "The audio mentions 'rain' and 'flooding', which contradicts the 'sun' label."
+    },
+    {
+      "path": "audio/rain/clip5.wav",
+      "kind": "audio",
+      "expectRelevant": false,
+      "gotRelevant": false,
+      "expectLabel": null,
+      "gotLabel": null,
+      "ms": 2668,
+      "inTok": 180,
+      "outTok": 39,
+      "reason": "The audio contains instructions for making batter, not a weather report."
+    },
+    {
+      "path": "audio/sun/clip6.wav",
+      "kind": "audio",
+      "expectRelevant": false,
+      "gotRelevant": true,
+      "expectLabel": null,
+      "gotLabel": null,
+      "ms": 2641,
+      "inTok": 182,
+      "outTok": 37,
+      "reason": "The audio contains a financial statement, not weather information."
+    },
+    {
+      "path": "audio/rain/clip7.wav",
+      "kind": "audio",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": true,
+      "gotLabel": true,
+      "ms": 2907,
+      "inTok": 170,
+      "outTok": 49,
+      "reason": "The audio explicitly mentions 'Drizzle and light rain' which directly relates to the 'rain' label."
+    },
+    {
+      "path": "video/v0.mp4",
+      "kind": "video",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": null,
+      "gotLabel": true,
+      "ms": 1581,
+      "inTok": 423,
+      "outTok": 38,
+      "reason": "A single red ball is visible moving across the frame."
+    },
+    {
+      "path": "video/v1.mp4",
+      "kind": "video",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": null,
+      "gotLabel": true,
+      "ms": 1247,
+      "inTok": 423,
+      "outTok": 38,
+      "reason": "A single red ball is visible moving across the frame."
+    },
+    {
+      "path": "video/v2.mp4",
+      "kind": "video",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": null,
+      "gotLabel": true,
+      "ms": 2260,
+      "inTok": 423,
+      "outTok": 42,
+      "reason": "A single red ball is visible and appears to be moving across the frame."
+    },
+    {
+      "path": "video/v3.mp4",
+      "kind": "video",
+      "expectRelevant": true,
+      "gotRelevant": true,
+      "expectLabel": null,
+      "gotLabel": true,
+      "ms": 750,
+      "inTok": 423,
+      "outTok": 42,
+      "reason": "A single red ball is visible and appears to be moving across the frame."
+    },
+    {
+      "path": "video/v4.mp4",
+      "kind": "video",
+      "expectRelevant": false,
+      "gotRelevant": false,
+      "expectLabel": null,
+      "gotLabel": null,
+      "ms": 1542,
+      "inTok": 423,
+      "outTok": 40,
+      "reason": "The frame shows a title slide with no red ball or movement."
+    },
+    {
+      "path": "video/v5.mp4",
+      "kind": "video",
+      "expectRelevant": false,
+      "gotRelevant": false,
+      "expectLabel": null,
+      "gotLabel": null,
+      "ms": 1909,
+      "inTok": 423,
+      "outTok": 41,
+      "reason": "No red ball or movement is visible; the frame is static noise."
+    }
+  ],
+  "dupRows": [
+    {
+      "pair": "dup/pair0_a.jpg ~ dup/pair0_b.jpg",
+      "duplicate": true,
+      "similarity": 0.9958,
+      "ms": 277
+    },
+    {
+      "pair": "dup/pair1_a.jpg ~ dup/pair1_b.jpg",
+      "duplicate": true,
+      "similarity": 0.9938,
+      "ms": 270
+    },
+    {
+      "pair": "dup/pair2_a.jpg ~ dup/pair2_b.jpg",
+      "duplicate": true,
+      "similarity": 0.9918,
+      "ms": 291
+    },
+    {
+      "pair": "dup/pair3_a.jpg ~ dup/pair3_b.jpg",
+      "duplicate": false,
+      "similarity": 0.9348,
+      "ms": 209
+    },
+    {
+      "pair": "dup/pair4_a.jpg ~ dup/pair4_b.jpg",
+      "duplicate": false,
+      "similarity": 0.9397,
+      "ms": 210
+    },
+    {
+      "pair": "dup/pair5_a.jpg ~ dup/pair5_b.jpg",
+      "duplicate": false,
+      "similarity": 0.9276,
+      "ms": 200
+    }
+  ]
+}

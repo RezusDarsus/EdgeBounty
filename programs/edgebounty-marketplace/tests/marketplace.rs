@@ -554,3 +554,32 @@ fn agreed_arbitrator_resolves_only_its_own_orders() {
     let da = env.dispute_authority.insecure_clone();
     env.resolve(&da, order2, DisputeResolution::Split, 10_000).unwrap();
 }
+
+#[test]
+fn initialization_requires_upgrade_authority() {
+    // A stranger racing the first transaction cannot take over the platform.
+    let mut env = Env::uninitialized();
+    let admin = env.admin.pubkey();
+    env.set_upgrade_authority(Some(admin));
+    let attacker = env.user(0);
+    let err = env.try_initialize(&attacker.kp, 500).unwrap_err();
+    assert!(err.contains("NotUpgradeAuthority"), "got:
+{err}");
+    assert!(env.svm.get_account(&config_pda()).is_none(), "attacker must not create config");
+    let owner = env.admin.insecure_clone();
+    env.try_initialize(&owner, 500).unwrap();
+    let c: PlatformConfig = env.fetch(&config_pda());
+    assert_eq!(c.admin, admin);
+    // Re-initialization is impossible once the config exists.
+    assert!(env.try_initialize(&owner, 100).is_err());
+}
+
+#[test]
+fn immutable_program_cannot_be_initialized() {
+    let mut env = Env::uninitialized();
+    env.set_upgrade_authority(None);
+    let owner = env.admin.insecure_clone();
+    let err = env.try_initialize(&owner, 500).unwrap_err();
+    assert!(err.contains("NotUpgradeAuthority"), "got:
+{err}");
+}

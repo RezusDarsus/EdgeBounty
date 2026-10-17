@@ -46,6 +46,19 @@ async function signIn() {
   return (await app.inject({ method: 'POST', url: '/auth/verify', payload: { wallet: kp.publicKey.toBase58(), nonce: ch.nonce, signature } })).json().token;
 }
 
+it('accepts private infringement reports, prevents duplicate open reports and requires admin review', async () => {
+ const token=await signIn(), other=await signIn();
+ const headers={authorization:`Bearer ${token}`};
+ const [listing]=await ctx.db.insert(schema.listings).values({sellerId:randomUUID(),sellerWallet:Keypair.generate().publicKey.toBase58(),assetId:randomUUID(),assetVersionId:randomUUID(),kind:'dataset',title:'Report fixture',description:'Synthetic fixture',category:'image',licenseId:'fixture',licenseHash:'a'.repeat(64),terms:{},termsHash:'b'.repeat(64),priceMicro:1n,listingIdOnchain:1n,onchainAddress:Keypair.generate().publicKey.toBase58(),status:'published'}).returning();
+ const payload={reason:'I own the original synthetic work referenced in this report.',evidenceUrl:'https://example.com/evidence',goodFaith:true};
+ const sent=await Promise.all([1,2].map(()=>app.inject({method:'POST',url:`/listings/${listing.id}/report`,headers,payload})));
+ expect(sent.map(r=>r.statusCode).sort()).toEqual([200,409]);
+ expect((await app.inject({url:'/me/infringement-reports',headers})).json()).toHaveLength(1);
+ expect((await app.inject({url:'/me/infringement-reports',headers:{authorization:`Bearer ${other}`}})).json()).toHaveLength(0);
+ expect((await app.inject({url:'/admin/infringement-reports',headers})).statusCode).toBe(403);
+ expect((await ctx.db.select().from(schema.listings).where(eq(schema.listings.id,listing.id)))[0].status).toBe('published');
+});
+
 it('deduplicates retention notices and restricts reading/acknowledging them to the owner', async () => {
   const owner = await signIn(), other = await signIn();
   const account = (await ctx.db.select().from(schema.accounts)).at(-2)!;

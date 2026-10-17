@@ -59,7 +59,7 @@ pm2 start "$(command -v solana-test-validator)" --name validator -- \
   --ledger "$HOME/.edgebounty-ledger" \
   --mint "$(solana-keygen pubkey keys/localnet-authority.json)" \
   --bind-address 127.0.0.1 --rpc-port 8899 \
-  --bpf-program "$PROGRAM_ID" "$SO"
+  --upgradeable-program "$PROGRAM_ID" "$SO" keys/localnet-authority.json
 echo "==> waiting for validator"
 for _ in $(seq 1 60); do
   curl -s -X POST -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"getHealth"}' http://127.0.0.1:8899 | grep -q ok && break

@@ -129,6 +129,11 @@ export const DatasetMetrics = z.object({
   relevance: z
     .object({ estimateBps: z.number().int(), lowBps: z.number().int(), highBps: z.number().int(), sampleSize: z.number().int(), method: z.string() })
     .nullable(),
+  /** sampled AI review of audio/video clips (estimate with 95% interval), separate from image relevance */
+  mediaRelevance: z
+    .object({ estimateBps: z.number().int(), lowBps: z.number().int(), highBps: z.number().int(), sampleSize: z.number().int(), method: z.string(), skipped: z.number().int() })
+    .nullable()
+    .optional(),
   /** audio/video container & signal statistics (Phase 5) */
   media: z.record(z.string(), z.unknown()).nullable().optional(),
 });

@@ -19,12 +19,12 @@ export const metadata: Metadata = {
 const FOOTER: [string, [string, string][]][] = [
   ['Marketplace', [['/datasets', 'Datasets'], ['/models', 'Models'], ['/bounties', 'Funded requests'], ['/failure-bounties', 'Failure bounties'], ['/providers', 'Verifiers']]],
   ['Sell', [['/sell', 'List a dataset or model'], ['/provider', 'Become a verifier'], ['/storage', 'Storage'], ['/pricing', 'Fees and pricing']]],
-  ['How it works', [['/how-escrow-works', 'How escrow works'], ['/verify', 'Private verification'], ['/help', 'Help and disputes']]],
+  ['How it works', [['/how-escrow-works', 'How escrow works'], ['/verify', 'Private verification'], ['/help', 'Help and disputes'], ['/developers', 'Developer API']]],
 ];
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${plexSans.variable} ${plexMono.variable} ${newsreader.variable}`}>
+    <html lang="en" data-theme="dark" className={`${plexSans.variable} ${plexMono.variable} ${newsreader.variable}`}>
       <body className="flex min-h-screen flex-col">
         <Providers>
           <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-3 focus:z-50 focus:rounded-md focus:bg-ink focus:px-3 focus:py-2 focus:text-paper">

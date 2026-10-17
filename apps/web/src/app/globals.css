@@ -19,7 +19,7 @@
   --ease-io: cubic-bezier(0.6, 0, 0.2, 1);
   color-scheme: light;
 }
-/* The marketplace is always light. Dark tokens remain only for previewing on /design-system. */
+/* EdgeBounty 2.0 uses Night Ledger by default; the preview can select either palette. */
 :root[data-theme='dark'] {
   --paper: #0c0f17;
   --panel: #131826;

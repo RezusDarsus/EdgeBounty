@@ -2,7 +2,7 @@ import { createCheckout, ensureListingCoverage } from '../lib/billing.js';
 import { checkoutView, platformResultReusable } from '../lib/checkout-view.js';
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
-import { and, desc, eq, gte, ilike, inArray, or, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, gte, ilike, inArray, lte, or, sql } from 'drizzle-orm';
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { randomBytes, randomUUID } from 'node:crypto';
@@ -138,22 +138,42 @@ export function marketplaceRoutes(app: FastifyInstance, ctx: AppContext) {
 
   app.get('/listings', async (req) => {
     const q = parse(
-      z.object({ kind: z.enum(['dataset', 'model', 'code', 'other']).optional(), category: z.string().optional(), q: z.string().max(100).optional(), seller: z.string().optional(), limit: z.coerce.number().int().min(1).max(100).default(30), offset: z.coerce.number().int().min(0).default(0) }),
+      z.object({
+        kind: z.enum(['dataset', 'model', 'code', 'other']).optional(), category: z.string().optional(), q: z.string().trim().max(100).optional(), seller: z.string().optional(),
+        sort: z.enum(['relevance', 'newest', 'price-asc', 'price-desc', 'sales']).optional(),
+        verified: z.enum(['1', 'true']).optional(),
+        minPrice: z.coerce.bigint().min(0n).optional(), maxPrice: z.coerce.bigint().min(0n).optional(),
+        limit: z.coerce.number().int().min(1).max(100).default(30), offset: z.coerce.number().int().min(0).default(0),
+      }),
       req.query,
     );
     const where = [eq(schema.listings.status, 'published')];
     if (q.kind) where.push(eq(schema.listings.kind, q.kind));
     if (q.category) where.push(eq(schema.listings.category, q.category));
     if (q.seller) where.push(eq(schema.listings.sellerWallet, q.seller));
-    if (q.q) where.push(or(ilike(schema.listings.title, `%${q.q}%`), ilike(schema.listings.description, `%${q.q}%`))!);
-    const rows = await db.select().from(schema.listings).where(and(...where)).orderBy(desc(schema.listings.createdAt)).limit(q.limit).offset(q.offset);
-    return { items: await Promise.all(rows.map((l) => publicListing(ctx, l))), categories: DATASET_CATEGORIES };
+    if (q.minPrice !== undefined) where.push(gte(schema.listings.priceMicro, q.minPrice));
+    if (q.maxPrice !== undefined) where.push(lte(schema.listings.priceMicro, q.maxPrice));
+    if (q.verified) where.push(sql`exists (${PASSED_CHECK} and j.asset_version_id = ${schema.listings.assetVersionId})`);
+    // Ranked full-text search (stemmed, uses the listings_search GIN index) plus substring fallback for partial words.
+    const tsQuery = q.q ? sql`websearch_to_tsquery('english', ${q.q})` : null;
+    if (q.q) where.push(or(sql`${LISTING_TSV} @@ ${tsQuery}`, ilike(schema.listings.title, `%${likeEscape(q.q)}%`))!);
+    const sort = q.sort ?? (q.q ? 'relevance' : 'newest');
+    const order = {
+      relevance: tsQuery ? [sql`ts_rank(${LISTING_TSV}, ${tsQuery}) desc`, desc(schema.listings.sales)] : [desc(schema.listings.createdAt)],
+      newest: [desc(schema.listings.createdAt)],
+      'price-asc': [asc(schema.listings.priceMicro)],
+      'price-desc': [desc(schema.listings.priceMicro)],
+      sales: [desc(schema.listings.sales), desc(schema.listings.createdAt)],
+    }[sort];
+    const rows = await db.select().from(schema.listings).where(and(...where)).orderBy(...order, desc(schema.listings.id)).limit(q.limit).offset(q.offset);
+    return { items: await Promise.all(rows.map((l) => publicListing(ctx, l))), categories: DATASET_CATEGORIES, sort };
   });
 
   app.get('/listings/:id', async (req) => {
     const { id } = parse(z.object({ id: zUuid }), req.params);
     const [l] = await db.select().from(schema.listings).where(eq(schema.listings.id, id));
     if (!l || (l.status !== 'published' && l.sellerWallet !== req.session?.wallet && !isAdmin(ctx, req.session))) throw notFound('listing');
+    if (l.status === 'published' && req.session?.accountId !== l.sellerId) await countView(ctx, l.id, req.session?.accountId);
     return publicListing(ctx, l, true);
   });
 
@@ -540,8 +560,29 @@ export function publicOrder(o: typeof schema.orders.$inferSelect) {
   };
 }
 
-async function publicListing(ctx: AppContext, l: typeof schema.listings.$inferSelect, detail = false) {
+/** Title outranks description, description outranks category; must match the listings_search index expression. */
+const LISTING_TSV = sql`(setweight(to_tsvector('english', ${schema.listings.title}), 'A') || setweight(to_tsvector('english', ${schema.listings.description}), 'B') || setweight(to_tsvector('english', ${schema.listings.category}), 'C'))`;
+/** Completed verification at L2 or above whose report passed. */
+const PASSED_CHECK = sql`select 1 from verification_jobs j join verification_results r on r.job_id = j.id where j.status = 'completed' and r.passed and j.level in ('L2', 'L3', 'L4')`;
+const likeEscape = (v: string) => v.replace(/[\\%_]/g, (c) => `\\${c}`);
+
+/** Signed-in viewers count once per listing per day (in-memory); anonymous views are approximate. */
+const seenToday = { day: '', keys: new Set<string>() };
+async function countView(ctx: AppContext, listingId: string, accountId?: string) {
+  const day = new Date().toISOString().slice(0, 10);
+  if (seenToday.day !== day) Object.assign(seenToday, { day, keys: new Set<string>() });
+  if (accountId) {
+    const key = `${accountId}:${listingId}`;
+    if (seenToday.keys.has(key)) return;
+    if (seenToday.keys.size < 200_000) seenToday.keys.add(key);
+  }
+  await ctx.db.execute(sql`insert into listing_views (listing_id, day, views) values (${listingId}::uuid, ${day}::date, 1) on conflict (listing_id, day) do update set views = listing_views.views + 1`).catch(() => {});
+}
+
+export async function publicListing(ctx: AppContext, l: typeof schema.listings.$inferSelect, detail = false) {
   const [v] = await ctx.db.select().from(schema.assetVersions).where(eq(schema.assetVersions.id, l.assetVersionId));
+  const best = await ctx.db.execute(sql`select max(j.level) as level from verification_jobs j join verification_results r on r.job_id = j.id where j.status = 'completed' and r.passed and j.level in ('L2', 'L3', 'L4') and j.asset_version_id = ${l.assetVersionId}::uuid`);
+  const verifiedLevel = ((((best as any).rows ?? best)[0]?.level) ?? null) as string | null;
   const [seller] = await ctx.db.select({ alias: schema.accounts.alias, mode: schema.accounts.mode }).from(schema.accounts).where(eq(schema.accounts.id, l.sellerId));
   let verification = null;
   if (detail) {
@@ -565,6 +606,7 @@ async function publicListing(ctx: AppContext, l: typeof schema.listings.$inferSe
     asset: { versionId: v?.id, fileCount: v?.fileCount, totalSize: v?.totalSize, commitment: v?.commitment },
     previews: preview.map((p, i) => ({ url: `/previews/${l.assetVersionId}/${i}`, kind: p.kind, label: p.label })),
     previewStatus: v?.previewStatus,
+    verifiedLevel,
     verification,
     createdAt: l.createdAt,
   };

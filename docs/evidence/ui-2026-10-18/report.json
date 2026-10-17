@@ -1,0 +1,90 @@
+[
+  {
+    "name": "desktop",
+    "route": "/",
+    "status": 200,
+    "overflow": 0,
+    "h1": "Find the data your AI needs. Fund the data that doesn’t exist.",
+    "theme": "dark",
+    "brokenImages": 0,
+    "errors": [],
+    "screenshot": "desktop-home.png"
+  },
+  {
+    "name": "desktop",
+    "route": "/datasets",
+    "status": 200,
+    "overflow": 0,
+    "h1": "Datasets",
+    "theme": "dark",
+    "brokenImages": 0,
+    "errors": [],
+    "screenshot": "desktop-datasets.png"
+  },
+  {
+    "name": "desktop",
+    "route": "/bounties/new",
+    "status": 200,
+    "overflow": 0,
+    "h1": "Fund a custom request",
+    "theme": "dark",
+    "brokenImages": 0,
+    "errors": [],
+    "screenshot": "desktop-bounties-new.png"
+  },
+  {
+    "name": "desktop",
+    "route": "/design-system",
+    "status": 200,
+    "overflow": 0,
+    "h1": "Datasheet design system",
+    "theme": "light",
+    "brokenImages": 0,
+    "errors": [],
+    "screenshot": "desktop-design-system.png"
+  },
+  {
+    "name": "mobile",
+    "route": "/",
+    "status": 200,
+    "overflow": 0,
+    "h1": "Find the data your AI needs. Fund the data that doesn’t exist.",
+    "theme": "dark",
+    "brokenImages": 0,
+    "errors": [],
+    "screenshot": "mobile-home.png"
+  },
+  {
+    "name": "mobile",
+    "route": "/datasets",
+    "status": 200,
+    "overflow": 0,
+    "h1": "Datasets",
+    "theme": "dark",
+    "brokenImages": 0,
+    "errors": [],
+    "screenshot": "mobile-datasets.png"
+  },
+  {
+    "name": "mobile",
+    "route": "/bounties/new",
+    "status": 200,
+    "overflow": 0,
+    "h1": "Fund a custom request",
+    "theme": "dark",
+    "brokenImages": 0,
+    "errors": [],
+    "screenshot": "mobile-bounties-new.png"
+  },
+  {
+    "name": "mobile",
+    "route": "/design-system",
+    "status": 200,
+    "overflow": 0,
+    "h1": "Datasheet design system",
+    "theme": "light",
+    "brokenImages": 0,
+    "errors": [],
+    "screenshot": "mobile-design-system.png"
+  }
+]

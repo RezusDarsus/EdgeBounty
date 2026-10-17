@@ -7,8 +7,9 @@ import { UNIT, localnetAvailable } from './helpers.js';
 import { actor, hex, ok, png, send, startHarness, uploadAsset, type Harness } from './api-harness.js';
 
 const envFile = join(import.meta.dirname, '..', '..', 'apps', 'api', '.env');
-if (!process.env.NVIDIA_API_KEY && existsSync(envFile)) process.loadEnvFile(envFile);
-const ready = (await localnetAvailable()) && !!process.env.NVIDIA_API_KEY;
+const approved = process.env.RUN_LIVE_AI_TESTS === '1';
+if (approved && !process.env.NVIDIA_API_KEY && existsSync(envFile)) process.loadEnvFile(envFile);
+const ready = approved && (await localnetAvailable()) && !!process.env.NVIDIA_API_KEY;
 
 describe.skipIf(!ready)('Level 3 with NVIDIA (live)', () => {
   let h: Harness;

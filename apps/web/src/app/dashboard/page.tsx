@@ -20,7 +20,9 @@ import { RequireSession } from '@/components/nav';
 
 import { Badge, Button, Card, Empty, ErrorNote, Field, Hash, Page, StateBadge, Tabs, inputCls } from '@/components/ui';
 
-const TABS = ['Buying & requests', 'Selling & contributions', 'My datasets & models', 'Verification', 'Settings'];
+import { MyCollections, MyReceipts, SellerAnalytics } from '@/components/growth';
+
+const TABS = ['Buying & requests', 'Selling & contributions', 'My datasets & models', 'Analytics', 'Collections', 'Receipts', 'Verification', 'Settings'];
 
 export default function Dashboard() {
 
@@ -61,6 +63,12 @@ export default function Dashboard() {
         {tab === 'Selling & contributions' && <Orders role="seller" />}
 
         {tab === 'My datasets & models' && <MyListings />}
+
+        {tab === 'Analytics' && <SellerAnalytics />}
+
+        {tab === 'Collections' && <MyCollections />}
+
+        {tab === 'Receipts' && <MyReceipts />}
 
         {tab === 'Verification' && <MyJobs />}
 

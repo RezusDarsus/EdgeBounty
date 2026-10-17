@@ -133,6 +133,7 @@ export default function OrderWorkspace({ params }: { params: Promise<{ id: strin
             <Card key={v.jobId} title="Verification in progress"><p className="text-sm text-muted">Status: {v.status}{v.error ? ` — ${v.error}` : ''}</p></Card>
           ))}
 
+          {['settled', 'refunded'].includes(state) && (role === 'buyer' || role === 'seller') && <p className="text-sm"><Link className="underline" href={`/orders/${id}/receipt`}>View receipt</Link></p>}
           {['settled', 'refunded'].includes(state) && (role === 'buyer' || role === 'seller') && <ReviewForm orderId={id} />}
         </div>
 

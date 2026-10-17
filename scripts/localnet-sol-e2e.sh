@@ -16,4 +16,4 @@ echo "program $PROGRAM_ID, faucet mint authority $(solana-keygen pubkey "$AUTH")
 exec solana-test-validator --reset --ledger "$LEDGER" \
   --mint "$(solana-keygen pubkey "$AUTH")" \
   --bind-address 127.0.0.1 --rpc-port 8999 --faucet-port 9990 --gossip-port 11000 --dynamic-port-range 11001-11100 \
-  --bpf-program "$PROGRAM_ID" "$SO" >"$HOME/.edgebounty-sol-e2e-validator.log" 2>&1
+  --upgradeable-program "$PROGRAM_ID" "$SO" "$AUTH" >"$HOME/.edgebounty-sol-e2e-validator.log" 2>&1

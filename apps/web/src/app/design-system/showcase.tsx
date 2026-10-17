@@ -19,10 +19,11 @@ export function Showcase() {
   const [tab, setTab] = useState('Overview');
   useEffect(() => {
     const el = document.documentElement;
-    if (theme === 'system') delete el.dataset.theme;
-    else el.dataset.theme = theme;
+    const previous = el.dataset.theme;
+    el.dataset.theme = theme === 'system' ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme;
     return () => {
-      delete el.dataset.theme;
+      if (previous) el.dataset.theme = previous;
+      else delete el.dataset.theme;
     };
   }, [theme]);
 

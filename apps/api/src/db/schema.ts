@@ -1,11 +1,33 @@
 import { sql } from 'drizzle-orm';
-import { bigint, boolean, index, integer, jsonb, pgTable, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
+import { bigint, boolean, date, index, integer, jsonb, pgTable, primaryKey, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
 
 const id = () => uuid('id').primaryKey().defaultRandom();
 const created = () => timestamp('created_at', { withTimezone: true }).notNull().defaultNow();
 const ts = (name: string) => timestamp(name, { withTimezone: true });
 /** lamports (SOL base units; legacy Micro field names), exact integers (never floats) */
 const micro = (name: string) => bigint(name, { mode: 'bigint' });
+
+/** Buyer-curated lists of listings (Phase 5 growth); private unless `public`. */
+export const collections = pgTable('collections', {
+  id: id(), ownerId: uuid('owner_id').notNull(), title: text('title').notNull(), description: text('description').notNull().default(''),
+  public: boolean('public').notNull().default(false), createdAt: created(), updatedAt: ts('updated_at').notNull().defaultNow(),
+}, t => [index('collections_owner').on(t.ownerId)]);
+
+export const collectionItems = pgTable('collection_items', {
+  collectionId: uuid('collection_id').notNull(), listingId: uuid('listing_id').notNull(), note: text('note').notNull().default(''), addedAt: ts('added_at').notNull().defaultNow(),
+}, t => [primaryKey({ columns: [t.collectionId, t.listingId] })]);
+
+/** Approximate daily page views per listing (no IPs or viewer identities stored). */
+export const listingViews = pgTable('listing_views', {
+  listingId: uuid('listing_id').notNull(), day: date('day').notNull(), views: integer('views').notNull().default(0),
+}, t => [primaryKey({ columns: [t.listingId, t.day] })]);
+
+export const infringementReports = pgTable('infringement_reports', {
+  id: id(), reporterId: uuid('reporter_id').notNull(), listingId: uuid('listing_id').notNull(),
+  reason: text('reason').notNull(), evidenceUrl: text('evidence_url').notNull(),
+  status: text('status').notNull().default('open'), resolution: text('resolution'),
+  createdAt: created(), reviewedAt: ts('reviewed_at'),
+}, t => [index('infringement_reports_listing').on(t.listingId)]);
 
 export const notifications = pgTable('notifications', {
   id: id(), accountId: uuid('account_id').notNull(), dedupeKey: text('dedupe_key').notNull().unique(),

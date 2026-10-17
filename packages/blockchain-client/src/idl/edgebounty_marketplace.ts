@@ -1039,6 +1039,13 @@ export type EdgebountyMarketplace = {
           }
         },
         {
+          "name": "program",
+          "address": "6L6441Vus4rUdQXLiGfFtXUtRWbjqg3Lk1AfCjj6x3E"
+        },
+        {
+          "name": "programData"
+        },
+        {
           "name": "paymentMint"
         },
         {
@@ -3238,6 +3245,11 @@ export type EdgebountyMarketplace = {
       "code": 6031,
       "name": "alreadyRevoked",
       "msg": "Attestation already revoked"
+    },
+    {
+      "code": 6032,
+      "name": "notUpgradeAuthority",
+      "msg": "Only the program upgrade authority can initialize the platform"
     }
   ],
   "types": [

@@ -104,6 +104,8 @@ export function nvidiaJudge(cfg: Config, client?: Pick<OpenAI, 'chat'>): ImageJu
           model: cfg.L3_VISION_MODEL,
           temperature: 0,
           max_tokens: 300,
+          // Nemotron models: answer directly instead of emitting a reasoning trace
+          ...(/nemotron/i.test(cfg.L3_VISION_MODEL) ? ({ chat_template_kwargs: { enable_thinking: false } } as object) : {}),
           messages: [
             {
               role: 'user',

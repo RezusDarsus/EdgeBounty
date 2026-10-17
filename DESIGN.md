@@ -1,5 +1,7 @@
 # EdgeBounty — Design System ("Datasheet")
 
+> 2026-10-18 amendment: [docs/DESIGN.md](docs/DESIGN.md) supersedes the light-only product decision below. EdgeBounty 2.0 defaults to the existing Night Ledger palette; retain these components, typefaces and evidence patterns.
+
 ## Brief (binding)
 
 Build the EdgeBounty web app: dataset and model listings, funded requests, failure bounties,

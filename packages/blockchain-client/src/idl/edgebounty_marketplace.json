@@ -1033,6 +1033,13 @@
           }
         },
         {
+          "name": "program",
+          "address": "6L6441Vus4rUdQXLiGfFtXUtRWbjqg3Lk1AfCjj6x3E"
+        },
+        {
+          "name": "program_data"
+        },
+        {
           "name": "payment_mint"
         },
         {
@@ -3232,6 +3239,11 @@
       "code": 6031,
       "name": "AlreadyRevoked",
       "msg": "Attestation already revoked"
+    },
+    {
+      "code": 6032,
+      "name": "NotUpgradeAuthority",
+      "msg": "Only the program upgrade authority can initialize the platform"
     }
   ],
   "types": [

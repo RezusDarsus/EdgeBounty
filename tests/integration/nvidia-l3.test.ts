@@ -8,8 +8,10 @@ import { assessRelevance, explainReport, parseJudgement } from '../../apps/api/s
 import { png } from '../end-to-end/api-harness.js';
 
 const envFile = join(import.meta.dirname, '..', '..', 'apps', 'api', '.env');
-if (!process.env.NVIDIA_API_KEY && existsSync(envFile)) process.loadEnvFile(envFile);
-const live = !!process.env.NVIDIA_API_KEY;
+// A credential is not permission to spend credits during the default test suite.
+const approved = process.env.RUN_LIVE_AI_TESTS === '1';
+if (approved && !process.env.NVIDIA_API_KEY && existsSync(envFile)) process.loadEnvFile(envFile);
+const live = approved && !!process.env.NVIDIA_API_KEY;
 
 describe('parseJudgement', () => {
   it('extracts JSON from chatty model output and rejects garbage', () => {
@@ -32,7 +34,7 @@ describe.skipIf(!live)('NVIDIA L3 (live API)', () => {
     const r = await assessRelevance(cfg, samples, 'real photographs of cats', 3);
     expect(r.apiCalls).toBe(3);
     expect(r.sampleSize + r.undetermined).toBe(3);
-    expect(r.method).toContain('llama-3.2-11b-vision');
+    expect(r.method).toContain(cfg.L3_VISION_MODEL);
     if (r.sampleSize > 0) expect(r.estimateBps).toBeLessThanOrEqual(5000);
 
     const summary = await explainReport(cfg, {

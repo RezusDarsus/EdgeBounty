@@ -11,6 +11,7 @@ import { useSession } from '@/app/providers';
 import { Badge, Button, Card, ErrorNote, EvidenceLadder, Field, Hash, KV, Notice, Page, Skeleton, inputCls } from '@/components/ui';
 import { BPS, DEFAULT_FEE_BPS, computePayout } from '@edgebounty/pricing-engine';
 import { EvidenceTable, ReportView } from '@/components/report';
+import { SaveToCollection } from '@/components/growth';
 
 function InfringementForm({listingId,signedIn}:{listingId:string;signedIn:boolean}) {
  const [reason,setReason]=useState(''),[evidenceUrl,setEvidenceUrl]=useState(''),[goodFaith,setGoodFaith]=useState(false),[sent,setSent]=useState(false),[error,setError]=useState<unknown>(null);
@@ -194,6 +195,7 @@ export default function ListingDetail({ params }: { params: Promise<{ id: string
               </div>
             )}
             {mine && <Badge>Your listing</Badge>}
+            {account && <div className="mt-3"><SaveToCollection listingId={id} /></div>}
             <ErrorNote error={err} />
           </Card>
         </div>

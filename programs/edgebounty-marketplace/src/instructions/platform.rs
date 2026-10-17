@@ -20,12 +20,18 @@ pub struct PlatformParams {
     pub dispute_authority: Pubkey,
 }
 
+/// Only the program's upgrade authority can initialize, so a deployment cannot be taken over by
+/// whoever races the first `initialize_platform` transaction. Immutable programs (no authority) cannot initialize.
 #[derive(Accounts)]
 pub struct InitializePlatform<'info> {
     #[account(mut)]
     pub admin: Signer<'info>,
     #[account(init, payer = admin, space = 8 + PlatformConfig::INIT_SPACE, seeds = [CONFIG_SEED], bump)]
     pub config: Account<'info, PlatformConfig>,
+    #[account(constraint = program.programdata_address()? == Some(program_data.key()) @ EdgeBountyError::NotUpgradeAuthority)]
+    pub program: Program<'info, crate::program::EdgebountyMarketplace>,
+    #[account(constraint = program_data.upgrade_authority_address == Some(admin.key()) @ EdgeBountyError::NotUpgradeAuthority)]
+    pub program_data: Account<'info, ProgramData>,
     pub payment_mint: Account<'info, Mint>,
     #[account(token::mint = payment_mint)]
     pub treasury: Account<'info, TokenAccount>,

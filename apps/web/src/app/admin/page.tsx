@@ -11,7 +11,7 @@ import { useSession } from '@/app/providers';
 import { RequireSession } from '@/components/nav';
 import { Badge, Button, Card, Empty, ErrorNote, Field, Hash, KV, Page, Tabs, inputCls } from '@/components/ui';
 
-const TABS = ['Overview', 'Disputes', 'Providers', 'Moderation', 'Escrow', 'Economics', 'Fraud', 'Audit log'];
+const TABS = ['Overview', 'Metrics', 'Disputes', 'Providers', 'Moderation', 'Escrow', 'Economics', 'Fraud', 'Audit log'];
 
 function InfringementQueue() {
  const {data,error,reload}=useApi<any[]>('/admin/infringement-reports');
@@ -33,16 +33,41 @@ export default function Admin() {
         <Page kicker="Operations" title="Administration" subtitle="Every action here is recorded in the audit log. Administrative powers are limited by the program: no one can redirect escrowed funds.">
           <Tabs tabs={TABS} active={tab} onChange={setTab} />
           {tab === 'Overview' && <Overview />}
+          {tab === 'Metrics' && <Metrics />}
           {tab === 'Disputes' && <Disputes />}
           {tab === 'Providers' && <ProvidersAdmin />}
           {tab === 'Moderation' && <><InfringementQueue /><Moderation /></>}
           {tab === 'Escrow' && <Escrow />}
-          {tab === 'Economics' && <Economics />}
+          {tab === 'Economics' && <><Economics /><CloudflareReconciliation /></>}
           {tab === 'Fraud' && <Fraud />}
           {tab === 'Audit log' && <AuditLog />}
         </Page>
       )}
     </RequireSession>
+  );
+}
+
+/** Marketplace health metrics from master plan section 17; money and costs live under Economics. */
+function Metrics() {
+  const [days, setDays] = useState(30);
+  const { data: m, error } = useApi<any>(`/admin/metrics?days=${days}`, [days]);
+  const bps = (v: number | null) => (v === null ? '—' : `${(v / 100).toFixed(1)}%`);
+  return (
+    <>
+      <div className="mb-4 flex items-center gap-2 text-sm text-muted">Period
+        <select className={`${inputCls} w-auto py-1`} value={days} onChange={(e) => setDays(Number(e.target.value))}>{[7, 30, 90, 365].map((d) => <option key={d} value={d}>{d} days</option>)}</select>
+      </div>
+      <ErrorNote error={error} />
+      {m && (
+        <div className="grid gap-4 md:grid-cols-2">
+          <Card title="Marketplace"><KV rows={[['GMV (settled sales)', sol(m.marketplace.gmvMicro)], ['Completed sales', m.marketplace.completedSales], ['Average sale', m.marketplace.averageSaleMicro ? sol(m.marketplace.averageSaleMicro) : '—'], ['Commission earned', sol(m.marketplace.commissionMicro)], ['Refunded orders', m.marketplace.refundedOrders], ['Listing views', m.marketplace.listingViews.toLocaleString('en-US')], ['View → sale', bps(m.marketplace.viewToSaleBps)]]} /></Card>
+          <Card title="Customers"><KV rows={[['Active buyers', m.customers.activeBuyers], ['Repeat buyers', m.customers.repeatBuyers], ['Active sellers', m.customers.activeSellers]]} /></Card>
+          <Card title="Bounties"><KV rows={[['Created', m.bounties.created], ['By state', Object.entries(m.bounties.byState).map(([k, v]) => `${k}: ${v}`).join(', ') || '—']]} /></Card>
+          <Card title="Verification and delivery"><KV rows={[['Verification results', m.verification.results], ['Reused (no new AI spend)', `${m.verification.reused} · ${bps(m.verification.cacheHitBps)}`], ['Authorized downloads', m.downloads.authorizedTransfers], ['Authorized bytes', bytes(Number(m.downloads.authorizedBytes))]]} /></Card>
+          {m.notes.map((n: string) => <p key={n} className="text-xs text-muted md:col-span-2">{n}</p>)}
+        </div>
+      )}
+    </>
   );
 }
 
@@ -157,6 +182,39 @@ function Escrow() {
     <Card title="Escrow reconciliation" right={data.ok ? <Badge tone="good">all vaults match</Badge> : <Badge tone="bad">{data.mismatches.length} mismatches</Badge>}>
       <p className="text-sm">Checked {data.checked} live vaults against recorded liabilities (amount + verifier fee).</p>
       {data.mismatches.map((m: any) => <p key={m.order} className="mono text-xs text-bad">{m.address}: expected {m.expected}, actual {m.actual}</p>)}
+    </Card>
+  );
+}
+
+/** Cloudflare-measured R2/Worker usage next to the API's own counters. */
+function CloudflareReconciliation() {
+  const { data, error } = useApi<any>('/admin/reconciliation/cloudflare');
+  const usd = (micro: string) => `$${(Number(micro) / 1e6).toFixed(2)}`;
+  return (
+    <Card title="Cloudflare usage reconciliation" className="mt-8" right={data?.usage ? `${date(data.usage.period.from)} – today` : undefined}>
+      <ErrorNote error={error} />
+      {data && !data.configured && <Empty>{data.reason}</Empty>}
+      {data?.configured && (
+        <>
+          <KV rows={[
+            ['R2 Class A operations', data.usage.r2.classA.toLocaleString('en-US')],
+            ['R2 Class B operations', data.usage.r2.classB.toLocaleString('en-US')],
+            ['Stored', `${bytes(data.usage.r2.storageBytes)} in ${data.usage.r2.objectCount} objects`],
+            ['Worker requests', `${data.worker.cloudflareRequests.toLocaleString('en-US')} (authorized transfers: ${data.worker.authorizedTransfersMonthToDate})`],
+            ['Estimated charges (month to date)', `${usd(data.usage.estimate.totalMicro)} · Workers plan: ${data.usage.estimate.plan}`],
+          ]} />
+          <p className="mt-2 text-xs text-muted">{data.usage.estimate.basis}</p>
+          <table className="mt-5 w-full text-left text-sm">
+            <thead className="text-xs text-muted"><tr><th className="py-1.5">Operation</th><th>Class</th><th className="text-right">Cloudflare (month)</th><th className="text-right">API seen (all time)</th></tr></thead>
+            <tbody>
+              {data.comparison.map((r: any) => (
+                <tr key={r.action} className="border-t border-line" title={r.note}><td className="py-1.5">{r.action}{r.note ? ' *' : ''}</td><td>{r.class}</td><td className="num text-right">{r.cloudflareMonthToDate}</td><td className="num text-right">{r.apiObservedAllTime}</td></tr>
+              ))}
+            </tbody>
+          </table>
+          <p className="mt-2 text-xs text-muted">* Browsers upload parts and the Worker reads objects directly, so the API never sees those calls.</p>
+        </>
+      )}
     </Card>
   );
 }

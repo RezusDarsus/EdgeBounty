@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useApi } from '@/lib/hooks';
 import { bytes, sol } from '@/lib/format';
 import { previewUrl } from '@/lib/api';
@@ -8,7 +8,7 @@ import { Badge, Empty, ErrorNote, Page, Skeleton, inputCls } from './ui';
 import { Specimen, shapeFor } from './brand';
 
 const PAGE = 24;
-type Sort = 'newest' | 'price-asc' | 'price-desc' | 'sales';
+type Sort = 'relevance' | 'newest' | 'price-asc' | 'price-desc' | 'sales';
 
 export function ListingGrid({ kind, title, subtitle }: { kind: 'dataset' | 'model'; title: string; subtitle: string }) {
   const [q, setQ] = useState('');
@@ -16,11 +16,13 @@ export function ListingGrid({ kind, title, subtitle }: { kind: 'dataset' | 'mode
   const [category, setCategory] = useState('');
   const [offset, setOffset] = useState(0);
   const [sort, setSort] = useState<Sort>('newest');
+  const [verified, setVerified] = useState(false);
   const [view, setView] = useState<'grid' | 'list'>('grid');
   useEffect(() => {
     const t = setTimeout(() => {
       setDebounced(q);
       setOffset(0);
+      if (q && sort === 'newest') setSort('relevance');
     }, 250);
     return () => clearTimeout(t);
   }, [q]);
@@ -36,17 +38,14 @@ export function ListingGrid({ kind, title, subtitle }: { kind: 'dataset' | 'mode
       localStorage.setItem('eb:view', v);
     } catch {}
   };
+  // relevance only makes sense with a search term; fall back to newest when it is cleared
+  const effectiveSort: Sort = sort === 'relevance' && !debounced ? 'newest' : sort;
   const { data, error, loading } = useApi<{ items: any[]; categories: string[] }>(
-    `/listings?kind=${kind}&limit=${PAGE}&offset=${offset}${debounced ? `&q=${encodeURIComponent(debounced)}` : ''}${category ? `&category=${category}` : ''}`,
-    [debounced, category, offset],
+    `/listings?kind=${kind}&limit=${PAGE}&offset=${offset}${debounced ? `&q=${encodeURIComponent(debounced)}` : ''}${category ? `&category=${category}` : ''}&sort=${effectiveSort}${verified ? '&verified=1' : ''}`,
+    [debounced, category, offset, effectiveSort, verified],
   );
-  const items = useMemo(() => {
-    const list = [...(data?.items ?? [])];
-    if (sort === 'price-asc') list.sort((a, b) => Number(BigInt(a.priceMicro) - BigInt(b.priceMicro)));
-    if (sort === 'price-desc') list.sort((a, b) => Number(BigInt(b.priceMicro) - BigInt(a.priceMicro)));
-    if (sort === 'sales') list.sort((a, b) => b.sales - a.sales);
-    return list;
-  }, [data, sort]);
+  // sorting happens on the server so every page is ordered consistently, not just the visible one
+  const items = data?.items ?? [];
   const noun = kind === 'model' ? 'models' : 'datasets';
 
   return (
@@ -83,6 +82,10 @@ export function ListingGrid({ kind, title, subtitle }: { kind: 'dataset' | 'mode
               );
             })}
           </div>
+          <label className="mt-6 flex items-start gap-2 text-sm text-ink-2">
+            <input type="checkbox" className="mt-0.5" checked={verified} onChange={(e) => { setVerified(e.target.checked); setOffset(0); }} />
+            <span>Passed Level 2 or higher only</span>
+          </label>
           <p className="mt-6 hidden text-xs leading-relaxed text-muted lg:block">
             Published {noun} passed at least the check level the seller paid for. Open a listing to read its reports and their limitations.
           </p>
@@ -96,7 +99,8 @@ export function ListingGrid({ kind, title, subtitle }: { kind: 'dataset' | 'mode
             <div className="flex items-center gap-2">
               <label className="flex items-center gap-2 whitespace-nowrap text-sm text-muted">
                 <span className="hidden sm:inline">Sort</span>
-                <select className={`${inputCls} w-auto py-1.5`} value={sort} onChange={(e) => setSort(e.target.value as Sort)}>
+                <select className={`${inputCls} w-auto py-1.5`} value={effectiveSort} onChange={(e) => { setSort(e.target.value as Sort); setOffset(0); }}>
+                  {debounced && <option value="relevance">Best match</option>}
                   <option value="newest">Newest</option>
                   <option value="price-asc">Price, low to high</option>
                   <option value="price-desc">Price, high to low</option>
@@ -128,7 +132,7 @@ export function ListingGrid({ kind, title, subtitle }: { kind: 'dataset' | 'mode
           )}
           {data && data.items.length === 0 && (
             <Empty>
-              {debounced || category ? (
+              {debounced || category || verified ? (
                 <>No {noun} match these filters. Clear the search or pick another category.</>
               ) : (
                 <>
@@ -144,7 +148,7 @@ export function ListingGrid({ kind, title, subtitle }: { kind: 'dataset' | 'mode
                 <li key={l.id} className="rise" style={{ animationDelay: `${Math.min(i, 8) * 40}ms` }}>
                   <Link href={`/listings/${l.id}`} className="group flex h-full flex-col border-t-[3px] border-ink pt-3">
                     <div className="flex items-baseline justify-between gap-3 border-b border-ink/25 pb-2">
-                      <span className="kicker truncate">{l.category.replace(/_/g, ' ')}</span>
+                      <span className="kicker truncate">{l.category.replace(/_/g, ' ')}{l.verifiedLevel && <span className="ml-2 normal-case tracking-normal text-good">· passed {l.verifiedLevel}</span>}</span>
                       <span className="mono shrink-0 text-[11px] uppercase text-muted">{l.formats?.slice(0, 2).join(' · ') || l.kind}</span>
                     </div>
                     {l.previews?.[0]?.kind === 'image' && <Thumb l={l} className="mt-3 aspect-[16/9] w-full rounded-[2px]" />}

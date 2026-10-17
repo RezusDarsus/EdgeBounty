@@ -25,6 +25,8 @@ import type { EdgebountyMarketplace } from './idl/edgebounty_marketplace';
 import { pdas, PROGRAM_ID } from './pdas';
 import { decodeAttestation, decodeFailureBounty, decodeJob, decodeListing, decodeOrder, decodeProvider, decodeConfig, type OrderView } from './decode';
 
+const BPF_LOADER_UPGRADEABLE = new PublicKey('BPFLoaderUpgradeab1e11111111111111111111111');
+
 export type Bytes32 = Uint8Array | number[];
 const arr = (b: Bytes32): number[] => {
   const a = Array.from(b);
@@ -220,9 +222,13 @@ export class EdgeBountyClient {
     return [
       await this.m
         .initializePlatform(this.platformArgs(p))
-        .accountsStrict({ admin, config: this.pda.config(), paymentMint: mint, treasury, systemProgram: SystemProgram.programId })
+        .accountsStrict({ admin, config: this.pda.config(), program: this.programId, programData: this.programData(), paymentMint: mint, treasury, systemProgram: SystemProgram.programId })
         .instruction(),
     ];
+  }
+  /** The upgradeable-loader ProgramData account; its upgrade authority is the only allowed initializer. */
+  programData() {
+    return PublicKey.findProgramAddressSync([this.programId.toBuffer()], BPF_LOADER_UPGRADEABLE)[0];
   }
   private platformArgs(p: PlatformParams) {
     return { feeBps: p.feeBps, reviewWindowSecs: bn(p.reviewWindowSecs), correctionWindowSecs: bn(p.correctionWindowSecs), failureBountyGraceSecs: bn(p.failureBountyGraceSecs), disputeAuthority: p.disputeAuthority };

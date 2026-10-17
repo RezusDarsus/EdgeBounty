@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { CatalogDiscovery } from '@/components/catalog-discovery';
 import { DatasheetFigure } from '@/components/datasheet-figure';
 
 const ESCROW: [string, string, string][] = [
@@ -17,8 +18,8 @@ const INDEX: [string, string, string][] = [
 ];
 
 const LEVELS: [string, string, string, string][] = [
-  ['L1', 'Technical checks', 'Every file opens; formats parse; corrupt files, exact duplicates, image sizes and null cells are counted.', 'Free within limits'],
-  ['L2', 'Sampled AI review', 'Perceptual near-duplicates and outliers are flagged, and a random sample is checked for relevance to the stated task — reported with a confidence interval.', 'Paid by seller'],
+  ['L1', 'Technical checks', 'Checks attempt to open and parse files within the verification budget. Reports count detected corruption, exact duplicates, image sizes and null cells.', 'Free within limits'],
+  ['L2', 'Structural and sample checks', 'Budgeted file and schema checks report detected corruption, duplicates and structural findings. Read the report for the actual scope and untested requirements.', 'Paid by seller'],
   ['L3', 'Advanced review', 'Deeper sampled AI analysis within a capped budget, plus text-similarity checks against the seller’s own earlier uploads.', 'Paid by seller'],
   ['L4', 'Human review', 'A person reviews the delivery against the stated criteria. Quoted case by case.', 'Quoted manually'],
 ];
@@ -34,7 +35,7 @@ export default function Home() {
           <div>
             <p className="kicker mb-6">Datasets · models · funded requests — settled in USDC on Solana</p>
             <h1 className="display text-[42px] sm:text-[54px] lg:text-[62px]">
-              Buy training data on evidence, <em className="text-ink-2">not on a seller’s&nbsp;word.</em>
+              Find the data your AI needs. <em className="text-ink-2">Fund the data that doesn’t exist.</em>
             </h1>
           </div>
           <div className="lg:pb-2">
@@ -43,10 +44,10 @@ export default function Home() {
             </p>
             <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3">
               <Link href="/datasets" className="inline-flex h-11 items-center gap-2 rounded-md bg-accent px-5 text-[15px] font-medium text-accent-ink transition-colors hover:bg-[color-mix(in_oklab,var(--accent),var(--ink)_18%)]">
-                Browse datasets <span aria-hidden="true">→</span>
+                Explore marketplace <span aria-hidden="true">→</span>
               </Link>
               <Link href="/bounties/new" className={more}>
-                Fund data that doesn’t exist yet
+                Create a bounty
               </Link>
             </div>
           </div>
@@ -55,6 +56,8 @@ export default function Home() {
           <DatasheetFigure />
         </div>
       </section>
+
+      <CatalogDiscovery />
 
       {/* The two problems */}
       <section className="border-y border-line bg-panel">

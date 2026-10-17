@@ -2,7 +2,7 @@
 use {
     anchor_lang::{
         prelude::{Clock, Pubkey},
-        solana_program::{instruction::Instruction, system_program},
+        solana_program::{bpf_loader_upgradeable, instruction::Instruction, system_program},
         AccountDeserialize, InstructionData, ToAccountMetas,
     },
     anchor_spl::token::spl_token,
@@ -105,6 +105,15 @@ pub fn instr(data: impl InstructionData, accounts: impl ToAccountMetas) -> Instr
 
 impl Env {
     pub fn new() -> Self {
+        let mut env = Self::uninitialized();
+        let admin = env.admin.pubkey();
+        env.set_upgrade_authority(Some(admin));
+        env.initialize(500);
+        env
+    }
+
+    /// Program loaded (upgradeable, no authority yet) with mint/treasury created, platform not initialized.
+    pub fn uninitialized() -> Self {
         let mut svm = LiteSVM::new();
         let bytes = include_bytes!(concat!(
             env!("CARGO_TARGET_TMPDIR"),
@@ -128,8 +137,24 @@ impl Env {
         let admin_key = env.admin.pubkey();
         let treasury = env.treasury;
         env.create_token_account(treasury, mint, admin_key, 0);
-        env.initialize(500);
         env
+    }
+
+    pub fn programdata_pda() -> Pubkey {
+        Pubkey::find_program_address(&[pid().as_ref()], &bpf_loader_upgradeable::ID).0
+    }
+
+    /// Rewrites the ProgramData header: bincode tag u32 (3) | slot u64 | Option<Pubkey> (tag byte + 32 bytes).
+    pub fn set_upgrade_authority(&mut self, authority: Option<Pubkey>) {
+        let key = Self::programdata_pda();
+        let mut account = self.svm.get_account(&key).expect("programdata missing");
+        assert_eq!(&account.data[..4], &3u32.to_le_bytes(), "not a ProgramData account");
+        account.data[12..45].fill(0);
+        if let Some(a) = authority {
+            account.data[12] = 1;
+            account.data[13..45].copy_from_slice(a.as_ref());
+        }
+        self.svm.set_account(key, account).unwrap();
     }
 
     pub fn set_time(&mut self, ts: i64) {
@@ -247,18 +272,26 @@ impl Env {
     }
 
     fn initialize(&mut self, fee_bps: u16) {
+        let admin = self.admin.insecure_clone();
+        if let Err(e) = self.try_initialize(&admin, fee_bps) {
+            panic!("transaction failed: {e}");
+        }
+    }
+
+    pub fn try_initialize(&mut self, signer: &Keypair, fee_bps: u16) -> Result<(), String> {
         let i = instr(
             ix::InitializePlatform { params: self.params(fee_bps) },
             acc::InitializePlatform {
-                admin: self.admin.pubkey(),
+                admin: signer.pubkey(),
                 config: config_pda(),
+                program: pid(),
+                program_data: Self::programdata_pda(),
                 payment_mint: self.mint,
                 treasury: self.treasury,
                 system_program: system_program::ID,
             },
         );
-        let admin = self.admin.insecure_clone();
-        self.ok(&[i], &[&admin]);
+        self.send(&[i], &[signer])
     }
 
     pub fn update_fee(&mut self, fee_bps: u16) -> Result<(), String> {
