@@ -16,7 +16,7 @@ USDC, escrow, licensing and check levels. Never imply a guarantee the system can
 | Bounty create | Inline notice next to button | "Before you sign" ledger: reward, verification fee, total moving into escrow; network fees separate | Shows the financial breakdown before the transaction, using only values the page already computed. |
 | Sign-in gate | "Sign in required" | "Sign in with your wallet to continue" + 3-step explanation, "moves no funds and authorizes no payment" | Wallet sign-in explained for non-crypto users. |
 | Wallet button states | "Signing in…" / "Connecting…" | "Waiting for signature…" / "Connecting wallet…" | Tells the user that the next action is in their wallet. |
-| Footer | "Test-chain MVP — not fully trustless" | "Test-network MVP. The escrow program is not audited and not every step is trustless." | Same honesty, said plainly. |
+| Footer | "Test-chain MVP — not fully trustless" | "Test-network MVP. The escrow program is not audited, and some steps — delivery and dispute review — run off-chain." | Same honesty, but it names which steps instead of using "trustless". |
 | 404 | (Next default) | "There's no page at this address… Orders and payments are not affected by a missing page." | Reassures on the one thing users fear. |
 
 Removed or avoided everywhere: "seamless", "unlock the power", "revolutionary", "next-generation",
