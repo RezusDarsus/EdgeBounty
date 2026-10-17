@@ -15,7 +15,7 @@ const SPEC: [string, string][] = [
 
 const RUNGS: [string, string, string, boolean][] = [
   ['L1', 'Technical checks', '0 corrupt · 14 exact duplicates', true],
-  ['L2', 'Sampled AI review', 'relevance 96.1% · CI 94.0–97.6 · n=400', true],
+  ['L2', 'Sampled AI review', 'relevance 96.1% · 95% CI 94.0–97.6 · n=400', true],
   ['L3', 'Advanced review', 'not run', false],
   ['L4', 'Human review', 'not run', false],
 ];
@@ -52,7 +52,7 @@ export function DatasheetFigure() {
           </div>
 
           <div className="mt-7 md:mt-1">
-            <p className="kicker mb-3">Evidence on file</p>
+            <p className="kicker mb-3">Completed checks</p>
             <ol className="border-t border-ink/70 text-[15px]">
               {RUNGS.map(([l, name, note, done], i) => (
                 <li key={l} className="rise grid grid-cols-[30px_1fr] items-baseline gap-x-3 border-b border-line py-2 last:border-0" style={d(640 + i * 160)}>
@@ -64,7 +64,7 @@ export function DatasheetFigure() {
             </ol>
             <p className="rise mt-4 font-serif text-[16px] italic leading-snug text-ink-2" style={d(1300)}>
               “Every label hand-checked.”<sup className="not-italic text-muted">*</sup>
-              <span className="mt-1 block font-sans text-[13px] not-italic text-muted">* the seller’s claim — not checked by EdgeBounty</span>
+              <span className="mt-1 block font-sans text-[13px] not-italic text-muted">* seller statement; not assessed by EdgeBounty</span>
             </p>
           </div>
         </div>
@@ -89,7 +89,7 @@ export function DatasheetFigure() {
         </div>
       </div>
       <figcaption className="mt-3 text-[13px] leading-relaxed text-muted">
-        <span className="font-medium text-ink">Fig. 1.</span> A listing as the buyer reads it: what was checked, what the seller only claims, and where the money sits. The 6% platform fee comes out of the seller’s share at settlement. Illustrative values.
+        <span className="font-medium text-ink">Fig. 1.</span> A buyer’s view of a listing: completed checks, seller statements and the escrow balance. The 6% platform fee is deducted from the seller’s share at settlement. Values are illustrative.
       </figcaption>
     </figure>
   );

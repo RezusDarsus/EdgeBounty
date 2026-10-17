@@ -10,7 +10,7 @@ import { Mark } from './brand';
 import { buttonCls } from './ui';
 const WalletMultiButton = dynamic(() => import('@solana/wallet-adapter-react-ui').then((m) => m.WalletMultiButton), { ssr: false });
 const LINKS = [
-  ['/assistant', 'Ask AI'],
+  ['/assistant', 'AI assistant'],
   ['/datasets', 'Datasets'],
   ['/models', 'Models'],
   ['/bounties', 'Funded requests'],
@@ -33,8 +33,8 @@ export function Nav() {
     try {
       const { api } = await import('@/lib/api');
       const funds = await api<{ sol: number; mockUsdc?: number }>('/dev/faucet', { body: { wallet: account!.wallet } });
-      setSuccess(`Added ${funds.sol} test SOL${funds.mockUsdc ? ` and ${funds.mockUsdc} test USDC` : ''}. These funds have no real value.`);
-    } catch (e) { setErr(e instanceof Error ? e.message : 'Could not get test funds. Try again.'); }
+      setSuccess(`Added ${funds.sol} test SOL${funds.mockUsdc ? ` and ${funds.mockUsdc} test USDC` : ''}. These tokens have no monetary value.`);
+    } catch (e) { setErr(e instanceof Error ? e.message : 'Test funds could not be added. Please try again.'); }
     finally { setFunding(false); }
   }
   return (
@@ -92,10 +92,10 @@ export function Nav() {
               }}
               className="rounded-md px-2 py-1.5 text-sm text-muted hover:text-ink"
             >
-              Change
+              Change wallet
             </button>
           )}
-          <button className="shrink-0 rounded-md p-2 text-ink hover:bg-sunk lg:hidden" onClick={() => setOpen(!open)} aria-label="Menu" aria-expanded={open}>
+          <button className="shrink-0 rounded-md p-2 text-ink hover:bg-sunk lg:hidden" onClick={() => setOpen(!open)} aria-label="Open menu" aria-expanded={open}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
           </button>
         </div>

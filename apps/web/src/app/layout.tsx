@@ -14,7 +14,7 @@ const newsreader = Gloock({ subsets: ['latin'], weight: '400', variable: '--font
 
 export const metadata: Metadata = {
   title: { default: 'EdgeBounty — datasets and models, sold on evidence', template: '%s · EdgeBounty' },
-  description: 'Buy and sell AI datasets and models, or fund the data you need. Payment sits in USDC escrow on Solana until delivery, and every listing shows what was actually checked.',
+  description: 'Buy and sell AI datasets and models, or fund the data you need. USDC remains in Solana escrow until the order is settled, and every listing shows which checks were completed.',
 };
 
 const FOOTER: [string, [string, string][]][] = [

@@ -4,25 +4,25 @@ import { RecentListings } from '@/components/recent-listings';
 import { DatasheetFigure } from '@/components/datasheet-figure';
 
 const ESCROW: [string, string, string][] = [
-  ['Funded', 'The buyer signs one transaction. USDC moves into a vault controlled by the EdgeBounty program — not by us, and not by the seller.', 'funded'],
-  ['Delivered', 'The seller uploads to private storage. A fingerprint of that exact version is recorded on-chain; the files themselves are not.', 'submitted'],
-  ['Reviewed', 'Checks run on the delivered version. The buyer approves, asks for a correction, or opens a dispute.', 'under_review'],
-  ['Settled', 'Funds release once: 94% to the seller, 6% platform fee. Only then does the full download unlock.', 'settled'],
+  ['Funded', 'The buyer signs a transaction that places USDC in a vault controlled by the EdgeBounty program.', 'funded'],
+  ['Delivered', 'The seller uploads the files to private storage. The chain records a fingerprint of that specific version, not the files themselves.', 'submitted'],
+  ['Reviewed', 'Checks run against the delivered version. The buyer can approve it, request a correction or open a dispute.', 'under_review'],
+  ['Settled', 'Funds are released once: 94% to the seller and 6% as the platform fee. Full downloads become available after settlement.', 'settled'],
 ];
 
 const INDEX: [string, string, string][] = [
-  ['/datasets', 'Datasets', 'Image, tabular and text data with previews, schemas and check reports.'],
-  ['/models', 'Models', 'ONNX models with static inspection and sandboxed benchmark results.'],
-  ['/bounties', 'Funded requests', 'Commissioned data work with the budget already in escrow.'],
-  ['/failure-bounties', 'Failure bounties', 'Pay for confirmed examples where a model gets it wrong.'],
-  ['/providers', 'Verifiers', 'Independent reviewers you can add to an order, paid for the work — not for a pass.'],
+  ['/datasets', 'Datasets', 'Image, tabular and text data, with previews, schemas and reports on completed checks.'],
+  ['/models', 'Models', 'ONNX models with static inspection and benchmark results from an isolated environment.'],
+  ['/bounties', 'Funded requests', 'Commission data collection with the agreed budget held in escrow.'],
+  ['/failure-bounties', 'Failure bounties', 'Submit examples that demonstrate a model failure and earn a reward when confirmed.'],
+  ['/providers', 'Verifiers', 'Engage independent reviewers for an order. Providers are paid for their work, regardless of the verdict.'],
 ];
 
 const LEVELS: [string, string, string, string][] = [
-  ['L1', 'Technical checks', 'Checks attempt to open and parse files within the verification budget. Reports count detected corruption, exact duplicates, image sizes and null cells.', 'Free within limits'],
-  ['L2', 'Structural and sample checks', 'Budgeted file and schema checks report detected corruption, duplicates and structural findings. Read the report for the actual scope and untested requirements.', 'Paid by seller'],
-  ['L3', 'Advanced review', 'Deeper sampled AI analysis within a capped budget, plus text-similarity checks against the seller’s own earlier uploads.', 'Paid by seller'],
-  ['L4', 'Human review', 'A person reviews the delivery against the stated criteria. Quoted case by case.', 'Quoted manually'],
+  ['L1', 'Technical checks', 'Files are opened and parsed within the verification budget. Reports identify detected corruption, exact duplicates, image dimensions and null values.', 'Free within limits'],
+  ['L2', 'Structural and sample checks', 'Budgeted file and schema checks report detected corruption, duplicates and structural findings. Review the report for its scope and any untested requirements.', 'Paid by seller'],
+  ['L3', 'Advanced review', 'Sampled AI analysis within a defined budget, supplemented by text-similarity checks against the seller’s previous uploads.', 'Paid by seller'],
+  ['L4', 'Human review', 'A reviewer assesses the delivery against the stated criteria. The service is quoted individually.', 'Quoted individually'],
 ];
 
 const more = 'inline-flex items-center gap-2 text-sm font-medium underline decoration-line underline-offset-4 transition-colors hover:decoration-ink';
@@ -34,21 +34,21 @@ export default function Home() {
       <section className="mx-auto max-w-6xl px-4 pb-20 pt-12 sm:px-6 md:pt-20">
         <div className="rise grid items-end gap-x-16 gap-y-8 lg:grid-cols-[1.3fr_1fr]">
           <div>
-            <p className="kicker mb-6">Datasets · models · funded requests — settled in USDC on Solana</p>
+            <p className="kicker mb-6">Datasets · models · funded requests · USDC settlement on Solana</p>
             <h1 className="display text-[42px] sm:text-[54px] lg:text-[62px]">
-              Find the data your AI needs. <em className="text-ink-2">Fund the data that doesn’t exist.</em>
+              Find the data your AI needs. <em className="text-ink-2">Commission what does not exist yet.</em>
             </h1>
           </div>
           <div className="lg:pb-2">
             <p className="max-w-[46ch] text-[17px] leading-relaxed text-ink-2">
-              Every listing shows which checks actually ran on the exact files you’d receive — and which statements are only the seller’s. Your USDC waits in a Solana escrow until the data is delivered.
+              Each listing distinguishes checks performed on the exact files offered from claims made by the seller. Your USDC remains in Solana escrow until delivery.
             </p>
             <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3">
               <Link href="/datasets" className="inline-flex h-11 items-center gap-2 rounded-md bg-accent px-5 text-[15px] font-medium text-accent-ink transition-colors hover:bg-[color-mix(in_oklab,var(--accent),var(--ink)_18%)]">
-                Explore marketplace <span aria-hidden="true">→</span>
+                Explore the marketplace <span aria-hidden="true">→</span>
               </Link>
               <Link href="/bounties/new" className={more}>
-                Create a bounty
+                Create a funded request
               </Link>
             </div>
           </div>
@@ -60,16 +60,16 @@ export default function Home() {
 
       <CatalogDiscovery />
       <RecentListings />
-      <section className="mx-auto max-w-6xl border-t border-line px-4 py-10 sm:px-6"><h2 className="display text-3xl">Describe what you need. Work through it with AI.</h2><p className="mt-3 max-w-[65ch] text-ink-2">Search real listings, draft a bounty, suggest metadata for your own uploads or understand a verification report. You stay in control of publishing and payments.</p><Link href="/assistant" className="mt-5 inline-flex min-h-11 items-center rounded-md bg-accent px-5 text-sm font-medium text-accent-ink">Open AI assistant</Link></section>
+      <section className="mx-auto max-w-6xl border-t border-line px-4 py-10 sm:px-6"><h2 className="display text-3xl">Turn your requirements into a clear plan with AI.</h2><p className="mt-3 max-w-[65ch] text-ink-2">Search published listings, prepare a funded request, draft metadata for an upload or review a verification report. You approve all content before publishing and authorize every payment.</p><Link href="/assistant" className="mt-5 inline-flex min-h-11 items-center rounded-md bg-accent px-5 text-sm font-medium text-accent-ink">Open the AI assistant</Link></section>
 
       {/* The two problems */}
       <section className="border-y border-line bg-panel">
         <div className="mx-auto grid max-w-6xl px-4 sm:px-6 md:grid-cols-2">
           <article className="border-b border-line py-14 md:border-b-0 md:border-r md:py-20 md:pr-12">
             <p className="kicker mb-5">For buyers</p>
-            <h2 className="display text-[30px] md:text-[34px]">The dataset you need is for sale somewhere. You just can’t tell if it’s any good.</h2>
+            <h2 className="display text-[30px] md:text-[34px]">The dataset you need may already exist. Its quality is harder to assess.</h2>
             <p className="mt-4 max-w-[52ch] text-ink-2">
-              Sample previews, schemas and check reports for the exact version on sale. Seller claims are marked as claims. If the delivered files don’t match what was listed, the fingerprint won’t either.
+              Review sample previews, schemas and reports for the specific version offered. Seller statements are identified as claims. If the delivered files differ from the listed version, their fingerprint will differ as well.
             </p>
             <Link href="/datasets" className={`mt-6 ${more}`}>
               Browse datasets and models <span aria-hidden="true">→</span>
@@ -77,9 +77,9 @@ export default function Home() {
           </article>
           <article className="py-14 md:py-20 md:pl-12">
             <p className="kicker mb-5">For teams with a gap</p>
-            <h2 className="display text-[30px] md:text-[34px]">Or it doesn’t exist yet, and you need someone to make it.</h2>
+            <h2 className="display text-[30px] md:text-[34px]">When the data does not exist, commission its collection.</h2>
             <p className="mt-4 max-w-[52ch] text-ink-2">
-              Post a request — say, 20,000 labelled images of corroded pipe joints — with the budget in escrow and pass/fail criteria fixed up front. Contributors can see the money is there; you only pay for work that meets the criteria.
+              Publish a request, such as 20,000 labelled images of corroded pipe joints, with its budget in escrow and acceptance criteria agreed in advance. Contributors can confirm that funds are reserved, and payment follows the order’s acceptance terms.
             </p>
             <Link href="/bounties/new" className={`mt-6 ${more}`}>
               Write a funded request <span aria-hidden="true">→</span>
@@ -91,16 +91,16 @@ export default function Home() {
       {/* What "checked" means */}
       <section className="mx-auto grid max-w-6xl gap-12 px-4 py-20 sm:px-6 md:py-28 lg:grid-cols-[1fr_1.2fr]">
         <div>
-          <p className="kicker mb-5">What “checked” means here</p>
+          <p className="kicker mb-5">What a completed check tells you</p>
           <h2 className="display text-[30px] md:text-[34px]">
-            Four levels of evidence. Each listing shows which ones actually ran.<sup className="ml-0.5 text-[0.55em] text-muted">†</sup>
+            Four levels of evidence. Every listing identifies the checks completed for its version.<sup className="ml-0.5 text-[0.55em] text-muted">†</sup>
           </h2>
           <p className="mt-4 max-w-[48ch] text-ink-2">
-            Checks run on the version you’d buy, and their reports stay attached to it. Higher levels cost the seller more, so not every listing has them — and that is shown, not hidden.
+            Reports are linked to the version offered for sale. Higher-level checks cost more, so coverage varies by listing and is shown explicitly.
           </p>
           <p className="mt-8 max-w-[48ch] border-t border-line pt-4 text-sm text-ink-2">
             <span className="mr-1 font-serif text-base text-ink">†</span>
-            <span className="font-medium text-ink">What a check is not.</span> A report is evidence about a sample, with stated limitations. It is not a guarantee that a dataset is correct, legal for your use, or good for your model.
+            <span className="font-medium text-ink">Limits of verification.</span> A report describes the checks performed and their limitations. It does not guarantee that a dataset is accurate, lawfully usable for your purpose or suitable for your model.
           </p>
         </div>
         <ol className="self-start border-y-[3px] border-ink">
@@ -121,13 +121,13 @@ export default function Home() {
       <section className="border-t border-line bg-panel">
         <div className="mx-auto grid max-w-6xl gap-12 px-4 py-20 sm:px-6 md:py-28 lg:grid-cols-[1fr_1.2fr]">
           <div>
-            <p className="kicker mb-5">Where your money is, at every step</p>
-            <h2 className="display text-[30px] md:text-[34px]">Payment moves on the program’s rules — once — and each move is on the record.</h2>
+            <p className="kicker mb-5">How funds move through escrow</p>
+            <h2 className="display text-[30px] md:text-[34px]">The program applies the agreed settlement rules once, with each transfer recorded on-chain.</h2>
             <p className="mt-4 max-w-[48ch] text-ink-2">
-              If review fails, the buyer can ask for a correction or open a dispute. Silence through the review window counts as approval. A refund returns the full escrowed amount.
+              If a delivery does not meet the review criteria, the buyer may request a correction or open a dispute. If the review period expires without action, the order is treated as approved. A refund returns the escrowed amount.
             </p>
             <Link href="/how-escrow-works" className={`mt-6 ${more}`}>
-              What the chain proves, and what it doesn’t <span aria-hidden="true">→</span>
+              What the blockchain records—and what it cannot establish <span aria-hidden="true">→</span>
             </Link>
           </div>
           <div>
@@ -146,10 +146,10 @@ export default function Home() {
               ))}
             </ol>
             <table className="mt-8 w-full text-[15px]">
-              <caption className="kicker mb-3 text-left">Settlement of a 240.00 USDC sale — example</caption>
+            <caption className="kicker mb-3 text-left">Example settlement for a 240.00 USDC sale</caption>
               <tbody>
                 <tr className="border-y border-line">
-                  <td className="py-2 text-ink-2">Seller receives (94%)</td>
+                  <td className="py-2 text-ink-2">Seller proceeds (94%)</td>
                   <td className="num py-2 text-right">225.60</td>
                 </tr>
                 <tr className="border-b border-ink">
@@ -157,7 +157,7 @@ export default function Home() {
                   <td className="num py-2 text-right">14.40</td>
                 </tr>
                 <tr>
-                  <td className="py-2.5 font-medium">Released from escrow</td>
+                  <td className="py-2.5 font-medium">Total released from escrow</td>
                   <td className="num py-2.5 text-right font-medium">240.00 USDC</td>
                 </tr>
               </tbody>
@@ -170,13 +170,13 @@ export default function Home() {
       <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 md:py-28">
         <div className="grid gap-10 lg:grid-cols-[1fr_1.2fr]">
           <div>
-            <p className="kicker mb-5">Index</p>
-            <h2 className="display text-[30px] md:text-[34px]">Where to start.</h2>
+            <p className="kicker mb-5">Explore EdgeBounty</p>
+            <h2 className="display text-[30px] md:text-[34px]">Choose where to begin.</h2>
             <p className="mt-4 max-w-[42ch] text-ink-2">
-              Selling instead? A listing goes live once the exact version passes an L2 or L3 check. L1 technical checks are free within a monthly allowance.
+              To sell an asset, publish its listing after the exact version passes an L2 or L3 check. L1 technical checks are free within the monthly allowance.
             </p>
             <Link href="/sell" className="mt-6 inline-flex h-10 items-center rounded-md bg-ink px-4 text-sm font-medium text-paper transition-colors hover:bg-ink-2">
-              List a dataset or model
+              List a dataset or a model
             </Link>
           </div>
           <ul className="border-y-[3px] border-ink">

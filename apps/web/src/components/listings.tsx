@@ -84,30 +84,30 @@ export function ListingGrid({ kind, title, subtitle }: { kind: 'dataset' | 'mode
           </div>
           <label className="mt-6 flex items-start gap-2 text-sm text-ink-2">
             <input type="checkbox" className="mt-0.5" checked={verified} onChange={(e) => { setVerified(e.target.checked); setOffset(0); }} />
-            <span>Passed Level 2 or higher only</span>
+            <span>Show only listings with an L2 or higher report</span>
           </label>
           <p className="mt-6 hidden text-xs leading-relaxed text-muted lg:block">
-            Published {noun} passed at least the check level the seller paid for. Open a listing to read its reports and their limitations.
+            Published {noun} have a passing report at the required level. Open a listing to review the report’s scope and limitations.
           </p>
         </aside>
 
         <div className="min-w-0">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-line pb-3">
             <p className="text-sm text-muted" aria-live="polite">
-              {loading && !data ? 'Loading…' : data ? `${data.items.length === PAGE ? `${offset + 1}–${offset + data.items.length}` : data.items.length ? `${offset + 1}–${offset + data.items.length}` : '0'} ${noun}${debounced ? ` matching “${debounced}”` : ''}` : ''}
+              {loading && !data ? 'Loading listings…' : data ? `${data.items.length === PAGE ? `${offset + 1}–${offset + data.items.length}` : data.items.length ? `${offset + 1}–${offset + data.items.length}` : '0'} ${noun}${debounced ? ` matching “${debounced}”` : ''}` : ''}
             </p>
             <div className="flex items-center gap-2">
               <label className="flex items-center gap-2 whitespace-nowrap text-sm text-muted">
-                <span className="hidden sm:inline">Sort</span>
+                <span className="hidden sm:inline">Sort by</span>
                 <select className={`${inputCls} w-auto py-1.5`} value={effectiveSort} onChange={(e) => { setSort(e.target.value as Sort); setOffset(0); }}>
-                  {debounced && <option value="relevance">Best match</option>}
-                  <option value="newest">Newest</option>
-                  <option value="price-asc">Price, low to high</option>
-                  <option value="price-desc">Price, high to low</option>
-                  <option value="sales">Most sold</option>
+                  {debounced && <option value="relevance">Most relevant</option>}
+                  <option value="newest">Most recent</option>
+                  <option value="price-asc">Price: low to high</option>
+                  <option value="price-desc">Price: high to low</option>
+                  <option value="sales">Best-selling</option>
                 </select>
               </label>
-              <div className="flex rounded-[2px] border border-line bg-panel p-0.5" role="group" aria-label="Layout">
+              <div className="flex rounded-[2px] border border-line bg-panel p-0.5" role="group" aria-label="Listing layout">
                 {(['grid', 'list'] as const).map((v) => (
                   <button key={v} onClick={() => setViewSaved(v)} aria-pressed={view === v} className={`rounded-[1px] px-2 py-1 text-xs capitalize transition-colors ${view === v ? 'bg-ink text-paper' : 'text-muted hover:text-ink'}`}>
                     {v}
@@ -133,10 +133,10 @@ export function ListingGrid({ kind, title, subtitle }: { kind: 'dataset' | 'mode
           {data && data.items.length === 0 && (
             <Empty>
               {debounced || category || verified ? (
-                <>No {noun} match these filters. Clear the search or pick another category.</>
+                <>No {noun} match the selected filters. Clear the search or choose a different category.</>
               ) : (
                 <>
-                  No published {noun} yet. <Link href="/sell" className="text-ink underline">List the first one</Link>, or <Link href="/bounties/new" className="text-ink underline">fund a request</Link> for the data you need.
+                  No {noun} have been published yet. <Link href="/sell" className="text-ink underline">Publish the first listing</Link> or <Link href="/bounties/new" className="text-ink underline">create a funded request</Link> for the data you need.
                 </>
               )}
             </Empty>
@@ -148,7 +148,7 @@ export function ListingGrid({ kind, title, subtitle }: { kind: 'dataset' | 'mode
                 <li key={l.id} className="rise" style={{ animationDelay: `${Math.min(i, 8) * 40}ms` }}>
                   <Link href={`/listings/${l.id}`} className="group flex h-full flex-col border-t-[3px] border-ink pt-3">
                     <div className="flex items-baseline justify-between gap-3 border-b border-ink/25 pb-2">
-                      <span className="kicker truncate">{l.category.replace(/_/g, ' ')}{l.verifiedLevel && <span className="ml-2 normal-case tracking-normal text-good">· passed {l.verifiedLevel}</span>}</span>
+                      <span className="kicker truncate">{l.category.replace(/_/g, ' ')}{l.verifiedLevel && <span className="ml-2 normal-case tracking-normal text-good">· {l.verifiedLevel} report passed</span>}</span>
                       <span className="mono shrink-0 text-[11px] uppercase text-muted">{l.formats?.slice(0, 2).join(' · ') || l.kind}</span>
                     </div>
                     {l.previews?.[0]?.kind === 'image' && <Thumb l={l} className="mt-3 aspect-[16/9] w-full rounded-[2px]" />}
@@ -162,7 +162,7 @@ export function ListingGrid({ kind, title, subtitle }: { kind: 'dataset' | 'mode
                     <div className="mt-auto flex items-baseline justify-between gap-2 pt-2.5">
                       <span className="text-xs text-muted">
                         {l.seller.alias ?? 'Seller'}
-                        {l.sales > 0 && <> · {l.sales} sold</>}
+                        {l.sales > 0 && <> · {l.sales} sales</>}
                       </span>
                       <span className="num text-[16px] text-ink">{sol(l.priceMicro)}</span>
                     </div>

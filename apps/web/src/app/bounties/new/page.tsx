@@ -97,10 +97,10 @@ export default function NewBounty() {
   })();
   return (
     <RequireSession>
-      <Page kicker="New funded request" title="Fund a custom request" subtitle="Set a fixed USDC reward and the requirements. Contributors accept the stated reward; the platform does not set the price of their work. Funds stay in escrow until settlement.">
+      <Page kicker="New funded request" title="Commission custom work" subtitle="Define the deliverables, acceptance criteria and contributor reward. Contributors decide whether to accept the stated terms. Funds remain in escrow until settlement.">
         <BountyDraft apply={draft => setF(current => ({ ...current, title: draft.title, description: draft.description, deliverables: draft.deliverables.join('\n') }))} />
         <div className="grid gap-4 lg:grid-cols-2">
-          <Card title="The work">
+          <Card title="Scope and deliverables">
             <div className="space-y-3">
               <Field label="Title">
                 <input className={inputCls} value={f.title} onChange={set('title')} placeholder="Images of broken vehicle windows" />
@@ -109,27 +109,27 @@ export default function NewBounty() {
                 <textarea className={`${inputCls} h-28`} value={f.description} onChange={set('description')} />
               </Field>
               <div className="text-sm">
-                <p className="mb-2 font-medium">What must be delivered?</p>
+                <p className="mb-2 font-medium">Required deliverables</p>
                 <ul className="list-disc space-y-1 pl-5">{includedDeliverables.map((item) => <li key={item}>{item}</li>)}</ul>
               </div>
-              <Field label="Additional delivery requirements (optional)" hint="One per line. These become part of the agreed contract.">
+              <Field label="Additional requirements (optional)" hint="Enter one requirement per line. These terms form part of the agreement.">
                 <textarea className={`${inputCls} h-20`} value={f.deliverables} onChange={set('deliverables')} placeholder="For example: annotation guide and collection log" />
               </Field>
               <div className="grid grid-cols-2 gap-3">
-                <Field label={`Contributor reward (${CURRENCY})`} hint="You set the reward. Verification and network fees are separate.">
+                <Field label={`Contributor reward (${CURRENCY})`} hint="You define the reward. Verification and network fees are charged separately.">
                   <input className={inputCls} value={f.budget} onChange={set('budget')} />
                 </Field>
-                <Field label="Deadline (days)">
+                <Field label="Delivery deadline (days)">
                   <input className={inputCls} value={f.deadlineDays} onChange={set('deadlineDays')} />
                 </Field>
-                <Field label="Corrections allowed">
+                <Field label="Permitted correction rounds">
                   <input className={inputCls} value={f.maxCorrections} onChange={set('maxCorrections')} />
                 </Field>
-                <Field label="Who owns the delivered work?" hint="Choose the actual license terms that apply to this delivery.">
+                <Field label="Rights to the delivered work" hint="Select the license terms that will govern this delivery.">
                   <select className={inputCls} value={f.licenseId} onChange={set('licenseId')}>
                     {licenses?.map((l) => (
                       <option key={l.id} value={l.id}>
-                        {l.id === 'eb-nonexclusive-commercial-v1' ? 'Contributor owns it; you receive commercial usage rights' : l.id === 'eb-nonexclusive-research-v1' ? 'Contributor owns it; research use only' : l.id === 'eb-exclusive-transfer-v1' ? 'Ownership transfers exclusively to you' : l.name}
+                        {l.id === 'eb-nonexclusive-commercial-v1' ? 'Contributor retains ownership; you receive commercial usage rights' : l.id === 'eb-nonexclusive-research-v1' ? 'Contributor retains ownership; research use only' : l.id === 'eb-exclusive-transfer-v1' ? 'Exclusive ownership transfers to you' : l.name}
                       </option>
                     ))}
                   </select>
@@ -147,25 +147,25 @@ export default function NewBounty() {
             </div>
             {kind === 'image_dataset' && (
               <div className="grid grid-cols-2 gap-3">
-                <Field label="Min distinct images"><input className={inputCls} value={f.minImages} onChange={set('minImages')} /></Field>
+                <Field label="Minimum distinct images"><input className={inputCls} value={f.minImages} onChange={set('minImages')} /></Field>
                 <Field label="Readable files (%)"><input className={inputCls} value={f.minReadablePct} onChange={set('minReadablePct')} /></Field>
-                <Field label="Min width (px)"><input className={inputCls} value={f.minWidth} onChange={set('minWidth')} /></Field>
-                <Field label="Min height (px)"><input className={inputCls} value={f.minHeight} onChange={set('minHeight')} /></Field>
-                <Field label="Max exact duplicates"><input className={inputCls} value={f.maxExactDuplicates} onChange={set('maxExactDuplicates')} /></Field>
-                <Field label="Min relevance (%)" hint="sampled AI review (Level 3); lower 95% bound must clear it"><input className={inputCls} value={f.minRelevancePct} onChange={set('minRelevancePct')} placeholder="optional, e.g. 95" /></Field>
+                <Field label="Minimum width (px)"><input className={inputCls} value={f.minWidth} onChange={set('minWidth')} /></Field>
+                <Field label="Minimum height (px)"><input className={inputCls} value={f.minHeight} onChange={set('minHeight')} /></Field>
+                <Field label="Maximum exact duplicates"><input className={inputCls} value={f.maxExactDuplicates} onChange={set('maxExactDuplicates')} /></Field>
+                <Field label="Minimum relevance (%)" hint="Sampled AI review (L3); the lower bound of the 95% confidence interval must meet this value."><input className={inputCls} value={f.minRelevancePct} onChange={set('minRelevancePct')} placeholder="Optional, e.g. 95" /></Field>
                 {f.minRelevancePct && (
                   <div className="col-span-2">
-                    <Field label="Relevance definition"><input className={inputCls} value={f.relevancePrompt} onChange={set('relevancePrompt')} placeholder="Photo of a vehicle with a visibly broken window" /></Field>
+                    <Field label="Relevance criteria"><input className={inputCls} value={f.relevancePrompt} onChange={set('relevancePrompt')} placeholder="A vehicle photographed with a visibly broken window" /></Field>
                   </div>
                 )}
               </div>
             )}
             {kind === 'tabular_dataset' && (
               <div className="grid grid-cols-2 gap-3">
-                <Field label="Min rows"><input className={inputCls} value={f.minRows} onChange={set('minRows')} /></Field>
-                <Field label="Required columns" hint="comma separated"><input className={inputCls} value={f.requiredColumns} onChange={set('requiredColumns')} /></Field>
-                <Field label="Max null cells (%)"><input className={inputCls} value={f.maxNullPct} onChange={set('maxNullPct')} /></Field>
-                <Field label="Max duplicate rows (%)"><input className={inputCls} value={f.maxDupRowPct} onChange={set('maxDupRowPct')} /></Field>
+                <Field label="Minimum rows"><input className={inputCls} value={f.minRows} onChange={set('minRows')} /></Field>
+                <Field label="Required columns" hint="Separate column names with commas."><input className={inputCls} value={f.requiredColumns} onChange={set('requiredColumns')} /></Field>
+                <Field label="Maximum null cells (%)"><input className={inputCls} value={f.maxNullPct} onChange={set('maxNullPct')} /></Field>
+                <Field label="Maximum duplicate rows (%)"><input className={inputCls} value={f.maxDupRowPct} onChange={set('maxDupRowPct')} /></Field>
               </div>
             )}
             {kind === 'model' && (
@@ -192,8 +192,8 @@ export default function NewBounty() {
             )}
             <div className="mt-4 space-y-2 text-sm">
               <p className="font-medium">Platform verification</p>
-              <p>{quoteReady ? `Fixed fee per delivery: ${sol(verificationQuote!.feeMicro)} · includes ${verificationQuote!.rounds} verification rounds.` : 'Calculating the verification fee…'}</p>
-              <p className="text-muted">The fee follows the platform rate schedule and is locked when funded. Contributors cannot change it. Checks outside the agreed scope require a separate agreement.</p>
+              <p>{quoteReady ? `Verification fee per delivery: ${sol(verificationQuote!.feeMicro)} · includes ${verificationQuote!.rounds} verification rounds.` : 'Calculating the verification fee…'}</p>
+              <p className="text-muted">The fee follows the platform rate schedule and is fixed when the request is funded. Contributors cannot change it. Checks beyond the agreed scope require a separate agreement.</p>
               <ErrorNote error={quoteError} />
             </div>
           </Card>
@@ -203,11 +203,11 @@ export default function NewBounty() {
             <Field label="Structure">
               <select className={inputCls} value={f.structure} onChange={set('structure')}>
                 <option value="single">Single delivery</option>
-                <option value="milestones">Milestones (same developer)</option>
-                <option value="slots">Multi-seller slots</option>
+                <option value="milestones">Milestones (one developer)</option>
+                <option value="slots">Separate contributor slots</option>
               </select>
             </Field>
-            {f.structure === 'slots' && <Field label="Slots" hint="budget split evenly; each slot is taken by a different seller"><input className={inputCls} value={f.slots} onChange={set('slots')} /></Field>}
+            {f.structure === 'slots' && <Field label="Slots" hint="The budget is divided equally. Each slot is assigned to a different contributor."><input className={inputCls} value={f.slots} onChange={set('slots')} /></Field>}
             {f.structure === 'milestones' && (
               <Field label="Milestones" hint="one per line: title:amount:days — amounts must add up to the budget; later milestones are funded when the previous one settles">
                 <textarea className={`${inputCls} h-20`} value={f.milestones} onChange={set('milestones')} />
@@ -221,11 +221,11 @@ export default function NewBounty() {
         <section className="mt-6 grid gap-6 rounded-md border border-line bg-panel p-5 sm:p-6 lg:grid-cols-[1fr_380px]" aria-label="Escrow summary">
           <div>
             <h2 className="kicker !text-ink-2">Before you sign</h2>
-            <p className="mt-3 max-w-[60ch] text-sm text-ink-2">
-              Your wallet will show one transaction. It moves the total on the right into the escrow program — nothing goes to EdgeBounty or a contributor until settlement. Solana network fees are paid separately in SOL.
+              <p className="mt-3 max-w-[60ch] text-sm text-ink-2">
+              Your wallet will display a single transaction that places the amount shown at right in escrow. No funds are transferred to EdgeBounty or a contributor before settlement. Solana network fees are charged separately in SOL.
             </p>
             <p className="mt-3 max-w-[60ch] text-sm text-ink-2">
-              You can only reject a delivery when the agreed verifier fails it. If you stay silent through the review window, the contributor is paid.
+              You may reject a delivery only if the agreed verifier records a failed result. If you take no action during the review period, the contributor is paid.
             </p>
           </div>
           <div>
@@ -238,17 +238,17 @@ export default function NewBounty() {
               return (
                 <LedgerLine
                   rows={[
-                    [f.structure === 'milestones' ? 'First milestone reward' : 'Contributor reward', reward ? sol(reward) : '—', f.structure === 'milestones' ? 'later milestones are funded as each one settles' : 'held in escrow, released at settlement'],
-                    [`Verification fee${n > 1 ? ` × ${n} slots` : ''}`, quoteReady ? sol(BigInt(verificationQuote!.feeMicro) * BigInt(n)) : "calculating…", 'fixed platform rate, locked when funded'],
+                    [f.structure === 'milestones' ? 'First milestone reward' : 'Contributor reward', reward ? sol(reward) : '—', f.structure === 'milestones' ? 'subsequent milestones are funded as each preceding milestone settles' : 'held in escrow and released at settlement'],
+                    [`Verification fee${n > 1 ? ` × ${n} slots` : ''}`, quoteReady ? sol(BigInt(verificationQuote!.feeMicro) * BigInt(n)) : "Calculating…", 'fixed platform rate, locked at funding'],
                   ]}
-                  total={['Moves into escrow', total !== null ? sol(total) : '—']}
+                  total={['Total placed in escrow', total !== null ? sol(total) : '—']}
                 />
               );
             })()}
             <Button onClick={submit} disabled={f.title.length < 3 || f.description.length < 10 || !quoteReady} className="mt-4 h-11 w-full">
               {total !== null ? `Sign and fund ${sol(total)}` : 'Waiting for the fee quote…'}
             </Button>
-            {(f.title.length < 3 || f.description.length < 10) && <p className="mt-2 text-xs text-muted">Add a title and a description of at least 10 characters to continue.</p>}
+            {(f.title.length < 3 || f.description.length < 10) && <p className="mt-2 text-xs text-muted">Enter a title and a description of at least 10 characters to continue.</p>}
           </div>
         </section>
         <div className="mt-3">

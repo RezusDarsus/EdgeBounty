@@ -17,20 +17,20 @@ export default function Bounties() {
     <Page
       kicker="Marketplace · commissioned work"
       title="Funded requests"
-      subtitle="Custom dataset and model work where the reward is already in escrow. Accept a request on-chain to start, then deliver against criteria that were fixed before anyone began."
+      subtitle="Find funded opportunities for custom dataset and model work. Accept a request on-chain to begin; its acceptance criteria are fixed before work starts."
       actions={
         <Link href="/bounties/new" className="inline-flex h-9 items-center rounded-md bg-accent px-4 text-sm font-medium text-accent-ink transition-colors hover:bg-[color-mix(in_oklab,var(--accent),var(--ink)_18%)]">
-          Post a request
+          Create a request
         </Link>
       }
     >
       <label className="relative mb-6 block max-w-sm">
-        <span className="sr-only">Search requests</span>
+        <span className="sr-only">Search funded requests</span>
         <svg className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
           <circle cx="7" cy="7" r="4.5" />
           <path d="m10.5 10.5 3 3" />
         </svg>
-        <input className={`${inputCls} pl-9`} placeholder="Search requests" value={q} onChange={(e) => setQ(e.target.value)} />
+        <input className={`${inputCls} pl-9`} placeholder="Search funded requests" value={q} onChange={(e) => setQ(e.target.value)} />
       </label>
       <ErrorNote error={error} />
       {loading && !data && (
@@ -42,11 +42,11 @@ export default function Bounties() {
       )}
       {data?.length === 0 && (
         <Empty>
-          {debounced ? <>No open requests match “{debounced}”.</> : <>No open funded requests right now.</>}{' '}
+          {debounced ? <>No open requests match “{debounced}”.</> : <>There are no open funded requests at the moment.</>}{' '}
           <Link href="/bounties/new" className="text-ink underline">
-            Post one
+            Create a request
           </Link>{' '}
-          — the reward goes into escrow when you publish it.
+          — its reward enters escrow when you publish it.
         </Empty>
       )}
       {!!data?.length && (
@@ -58,10 +58,10 @@ export default function Bounties() {
                   <div className="mb-2 flex flex-wrap items-center gap-1.5">
                     <Badge tone="good">
                       <span aria-hidden="true" className="text-[9px]">●</span>
-                      Reward in escrow
+                      Reward secured in escrow
                     </Badge>
                     <span className="kicker">
-                      {[b.criteria?.kind?.replace(/_/g, ' '), b.verifierWallet ? 'platform-checked delivery' : null].filter(Boolean).join(' · ')}
+                      {[b.criteria?.kind?.replace(/_/g, ' '), b.verifierWallet ? 'platform verification required' : null].filter(Boolean).join(' · ')}
                     </span>
                   </div>
                   <h3 className="display text-[22px] leading-snug group-hover:underline group-hover:decoration-line">{b.title}</h3>
@@ -74,7 +74,7 @@ export default function Bounties() {
                   </div>
                   <div className="md:mt-2">
                     <dt className="sr-only">Deadline</dt>
-                    <dd className="text-xs text-muted">Due {date(b.deadline)}</dd>
+                    <dd className="text-xs text-muted">Deadline: {date(b.deadline)}</dd>
                   </div>
                 </dl>
               </Link>

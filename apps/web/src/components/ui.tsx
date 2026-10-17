@@ -25,7 +25,7 @@ export function Page({ title, subtitle, actions, kicker, children, wide }: { tit
 
 export function PageLoading() {
   return (
-    <main className="mx-auto max-w-6xl px-4 pt-14 sm:px-6" aria-busy="true" aria-label="Loading">
+    <main className="mx-auto max-w-6xl px-4 pt-14 sm:px-6" aria-busy="true" aria-label="Loading page content">
       <Skeleton className="h-3 w-40" />
       <Skeleton className="mt-4 h-10 w-2/3 max-w-xl" />
       <Skeleton className="mt-3 h-4 w-1/2 max-w-md" />
@@ -85,7 +85,7 @@ export function Button({ children, onClick, variant = 'primary', disabled, type 
       {busy ? (
         <>
           <span className="live-dot h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />
-          Working…
+          Processing…
         </>
       ) : (
         children
@@ -143,11 +143,11 @@ export function Hash({ value, label }: { value?: string | null; label?: string }
         });
       }}
       className="mono inline-flex max-w-full items-center gap-1 break-all rounded-[2px] bg-sunk px-1.5 py-0.5 text-left text-ink-2 transition-colors hover:text-ink"
-      title={`${value} — click to copy`}
+      title={`${value} — select to copy`}
     >
       {label ? `${label} ` : ''}
       {value.length > 20 ? `${value.slice(0, 8)}…${value.slice(-6)}` : value}
-      <span className="text-[10px] text-muted" aria-live="polite">{copied ? 'copied' : ''}</span>
+      <span className="text-[10px] text-muted" aria-live="polite">{copied ? 'Copied' : ''}</span>
     </button>
   );
 }
@@ -155,7 +155,7 @@ export function Hash({ value, label }: { value?: string | null; label?: string }
 export function ErrorNote({ error }: { error: unknown }) {
   if (!error) return null;
   const raw = error instanceof Error ? error.message : String(error);
-  const msg = /failed to fetch|networkerror|load failed/i.test(raw) ? 'Can’t reach the EdgeBounty server right now. Check your connection and try again.' : raw;
+  const msg = /failed to fetch|networkerror|load failed/i.test(raw) ? 'EdgeBounty could not be reached. Check your internet connection and try again.' : raw;
   return (
     <p role="alert" className="flex gap-2 rounded-md border border-bad/35 bg-bad/6 px-3 py-2.5 text-sm text-bad">
       <span aria-hidden="true">■</span>
@@ -231,10 +231,10 @@ export function Notice({ children, tone = 'neutral' }: { children: ReactNode; to
 }
 
 const RUNGS = [
-  ['L1', 'Technical checks', 'Files open, formats parse, corrupt files and exact duplicates counted'],
-  ['L2', 'Sampled AI review', 'Near-duplicates and outliers flagged; a sample checked for relevance'],
-  ['L3', 'Advanced review', 'Deeper sampled AI analysis within a capped budget'],
-  ['L4', 'Human review', 'A person reviews against the stated criteria'],
+  ['L1', 'Technical checks', 'File readability, format parsing, detected corruption and exact duplicates'],
+  ['L2', 'Sampled AI review', 'Sampled relevance assessment; near-duplicates and outliers may be flagged'],
+  ['L3', 'Advanced review', 'Extended sampled AI analysis within a defined budget'],
+  ['L4', 'Human review', 'A reviewer assesses the submission against the stated criteria'],
 ] as const;
 
 /** Which levels a listing was actually checked at. A rung fills only when a report exists; nothing here is a guarantee. */
@@ -242,17 +242,17 @@ export function EvidenceLadder({ levels, passed, compact }: { levels: string[]; 
   const top = Math.max(0, ...levels.map((l) => Number(l.slice(1)) || 0));
   if (compact)
     return (
-      <span className="inline-flex items-center gap-2" title={top ? `Checked up to level ${top}` : 'No checks reported'}>
+      <span className="inline-flex items-center gap-2" title={top ? `Checks completed through level ${top}` : 'No completed checks reported'}>
         <span className="flex gap-[3px]" aria-hidden="true">
           {RUNGS.map(([l], i) => (
             <span key={l} className={`h-2.5 w-1.5 rounded-[1px] ${i < top ? (passed === false ? 'bg-bad' : 'bg-ink') : 'bg-line'}`} />
           ))}
         </span>
-        <span className="text-xs text-muted">{top ? `Checked to L${top}` : 'Unchecked'}</span>
+        <span className="text-xs text-muted">{top ? `Checks through L${top}` : 'No checks reported'}</span>
       </span>
     );
   return (
-    <ol className="space-y-0" aria-label="Verification evidence">
+    <ol className="space-y-0" aria-label="Verification record">
       {RUNGS.map(([l, name, desc], i) => {
         const done = levels.includes(l) || i < top;
         return (
@@ -262,7 +262,7 @@ export function EvidenceLadder({ levels, passed, compact }: { levels: string[]; 
               <span className={`block text-sm ${done ? 'text-ink' : 'text-muted'}`}>{name}</span>
               <span className="block text-xs text-muted">{desc}</span>
             </span>
-            <span className={`text-xs ${done ? (passed === false ? 'text-bad' : 'text-good') : 'text-muted'}`}>{done ? (passed === false ? 'Criteria not met' : 'Report on file') : 'Not run'}</span>
+            <span className={`text-xs ${done ? (passed === false ? 'text-bad' : 'text-good') : 'text-muted'}`}>{done ? (passed === false ? 'Criteria not met' : 'Report available') : 'Not performed'}</span>
           </li>
         );
       })}
@@ -292,7 +292,7 @@ export function EscrowTrack({ state, kind }: { state: string; kind?: string }) {
   const off = OFF_TRACK[state];
   const current = steps.findIndex(([s]) => s === (off ? off.at : state));
   return (
-    <div className="min-w-0 border-y border-line py-4" aria-label="Escrow progress">
+    <div className="min-w-0 border-y border-line py-4" aria-label="Order and escrow progress">
       <ol className="flex items-start">
         {steps.map(([s, label], i) => {
           const done = i < current || (i === current && !off);

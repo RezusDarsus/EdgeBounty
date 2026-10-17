@@ -34,17 +34,17 @@ export const toMicro = (usd: string) => {
 };
 
 export const STATE_LABEL: Record<string, string> = {
-  draft: 'Draft (not on-chain)',
-  created: 'Created',
-  funded: 'Funded — open',
+  draft: 'Draft · not on-chain',
+  created: 'Created · not funded',
+  funded: 'Funded · open',
   assigned: 'In progress',
   submitted: 'Awaiting verification',
-  under_review: 'Buyer review',
-  approved: 'Approved — settling',
+  under_review: 'Under buyer review',
+  approved: 'Approved · awaiting settlement',
   disputed: 'Disputed',
-  correction_required: 'Correction requested',
+  correction_required: 'Correction required',
   settled: 'Settled',
   refunded: 'Refunded',
   cancelled: 'Cancelled',
-  mismatch: 'Integrity mismatch',
+  mismatch: 'On-chain order mismatch',
 };

@@ -1,18 +1,18 @@
 import { Page } from '@/components/ui';
 
 const STEPS: [string, string, string][] = [
-  ['Funded', 'The buyer funds the order. USDC moves into a vault owned by the order’s program address — neither EdgeBounty nor the seller can move it.', 'funded'],
-  ['Terms fixed', 'Terms, acceptance criteria and the license are hashed on-chain at funding. The platform fee (currently 6%) is locked at that moment; the program will not accept a fee above 10%.', ''],
-  ['Delivered', 'The seller accepts and submits a salted commitment to the exact file manifest. The files stay in private storage.', 'submitted'],
-  ['Checked', 'If a verifier was agreed, it evaluates the submission and signs an attestation, pass or fail. Verifiers are paid for the work either way.', ''],
-  ['Reviewed', 'The buyer reviews previews and reports, then accepts, requests a correction (only when the agreed verifier failed the submission) or opens a dispute. If the review window passes in silence, the order settles in the seller’s favour.', 'under_review'],
-  ['Settled', 'One instruction pays the seller, the verifier and the platform fee, and closes the vault — it cannot run twice.', 'settled'],
-  ['Downloaded', 'The delivery service re-reads the chain and issues short-lived download links to the buyer’s wallet only.', 'off-chain'],
+  ['Funded', 'The buyer funds the order. USDC moves into a vault controlled by the order’s program address; neither EdgeBounty nor the seller can transfer it directly.', 'funded'],
+  ['Terms fixed', 'The program records hashes of the terms, acceptance criteria and license at funding. It also locks the platform fee, currently 6%, subject to the program’s 10% maximum.', ''],
+  ['Delivered', 'The seller accepts the order and submits a salted commitment to the exact file manifest. The files remain in private storage.', 'submitted'],
+  ['Checked', 'If the parties selected a verifier, that provider evaluates the submission and signs an attestation with a pass or fail result. The verifier is paid for completing the work, regardless of the outcome.', ''],
+  ['Reviewed', 'The buyer reviews available previews and reports, then accepts the delivery, requests a correction when the agreed verifier has failed it, or opens a dispute. If the review period expires without action, the order settles in the seller’s favour.', 'under_review'],
+  ['Settled', 'A single instruction pays the seller, verifier and platform, then closes the vault. The instruction cannot be executed twice.', 'settled'],
+  ['Downloaded', 'The delivery service checks the on-chain order and issues short-lived download links exclusively to the buyer’s wallet.', 'off-chain'],
 ];
 
 export default function HowEscrowWorks() {
   return (
-    <Page kicker="How it works" title="How escrow works" subtitle="Every order is a small contract executed by the EdgeBounty Solana program. Here is each step, who can act, and what the chain does not prove.†">
+    <Page kicker="How it works" title="How escrow works" subtitle="Each order follows rules enforced by the EdgeBounty Solana program. This guide explains the process, who may act at each stage and what the blockchain cannot establish.†">
       <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr]">
         <ol className="self-start border-y-[3px] border-ink">
           {STEPS.map(([t, desc, state], i) => (
@@ -29,21 +29,21 @@ export default function HowEscrowWorks() {
 
         <div className="space-y-10">
           <section className="border-t-[3px] border-ink pt-3">
-            <h2 className="kicker mb-3 border-b border-ink/25 pb-2.5 !text-ink-2">What the rules give a buyer</h2>
+            <h2 className="kicker mb-3 border-b border-ink/25 pb-2.5 !text-ink-2">Buyer protections</h2>
             <ul className="space-y-2 text-sm text-ink-2">
               <li>Acceptance criteria are fixed before work starts.</li>
-              <li>Previews and any agreed checks come before the money moves.</li>
-              <li>A correction when the agreed verifier fails a delivery; a refund if the deadline is missed.</li>
-              <li>Disputes are decided on evidence by a reviewer, not by the seller.</li>
+              <li>Available previews and agreed verification results can be reviewed before settlement.</li>
+              <li>A correction may be requested when the agreed verifier rejects a delivery; missed deadlines may qualify for a refund.</li>
+              <li>An independent reviewer resolves disputes based on submitted evidence.</li>
             </ul>
           </section>
           <section className="border-t-[3px] border-ink pt-3">
-            <h2 className="kicker mb-3 border-b border-ink/25 pb-2.5 !text-ink-2">What they give a seller</h2>
+            <h2 className="kicker mb-3 border-b border-ink/25 pb-2.5 !text-ink-2">Seller protections</h2>
             <ul className="space-y-2 text-sm text-ink-2">
-              <li>Work starts only once the money is in escrow.</li>
-              <li>No full download before settlement.</li>
-              <li>Buyers cannot change the criteria after a submission.</li>
-              <li>Silence through the review window counts as acceptance.</li>
+              <li>Work begins only after the buyer funds the escrow.</li>
+              <li>The buyer cannot download the full delivery before settlement.</li>
+              <li>The buyer cannot change acceptance criteria after submission.</li>
+              <li>If the buyer takes no action during the review period, the order settles in the seller’s favour.</li>
             </ul>
           </section>
           <section className="border-t border-line pt-4">
@@ -51,8 +51,7 @@ export default function HowEscrowWorks() {
               <span className="mr-1 font-serif text-base">†</span>Limits we disclose
             </h2>
             <p className="text-sm leading-relaxed text-ink-2">
-              The program cannot prove that a private file was delivered; an accountable delivery service does that and keeps delivery logs. Previews can leak value. An attestation proves who issued which result, not that
-              the result is true. Pseudonymous wallets are not anonymous: Solana transactions and amounts are public.
+              The program cannot confirm that a private file was delivered; the delivery service performs that check and retains access logs. Previews may disclose valuable information. An attestation identifies who issued a result, but does not prove that the result is correct. Wallet pseudonyms do not provide anonymity: Solana transactions and amounts are public.
             </p>
           </section>
         </div>
