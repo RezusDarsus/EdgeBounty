@@ -4,6 +4,9 @@ export default function Help() {
   return (
     <Page kicker="Help" title="Support and dispute policy">
       <div className="grid gap-4 md:grid-cols-2">
+        <Card title="Contact support">
+          <p className="text-sm">Questions about fees, account access, uploads or a transaction? Email <a className="underline" href="mailto:darsavelidzerezo@gmail.com">darsavelidzerezo@gmail.com</a> and include the page or transaction you need help with. Never email your wallet recovery phrase or private key.</p>
+        </Card>
         <Card title="Opening a dispute">
           <ul className="list-disc space-y-1 pl-5 text-sm">
             <li>Buyers may open a dispute during the review period. Its reason is recorded on-chain as a hash; evidence files remain private.</li>

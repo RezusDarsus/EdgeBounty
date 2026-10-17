@@ -37,7 +37,7 @@ export async function getOwnedVersion(ctx: AppContext, versionId: string, accoun
 
 type Q = Pick<AppContext['db'], 'select'>;
 
-/** Purposes the MVP free tier may hold; everything else customer-side needs a prepaid plan. */
+/** Listing and benchmark assets can use purchased storage; no customer purpose receives a free quota. */
 export const FREE_TIER_PURPOSES = ['listing', 'benchmark', 'storage'];
 
 /**
@@ -90,11 +90,10 @@ export async function reserveUpload(
       // committed (completed) files and open reservations both count
       const [used, quota] = await Promise.all([storageUsedBytes(ctx, accountId, tx), storageQuotaBytes(ctx, accountId, tx)]);
       if (used + row.size > quota) throw new HttpError(402, 'quota_exceeded', `storage quota exceeded (${used}/${quota} bytes); purchase a storage plan`);
-      // the free tier covers marketplace listings (and the benchmarks model verification needs) only:
-      // EdgeBounty is not a general-purpose drive
+      // Marketplace assets and private customer files all require purchased storage.
       if (!FREE_TIER_PURPOSES.includes(purpose)) {
         const [paidUsed, paid] = await Promise.all([storageUsedBytes(ctx, accountId, tx, { excludeListing: true }), storageQuotaBytes(ctx, accountId, tx, { paidOnly: true })]);
-        if (paidUsed + row.size > paid) throw new HttpError(402, 'quota_exceeded', `the free tier covers marketplace listings only; ${purpose} storage needs a prepaid plan (${paidUsed}/${paid} paid bytes used)`);
+        if (paidUsed + row.size > paid) throw new HttpError(402, 'quota_exceeded', `${purpose} storage needs a prepaid plan (${paidUsed}/${paid} paid bytes used)`);
       }
     }
     const [u] = await tx.insert(schema.uploads).values(row).returning();

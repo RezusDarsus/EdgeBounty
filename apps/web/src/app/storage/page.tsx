@@ -25,7 +25,7 @@ export default function Storage() {
           <Card title="Usage">
             {data && (
               <>
-                <p className="text-sm">{bytes(data.usedBytes)} of {bytes(data.quotaBytes)} ({bytes(data.freeBytes)} free tier)</p>
+                <p className="text-sm">{bytes(data.usedBytes)} used of {bytes(data.quotaBytes)} paid storage</p>
                 <div className="mt-2 h-2 rounded bg-code"><div className="h-2 rounded bg-accent" style={{ width: `${used}%` }} /></div>
                 <ul className="mt-4 space-y-1 text-sm">
                   {data.allocations.map((a: any) => (

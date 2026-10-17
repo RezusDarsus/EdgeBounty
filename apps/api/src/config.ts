@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import { existsSync } from 'node:fs';
 
 const Env = z.object({
+  COLLABORATIVE_BOUNTIES_ENABLED: z.enum(['0', '1']).default('0'),
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   PORT: z.coerce.number().default(4000),
   HOST: z.string().default('127.0.0.1'),
@@ -78,16 +79,16 @@ const Env = z.object({
   MAX_UPLOAD_BYTES: z.coerce.number().default(10 * 1024 ** 3),
   MAX_FILE_BYTES: z.coerce.number().default(10 * 1024 ** 3),
   UPLOAD_PART_BYTES: z.coerce.number().default(16 * 1024 ** 2),
-  /** MVP free tier, added on top of paid plans */
-  FREE_STORAGE_BYTES: z.coerce.number().default(1024 ** 3),
+  /** No complimentary customer storage; zero disables the legacy allowance. */
+  FREE_STORAGE_BYTES: z.coerce.number().default(0),
   /** cap per bounty-submission / evidence version (workflow category; not charged to the quota) */
   SUBMISSION_MAX_BYTES: z.coerce.number().default(5 * 1024 ** 3),
   /** price of 1 SOL in micro-USD, used to convert USD-denominated rates at quote time (demo default; set from a real feed before mainnet) */
   SOL_USD_MICRO: z.coerce.bigint().default(150_000_000n),
   /** S3 Standard micro-USD per GB-month used in H (ESTIMATE; confirm eu-north-1 in the AWS Pricing Calculator) */
   S3_RATE_MICRO_PER_GB_MONTH: z.coerce.bigint().default(15_000n),
-  /** free-tier hosting per listed version, days; bounded and granted once per version */
-  FREE_RETENTION_DAYS: z.coerce.number().int().min(0).default(90),
+  /** Complimentary hosting disabled. */
+  FREE_RETENTION_DAYS: z.coerce.number().int().min(0).default(0),
   /** a listing must have at least this much funded hosting ahead of it */
   LISTING_MIN_COVERAGE_DAYS: z.coerce.number().int().min(1).default(30),
   // ---- cost reporting (all micro-USD; unset = unknown, never guessed) ----

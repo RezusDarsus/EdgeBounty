@@ -31,7 +31,7 @@ export async function versionBytes(ctx: AppContext, versionId: string, q: Q = ct
   return BigInt(v.totalSize);
 }
 
-/** All funded hosting intervals of a version (seller prepaid, free tier, buyers). */
+/** Funded hosting intervals of a version (seller prepaid and buyers; legacy allowance records may exist). */
 export async function versionCoverage(ctx: AppContext, versionId: string, q: Q = ctx.db): Promise<Interval[]> {
   const rows = await q.select().from(schema.hostingCoverage).where(eq(schema.hostingCoverage.assetVersionId, versionId));
   return rows.map((r) => ({ start: secs(r.startsAt), end: secs(r.endsAt) }));
@@ -55,9 +55,7 @@ const lockVersion = (q: Q, versionId: string) => q.execute(sql`select pg_advisor
 const lockAccount = (q: Q, accountId: string) => q.execute(sql`select pg_advisory_xact_lock(hashtextextended(${'free-tier:' + accountId}, 0))`);
 
 /**
- * Free tier: once per version, FREE_RETENTION_DAYS of hosting, only while the account's concurrently
- * free-hosted bytes stay within FREE_STORAGE_BYTES. Bounded in size AND time, so it cannot be cycled into
- * unlimited unpaid storage (a re-upload is a new version that again counts against the same 1 GB).
+ * Legacy free hosting is disabled by default and remains configurable only for an explicit operator policy.
  */
 export async function grantFreeCoverage(ctx: AppContext, accountId: string, versionId: string): Promise<boolean> {
   if (ctx.cfg.FREE_RETENTION_DAYS <= 0 || ctx.cfg.FREE_STORAGE_BYTES <= 0) return false;
@@ -232,7 +230,7 @@ export async function delistUnfundedListings(ctx: AppContext, graceDays: number)
   const cutoff = new Date(Date.now() - graceDays * 86_400_000);
   const out: string[] = [];
   for (const l of published) {
-    // only seller-side funding (prepaid or free tier) keeps a listing for sale; buyer-funded coverage keeps
+    // seller-side prepayment keeps a listing for sale; buyer-funded coverage keeps
     // the file for those buyers but does not pay for the seller's listing
     const seller = await ctx.db
       .select()

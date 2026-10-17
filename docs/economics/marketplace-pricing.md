@@ -1,6 +1,6 @@
 # Marketplace pricing and cost protection
 
-Status: **implemented locally, not deployed.** Code: `packages/pricing-engine/src/marketplace.ts` (formulas),
+Status: **implemented.** Code: `packages/pricing-engine/src/marketplace.ts` (formulas),
 `apps/api/src/lib/billing.ts` (coverage, checkout, metering), `apps/api/src/lib/costs.ts` (reporting),
 migration `apps/api/drizzle/0003_marketplace_pricing.sql` (additive only).
 This replaces the earlier proposal in `buyer-hosting-design.md`.
@@ -14,17 +14,17 @@ All money is integers:
 
 | Rule | Where | How |
 |---|---|---|
-| Marketplace, not a drive | `lib/assets.ts` `reserveUpload` | The free tier covers only `listing` and `benchmark` uploads. `storage` and other customer purposes need a prepaid plan |
-| Sellers pay for listing storage, even with 0 sales | `ensureListingCoverage` in `POST /listings` and `/listings/:id/versions` | A listing needs `LISTING_MIN_COVERAGE_DAYS` (30) of funded hosting ahead. Free tier, or `POST /versions/:id/hosting {months}` |
-| Free 1 GB, abuse-bounded | `grantFreeCoverage` | Once per version, `FREE_RETENTION_DAYS` (90), and only while the account's live free-hosted bytes ≤ `FREE_STORAGE_BYTES`. Serialised per account |
+| No free customer storage | `lib/assets.ts` `reserveUpload`; `FREE_STORAGE_BYTES=0` | All customer uploads, including listings, require purchased storage. Free listing coverage is disabled (`FREE_RETENTION_DAYS=0`). |
+| Sellers pay for listing storage, even with 0 sales | `ensureListingCoverage` in `POST /listings` and `/listings/:id/versions` | A listing needs `LISTING_MIN_COVERAGE_DAYS` (30) of funded hosting ahead. Seller prepayment via `POST /versions/:id/hosting {months}` is required when coverage is absent. |
+| Paid hosting only | `ensureListingCoverage` | A listing requires seller-prepaid or buyer-funded coverage; there is no complimentary 1 GiB hosting period. |
 | `H = max(0.30·M, ceil(GB)·M·S3_RATE·3)` | `hostingFee` | `S3_RATE_MICRO_PER_GB_MONTH` (default 23 000 = $0.023, **estimate**) |
 | One physical copy, many buyers | `hosting_coverage`, `delivery_entitlements` | Files are stored once per version. Each buyer has their own entitlement (access window + byte meter) |
-| No double charge for seller-funded hosting | `checkoutQuote` → `uncoveredGaps` | The buyer pays only for the **gaps** in the access window not already covered (seller prepaid, free tier, earlier buyers). Prorated per second |
+| No double charge for funded hosting | `checkoutQuote` → `uncoveredGaps` | The buyer pays only for the **gaps** in the access window not already covered by seller prepayment or earlier buyers. Prorated per second |
 | Every promised period stays funded | `fundCheckout` | Paid gaps become `buyer` coverage rows. Coverage rows are immutable and only ever added, so a gap computed at quote time can't reopen later |
 | Downloads $0.15/GB; 1/2/3 included for 1/3/6 months | `includedDownloadFee`, `downloadAllowanceBytes` | Allowance = N × object bytes. Fee = N × ceil(GB) × $0.15 |
 | Extra downloads prepaid | `POST /entitlements/:id/download-credits {gb}` | Adds `extra_bytes` once the invoice is paid |
 | Range / resume | `routes/delivery.ts` | Single-range RFC 9110: `206`/`416`, `accept-ranges: bytes` |
-| 5% commission from seller; $0.50 minimum | `commission`, `minimumFeeShortfall` | The buyer pays `max(0, ceil($0.50 in lamports) − floor(5%·P))`. The 5% is the on-chain fee, unchanged |
+| 6% commission from seller; no minimum | `commission`, `minimumFeeShortfall` | The commission mirrors the deployed 600-bps on-chain fee; there is no flat or minimum commission. |
 | Verify once per version + policy | `verification_runs` (unique key), `claimRun` in `services/jobs.ts` | See below |
 | Recover verification cost | the seller's paid listing verification (existing flow) + commission | Buyers are never charged for an existing result (`platformResultReusable` sets the verifier fee to 0) |
 | Cost and break-even reporting | `GET /admin/costs` | See below |
@@ -109,7 +109,7 @@ With seller coverage, buyer hosting drops to $0.
 
 - **Downloads:** $0.15/GB charged vs ~$0.09/GB estimated egress, about a 40% margin before request costs.
 - **Hosting:** 3× the S3 storage rate, with a $0.30/month floor.
-- **Platform revenue:** at least $0.50 per sale. Above $10 it's the 5% commission.
+- **Platform revenue:** 6% of the sale price at settlement.
 - **Break-even:** every $1 of fixed monthly cost needs **2 purchases** at the minimum take, or fewer at higher prices.
   Example: a $50 listing yields $2.50, so 1 purchase covers $2.50 of fixed cost.
 

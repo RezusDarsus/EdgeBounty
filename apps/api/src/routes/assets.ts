@@ -200,7 +200,7 @@ export function assetRoutes(app: FastifyInstance, ctx: AppContext) {
     const { id } = parse(z.object({ id: zUuid }), req.params);
     const { asset } = await getOwnedVersion(ctx, id, s.accountId);
     const v = await finalizeVersion(ctx, id);
-    // automatic Level-1 validation + controlled preview generation (free tier)
+    // automatic Level-1 validation + controlled preview generation
     const encrypted = !!(v.metadata as any)?.encrypted;
     if (!encrypted && ['listing', 'submission', 'failure_example'].includes(asset.purpose)) await enqueuePreview(ctx, v.id, s.accountId);
     return { versionId: v.id, commitment: v.commitment, fileCount: v.fileCount, totalSize: v.totalSize, manifest: v.manifest };
