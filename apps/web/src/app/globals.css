@@ -129,8 +129,12 @@ a {
 .display {
   font-family: var(--font-serif);
   font-weight: 400;
-  letter-spacing: -0.02em;
-  line-height: 1.08;
+  letter-spacing: 0.005em;
+  word-spacing: 0.06em;
+  line-height: 1.12;
+}
+.display em {
+  font-style: normal;
 }
 /* booktabs: heavy top/bottom rule, hairline mid rules */
 .rule-top {

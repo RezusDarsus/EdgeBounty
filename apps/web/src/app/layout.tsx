@@ -1,15 +1,15 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { IBM_Plex_Mono, IBM_Plex_Sans, Newsreader } from 'next/font/google';
+import { Gloock, IBM_Plex_Mono, Schibsted_Grotesk } from 'next/font/google';
 import '@solana/wallet-adapter-react-ui/styles.css';
 import './globals.css';
 import { Providers } from './providers';
 import { Nav } from '@/components/nav';
 import { Mark } from '@/components/brand';
 
-const plexSans = IBM_Plex_Sans({ subsets: ['latin'], weight: ['400', '500', '600'], variable: '--font-plex-sans', display: 'swap' });
+const plexSans = Schibsted_Grotesk({ subsets: ['latin'], weight: ['400', '500', '600'], variable: '--font-plex-sans', display: 'swap' });
 const plexMono = IBM_Plex_Mono({ subsets: ['latin'], weight: ['400', '500'], variable: '--font-plex-mono', display: 'swap' });
-const newsreader = Newsreader({ subsets: ['latin'], weight: ['400', '500'], style: ['normal', 'italic'], variable: '--font-newsreader', display: 'swap' });
+const newsreader = Gloock({ subsets: ['latin'], weight: '400', variable: '--font-newsreader', display: 'swap' });
 
 export const metadata: Metadata = {
   title: { default: 'EdgeBounty — datasets and models, sold on evidence', template: '%s · EdgeBounty' },

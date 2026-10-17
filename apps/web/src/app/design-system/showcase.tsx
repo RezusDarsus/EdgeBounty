@@ -5,8 +5,8 @@ import { Mark, Specimen } from '@/components/brand';
 
 const TOKENS = ['paper', 'panel', 'sunk', 'ink', 'ink-2', 'muted', 'line', 'accent', 'accent-wash', 'good', 'warn', 'bad'];
 const FACES: Record<string, string> = {
-  'Newsreader (display, chosen)': 'var(--font-serif)',
-  'IBM Plex Sans (UI, chosen)': 'var(--font-sans)',
+  'Gloock (display, chosen)': 'var(--font-serif)',
+  'Schibsted Grotesk (UI, chosen)': 'var(--font-sans)',
   'IBM Plex Mono (data, chosen)': 'var(--font-mono)',
   'System UI (fallback)': 'ui-sans-serif, system-ui, sans-serif',
   'Georgia (serif fallback)': 'Georgia, serif',
@@ -53,14 +53,14 @@ export function Showcase() {
           </div>
         </Section>
 
-        <Section n="Type" note="Newsreader for display, IBM Plex Sans for interface and body, IBM Plex Mono for numbers, hashes and kickers. All SIL OFL.">
+        <Section n="Type" note="Gloock for display, Schibsted Grotesk for interface and body, IBM Plex Mono for numbers, hashes and kickers. All SIL OFL.">
           <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
             <div className="space-y-5 rounded-md border border-line bg-panel p-6">
               <p className="kicker">Kicker · Plex Mono 11 / +0.08em</p>
               <p className="display text-[56px]">Display 56</p>
               <p className="display text-[34px]">Section title 34 — about 1.9× body</p>
               <p className="display text-[22px]">Card title 22</p>
-              <p className="max-w-[68ch] text-[15px]">Body 15/1.55 in Plex Sans. A report is evidence about a sample, with stated limitations — not a guarantee that a dataset is correct.</p>
+              <p className="max-w-[68ch] text-[15px]">Body 15/1.55 in Schibsted Grotesk. A report is evidence about a sample, with stated limitations — not a guarantee that a dataset is correct.</p>
               <p className="num text-[22px]">240.00 USDC · 225.60 · 14.40</p>
               <Hash value="7f3a9e1c2b4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f708c91e" />
             </div>

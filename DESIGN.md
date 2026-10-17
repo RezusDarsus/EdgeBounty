@@ -74,14 +74,14 @@ All faces are SIL Open Font License (free for commercial use), self-hosted throu
 
 | Role | Face | Spec |
 |---|---|---|
-| Display (h1–h2, hero, section and card titles) | **Newsreader** (Production Type) | 400–500, opsz auto, tracking −0.02em, leading 1.05–1.15, `text-wrap: balance` |
-| UI + body | **IBM Plex Sans** | 400/500/600, body 15px/1.55, max 68ch |
+| Display (h1–h2, hero, section and card titles) | **Gloock** (Duarte Pinto) | 400, tracking +0.005em, leading 1.1–1.15, no italics (emphasis by colour), `text-wrap: balance` |
+| UI + body | **Schibsted Grotesk** (Bakken & Bæck) | 400/500/600, body 15px/1.55, max 68ch |
 | Data: hashes, numerals, all prices and amounts, kickers, table figures | **IBM Plex Mono** | 400/500, `tabular-nums`, kickers 11px uppercase +0.08em |
 
-Why: Newsreader is the voice of the paper the dataset would be cited in. Plex is a technical grotesk
-with real character (built for IBM's engineering docs), so it is not the Inter default. Plex Mono pairs
-with it at the metric level, so hashes and amounts sit on the same baseline as prose.
-Rejected: Inter, Space Grotesk, Fraunces (AI defaults), Geist (Vercel's identity).
+Why: Gloock is a high-contrast display serif with the weight of a printed journal headline, and it is rarely
+used on AI products. Schibsted Grotesk was drawn for a newspaper group: plain, sturdy, built for long reading.
+Plex Mono keeps hashes and amounts exact and tabular.
+Rejected: Inter, Space Grotesk, Fraunces, Instrument Serif (AI defaults), Geist (Vercel's identity). Newsreader + IBM Plex Sans was v1.
 
 Scale (ratio ≈1.25): 12 · 13 · 15 (body) · 18 · 22 · 28 · 40 · 56/72 (hero only).
 Section titles are 28 (≈1.9× body). Hierarchy otherwise comes from weight, rules and space.
