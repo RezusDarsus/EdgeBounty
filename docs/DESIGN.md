@@ -1,5 +1,9 @@
 # EdgeBounty 2.0 design decisions
 
+Assistant extension: Operate mode within the established Datasheet system. Task choices sit beside a readable, keyboard-focusable conversation on desktop and wrap above it on mobile. The composer includes explicit context-sharing consent, provider/error/empty states and quota information; model details sit below the composer. The floating entry link disappears on the assistant itself. Metadata and bounty drafts require separate human application; the chat never presents a payment confirmation control.
+
+Reference inspection follow-up: [Linear features](https://linear.app/features) was checked for task-oriented product organization, and [Hugging Face dataset cards](https://huggingface.co/docs/hub/datasets-cards) for separating descriptive metadata and declared context from evaluation evidence. The Mercury product URL was unavailable through the web reader; existing `docs/design/references/mercury.md` remains the reference note. These are analytical inputs, not copied assets or a claim of a full live visual-reference audit.
+
 Reviewed 2026-10-18. The existing design system is documented in [../DESIGN.md](../DESIGN.md); reusable components and the internal `/design-system` preview already exist. Preserve the application structure, evidence ladder, ledger breakdowns, and readable technical values.
 
 The supplied 2.0 brief supersedes the earlier light-only decision: use the existing Night Ledger navy tokens for the application. Retain the established Gloock, Schibsted Grotesk and IBM Plex Mono families; the brief's Space Grotesk/Inter/JetBrains choices are suggestions, not requirements. Evaluate any typography replacement separately against real catalog content. Blue remains restrained; semantic colors retain their status meanings.

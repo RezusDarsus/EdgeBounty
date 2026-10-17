@@ -1,5 +1,6 @@
 import { paymentMint } from './lib/payments.js';
 import { agentRoutes } from './routes/agents.js';
+import type { AssistantProvider } from './services/assistant.js';
 import { infringementRoutes } from './routes/infringement.js';
 import { growthRoutes } from './routes/growth.js';
 import { notificationRoutes } from './routes/notifications.js';
@@ -24,7 +25,7 @@ import { encryptedDeliveryRoutes } from './routes/encrypted.js';
 
 const bigintSafe = (_: string, v: unknown) => (typeof v === 'bigint' ? v.toString() : v);
 
-export async function buildApp(ctx: AppContext, opts: { logger?: boolean } = {}): Promise<FastifyInstance> {
+export async function buildApp(ctx: AppContext, opts: { logger?: boolean; assistantProvider?: AssistantProvider } = {}): Promise<FastifyInstance> {
   const app = Fastify({
     logger: opts.logger
       ? {
@@ -121,6 +122,6 @@ export async function buildApp(ctx: AppContext, opts: { logger?: boolean } = {})
   notificationRoutes(app, ctx);
   infringementRoutes(app, ctx);
   growthRoutes(app, ctx);
-  agentRoutes(app, ctx);
+  agentRoutes(app, ctx, opts.assistantProvider);
   return app;
 }

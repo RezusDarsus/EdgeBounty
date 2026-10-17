@@ -1,4 +1,5 @@
 import { delistUnfundedListings } from './lib/billing.js';
+import { purgeAgentCache } from './services/assistant.js';
 import { STORAGE } from '@edgebounty/pricing-engine';
 import { initializeSemanticIndex } from './services/semantic.js';
 import { stopSandboxes } from './services/sandbox.js';
@@ -46,6 +47,7 @@ if (cfg.WORKERS === 'on' && platform?.paymentMint.equals(paymentMint(cfg))) {
   if (cfg.VERIFICATION_EXECUTOR === 'api') stops.push(startOrchestrator(ctx));
   stops.push(startIndexer(ctx, cfg.INDEXER_INTERVAL_MS));
   const hk = setInterval(() => {
+    purgeAgentCache(ctx).catch((e) => app.log.error(e));
     purgeExpiredUploads(ctx).catch((e) => app.log.error(e));
     storageExpiryTick(ctx).catch((e) => app.log.error(e));
     retentionNoticeTick(ctx).catch((e) => app.log.error(e));

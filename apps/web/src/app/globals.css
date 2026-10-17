@@ -182,14 +182,14 @@ a {
   animation: pulse-dot 1.6s var(--ease-io) infinite;
 }
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    animation-delay: 0ms !important;
-    transition-duration: 0.001ms !important;
+  .rise, .skeleton, .live-dot {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
   }
+  [style*='fill-x'] { animation: none !important; transform: scaleX(1); }
+  .skeleton { background: var(--sunk); }
+  html { scroll-behavior: auto; }
 }
 
 /* Wallet adapter, brought onto the system */

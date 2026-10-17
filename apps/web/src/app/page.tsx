@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { CatalogDiscovery } from '@/components/catalog-discovery';
+import { RecentListings } from '@/components/recent-listings';
 import { DatasheetFigure } from '@/components/datasheet-figure';
 
 const ESCROW: [string, string, string][] = [
@@ -58,6 +59,8 @@ export default function Home() {
       </section>
 
       <CatalogDiscovery />
+      <RecentListings />
+      <section className="mx-auto max-w-6xl border-t border-line px-4 py-10 sm:px-6"><h2 className="display text-3xl">Describe what you need. Work through it with AI.</h2><p className="mt-3 max-w-[65ch] text-ink-2">Search real listings, draft a bounty, suggest metadata for your own uploads or understand a verification report. You stay in control of publishing and payments.</p><Link href="/assistant" className="mt-5 inline-flex min-h-11 items-center rounded-md bg-accent px-5 text-sm font-medium text-accent-ink">Open AI assistant</Link></section>
 
       {/* The two problems */}
       <section className="border-y border-line bg-panel">

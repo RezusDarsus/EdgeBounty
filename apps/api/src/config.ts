@@ -54,6 +54,13 @@ const Env = z.object({
   NVIDIA_API_KEY: z.string().optional(),
   /** Enable only after approving the provider spend budget. Drafts never perform financial actions. */
   AI_DRAFTS_ENABLED: z.enum(['0', '1']).default('0'),
+  /** Supplied free NVIDIA omni model handles interactive JSON; Lightning remains the L3 explanation model. */
+  AI_ASSISTANT_MODEL: z.string().default('nvidia/nemotron-3-nano-omni-30b-a3b-reasoning'),
+  AI_AGENT_DAILY_GLOBAL: z.coerce.number().int().min(1).max(100).default(100),
+  AI_AGENT_DAILY_ACCOUNT: z.coerce.number().int().min(1).max(10).default(10),
+  MALWARE_SCAN_REQUIRED: z.enum(['0', '1']).default('0'),
+  CLAMSCAN_BIN: z.string().default('clamscan'),
+  CLAMAV_DATABASE_DIR: z.string().default('/var/lib/clamav'),
   NVIDIA_BASE_URL: z.string().default('https://integrate.api.nvidia.com/v1'),
   SEMANTIC_DUPLICATES: z.enum(['on', 'off']).default('off'),
   NVIDIA_EMBEDDING_MODEL: z.string().default('nvidia/nemotron-3-embed-1b'),

@@ -8,6 +8,11 @@ import { conflict } from './http.js';
 
 /** Listings need paid full-file checks; a free preview is not publication approval. */
 export async function requireListingVerification(ctx: AppContext, versionId: string) {
+  if (ctx.cfg.MALWARE_SCAN_REQUIRED === '1') {
+    const [version] = await ctx.db.select().from(schema.assetVersions).where(eq(schema.assetVersions.id, versionId));
+    const scan = (version?.metadata as any)?.malware;
+    if (!scan || scan.status !== 'clean' || scan.policy !== 'clamav-bounded/1' || scan.commitment !== version?.commitment) throw conflict('Complete malware scanning and paid verification for this immutable version before publication.');
+  }
   const jobs = await ctx.db.select({ id: schema.verificationJobs.id })
     .from(schema.verificationJobs)
     .where(and(eq(schema.verificationJobs.assetVersionId, versionId), eq(schema.verificationJobs.status, 'completed'), inArray(schema.verificationJobs.level, ['L2', 'L3'])));

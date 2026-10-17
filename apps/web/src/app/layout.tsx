@@ -6,6 +6,7 @@ import './globals.css';
 import { Providers } from './providers';
 import { Nav } from '@/components/nav';
 import { Mark } from '@/components/brand';
+import { AssistantLink } from '@/components/assistant-link';
 
 const plexSans = Schibsted_Grotesk({ subsets: ['latin'], weight: ['400', '500', '600'], variable: '--font-plex-sans', display: 'swap' });
 const plexMono = IBM_Plex_Mono({ subsets: ['latin'], weight: ['400', '500'], variable: '--font-plex-mono', display: 'swap' });
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
 const FOOTER: [string, [string, string][]][] = [
   ['Marketplace', [['/datasets', 'Datasets'], ['/models', 'Models'], ['/bounties', 'Funded requests'], ['/failure-bounties', 'Failure bounties'], ['/providers', 'Verifiers']]],
   ['Sell', [['/sell', 'List a dataset or model'], ['/provider', 'Become a verifier'], ['/storage', 'Storage'], ['/pricing', 'Fees and pricing']]],
-  ['How it works', [['/how-escrow-works', 'How escrow works'], ['/verify', 'Private verification'], ['/help', 'Help and disputes'], ['/developers', 'Developer API']]],
+  ['How it works', [['/how-escrow-works', 'How escrow works'], ['/verify', 'Private verification'], ['/help', 'Help and disputes'], ['/developers', 'Developer API'], ['/policies', 'Data rights and privacy']]],
 ];
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -32,6 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </a>
           <Nav />
           <div id="main" className="flex-1">{children}</div>
+          <AssistantLink />
           <footer className="mt-24 border-t border-line bg-panel">
             <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
               <div>

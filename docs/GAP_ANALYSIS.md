@@ -1,5 +1,7 @@
 # EdgeBounty 2.0 gap register
 
+Follow-up update: [MASTER_IMPLEMENTATION_STATUS.md](MASTER_IMPLEMENTATION_STATUS.md) records the implemented AI conversation/metadata/report flows, durable limits/cache, auth/invoice fixes, ClamAV publication gate and new verification evidence. The original inventory below describes the earlier pass and is retained as audit history.
+
 Audit date: 2026-10-18. WORKING means directly tested within the stated local scope, not production approval. PARTIALLY IMPLEMENTED means source exists with material coverage/operation gaps. UNVERIFIED means not exercised in this run. Prior reports are linked rather than reasserted as new results.
 
 | Capability | Classification | Evidence / remaining work |

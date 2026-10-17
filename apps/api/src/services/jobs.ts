@@ -24,6 +24,7 @@ import { runSandboxed } from './sandbox.js';
 import { aiProvider, assessRelevance, explainReport } from './l3.js';
 import { runModelJob } from './model-jobs.js';
 import { VERIFICATION_POLICY_VERSION } from '../lib/verification-policy.js';
+import { scanMaterialized, MALWARE_POLICY } from './malware.js';
 import { checkImageDuplicates, checkTextDuplicates, IMAGE_DUPLICATE_SAMPLES } from './semantic.js';
 import { assessMedia, mediaKind, MEDIA_PROMPT_VERSION } from './media-review.js';
 
@@ -36,7 +37,7 @@ export function specFor(level: AnalysisLevel, criteria: unknown, benchmarkId?: s
   const ai = level === 'L3' && cfg ? { provider, model: provider === 'gemini' ? cfg.GEMINI_MODEL : provider === 'nvidia' ? cfg.L3_VISION_MODEL : cfg.L3_MODEL, promptVersion: 'image-review-2026-10-17', sampleItems: RATES.sampledAiItems } : null;
   const semantic = level === 'L3' && cfg?.SEMANTIC_DUPLICATES === 'on' ? { model: cfg.NVIDIA_EMBEDDING_MODEL, policy: 'owner-text-prefix-8192-v1', imageModel: cfg.NVIDIA_IMAGE_EMBEDDING_MODEL, imagePolicy: `owner-image-sample-${IMAGE_DUPLICATE_SAMPLES}-v1` } : null;
   const media = level === 'L3' && cfg && provider === 'nvidia' ? { model: cfg.L3_MEDIA_MODEL, promptVersion: MEDIA_PROMPT_VERSION, maxClips: cfg.L3_MEDIA_MAX_CLIPS, maxClipBytes: cfg.L3_MEDIA_MAX_BYTES } : null;
-  const spec = { schema: 'edgebounty.spec/1', level, criteria: criteria ?? null, validator: DATASET_VALIDATOR, benchmarkId: benchmarkId ?? null, ai, ...(semantic ? { semantic } : {}), ...(media ? { media } : {}) };
+  const spec = { schema: 'edgebounty.spec/1', level, criteria: criteria ?? null, validator: DATASET_VALIDATOR, benchmarkId: benchmarkId ?? null, ai, ...(semantic ? { semantic } : {}), ...(media ? { media } : {}), ...(cfg?.MALWARE_SCAN_REQUIRED === '1' && level !== 'L1' ? { malwarePolicy: MALWARE_POLICY } : {}) };
   return { spec, specHash: bytesToHex(hashDocument(DOMAIN.spec, spec)) };
 }
 
@@ -234,7 +235,14 @@ export async function runJob(ctx: AppContext, job: Job): Promise<void> {
     }
     if (files.some((f) => f.objectKey.startsWith('r2/'))) await ctx.db.execute(sql`update asset_versions set metadata = coalesce(metadata, '{}'::jsonb) || '{"hashVerification":"server-verified"}'::jsonb where id = ${version.id}`);
 
+    const malware = job.level === 'L1' ? null : await scanMaterialized(ctx.cfg, inDir);
+    if (malware) await ctx.db.execute(sql`update asset_versions set metadata = coalesce(metadata, '{}'::jsonb) || ${JSON.stringify({ malware: { ...malware, commitment: version.commitment } })}::jsonb where id=${version.id}`);
     const report = asset.kind === 'model' ? await runModelJob(ctx, job, version, asset, inDir, outDir) : await runDatasetJob(ctx, job, version, asset, inDir, outDir);
+    if (malware) {
+      report.report.tools.push({ name: 'ClamAV signature scan', version: malware.engine });
+      report.report.limitations.push(malware.limitation);
+      if (report.usage) report.usage.computeMs += malware.elapsedMs;
+    }
     const reportHash = bytesToHex(hashDocument(DOMAIN.report, report.report));
     const [result] = await ctx.db.insert(schema.verificationResults).values({ jobId: job.id, report: report.report, reportHash, passed: report.report.passed }).returning();
     await ctx.db

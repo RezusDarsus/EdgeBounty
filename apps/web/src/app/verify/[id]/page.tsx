@@ -1,5 +1,6 @@
 'use client';
 import { use, useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { CAPABILITIES } from '@edgebounty/shared-types';
 import { api } from '@/lib/api';
@@ -59,7 +60,7 @@ export default function JobPage({ params }: { params: Promise<{ id: string }> })
         {j && (
           <div className="grid gap-4 lg:grid-cols-[2fr_1fr]">
             <Card title="Report" right={j.result && <Button variant="ghost" onClick={exportReport}>Export JSON</Button>}>
-              {j.result ? <ReportView report={j.result.report} reportHash={j.result.reportHash} attestation={j.result.attestation} /> : <p className="text-sm text-muted">{j.status === 'needs_authorization' ? j.error : j.error ?? 'Running in an isolated worker…'}</p>}
+              {j.result ? <><Link href={`/assistant?mode=verification&job=${id}`} className="mb-4 inline-flex min-h-11 items-center text-sm underline">Explain this report with AI</Link><ReportView report={j.result.report} reportHash={j.result.reportHash} attestation={j.result.attestation} /></> : <p className="text-sm text-muted">{j.status === 'needs_authorization' ? j.error : j.error ?? 'Running in an isolated worker…'}</p>}
               {j.status === 'needs_authorization' && <Button className="mt-3" onClick={async () => { await api(`/verification/jobs/${id}/reauthorize`, { method: 'POST' }); reload(); }}>Accept new quote</Button>}
             </Card>
             <div className="space-y-4">

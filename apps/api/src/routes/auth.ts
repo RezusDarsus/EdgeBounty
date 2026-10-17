@@ -81,6 +81,9 @@ export function authRoutes(app: FastifyInstance, ctx: AppContext) {
   /** Account deletion: erases profile data; on-chain records are public and immutable. */
   app.delete('/me', async (req) => {
     const s = requireSession(req);
+    await db.update(schema.apiKeys).set({ revokedAt: new Date() }).where(eq(schema.apiKeys.accountId, s.accountId));
+    // Erase cached private AI output; retain prompt-free quota reservation records until retention cleanup.
+    await db.update(schema.agentRequests).set({ response: null, status: 'erased' }).where(eq(schema.agentRequests.accountId, s.accountId));
     await db.update(schema.profiles).set({ displayName: null, organization: null, bio: null, links: [] }).where(eq(schema.profiles.accountId, s.accountId));
     await db.update(schema.accounts).set({ deletedAt: new Date(), mode: 'pseudonymous' }).where(eq(schema.accounts.id, s.accountId));
     await audit(db, s, 'account.delete', s.accountId);

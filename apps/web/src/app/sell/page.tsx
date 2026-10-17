@@ -1,5 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { MetadataDraft } from '@/components/metadata-draft';
 import { useRouter } from 'next/navigation';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { DATASET_CATEGORIES } from '@edgebounty/shared-types';
@@ -110,7 +112,7 @@ export default function Sell() {
             <div className="mt-3">
               <AssetUploader key={uploadKey} kind={kind} purpose="listing" name={f.title || `${kind} listing`} accept={kind === 'model' ? '.onnx,.safetensors' : undefined} onDone={setAsset} />
             </div>
-            {asset && <p className="mt-3 text-sm text-muted">Basic preview checks start automatically. Complete the verification step below before publishing.</p>}
+            {asset && <><p className="mt-3 text-sm text-muted">Basic preview checks start automatically. Complete the verification step below before publishing.</p><MetadataDraft key={asset.versionId} versionId={asset.versionId} apply={m => setF(current => ({ ...current, title: m.title, description: m.description, formats: m.formats.join(', ') }))} /><Link href={`/assistant?mode=metadata&version=${asset.versionId}`} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex min-h-11 items-center text-sm underline">Ask more about this manifest (new tab)</Link></>}
           </Card>
           <Card title="2 · Listing terms">
             <div className="space-y-3">

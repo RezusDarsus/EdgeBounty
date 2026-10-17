@@ -39,6 +39,14 @@ export const operationCounters = pgTable('operation_counters', {
   key: text('key').primaryKey(), count: micro('count').notNull().default(sql`0`), updatedAt: ts('updated_at').notNull().defaultNow(),
 });
 
+/** Account-scoped immutable-response cache and durable provider-call reservations. No raw prompts. */
+export const agentRequests = pgTable('agent_requests', {
+  id: id(), accountId: uuid('account_id').notNull(), requestHash: text('request_hash').notNull(),
+  mode: text('mode').notNull(), status: text('status').notNull().default('running'),
+  response: jsonb('response'), inputTokens: integer('input_tokens'), outputTokens: integer('output_tokens'),
+  createdAt: created(),
+}, t => [uniqueIndex('agent_requests_account_hash').on(t.accountId, t.requestHash), index('agent_requests_created').on(t.createdAt)]);
+
 /** Each gateway HTTP request reserves its range once; failed storage reads can refund once. */
 export const gatewayTransfers = pgTable('gateway_transfers', {
   id: uuid('id').primaryKey(),

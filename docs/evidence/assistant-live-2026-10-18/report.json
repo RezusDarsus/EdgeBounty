@@ -1,0 +1,162 @@
+[
+  {
+    "name": "mobile-small",
+    "route": "/assistant",
+    "status": 200,
+    "overflow": 0,
+    "h1": "Ask EdgeBounty AI",
+    "mainCount": 1,
+    "focusOutline": "none",
+    "errors": [],
+    "screenshot": "mobile-small-assistant.png"
+  },
+  {
+    "name": "mobile",
+    "interaction": "live-chat",
+    "status": 200,
+    "cached": false,
+    "provider": "nvidia",
+    "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+    "cost": {
+      "calls": 1,
+      "inputTokens": 287,
+      "outputTokens": 176,
+      "billedUsd": null
+    }
+  },
+  {
+    "name": "mobile",
+    "route": "/assistant",
+    "status": 200,
+    "overflow": 0,
+    "h1": "Ask EdgeBounty AI",
+    "mainCount": 1,
+    "focusOutline": "none",
+    "errors": [],
+    "screenshot": "mobile-assistant.png"
+  },
+  {
+    "name": "mobile",
+    "route": "/",
+    "status": 200,
+    "overflow": 0,
+    "h1": "Find the data your AI needs. Fund the data that doesn’t exist.",
+    "mainCount": 1,
+    "focusOutline": "none",
+    "errors": [],
+    "screenshot": "mobile-home.png"
+  },
+  {
+    "name": "mobile",
+    "route": "/policies",
+    "status": 200,
+    "overflow": 0,
+    "h1": "Data rights, privacy and the test-network MVP",
+    "mainCount": 1,
+    "focusOutline": "none",
+    "errors": [],
+    "screenshot": "mobile-policies.png"
+  },
+  {
+    "name": "mobile",
+    "route": "/assistant?mode=metadata",
+    "status": 200,
+    "overflow": 0,
+    "h1": "Ask EdgeBounty AI",
+    "mainCount": 1,
+    "focusOutline": "none",
+    "errors": [],
+    "screenshot": "mobile-assistant-mode-metadata.png"
+  },
+  {
+    "name": "mobile",
+    "route": "/assistant?mode=verification",
+    "status": 200,
+    "overflow": 0,
+    "h1": "Ask EdgeBounty AI",
+    "mainCount": 1,
+    "focusOutline": "none",
+    "errors": [],
+    "screenshot": "mobile-assistant-mode-verification.png"
+  },
+  {
+    "name": "laptop",
+    "route": "/assistant",
+    "status": 200,
+    "overflow": 0,
+    "h1": "Ask EdgeBounty AI",
+    "mainCount": 1,
+    "focusOutline": "none",
+    "errors": [],
+    "screenshot": "laptop-assistant.png"
+  },
+  {
+    "name": "desktop",
+    "interaction": "live-chat",
+    "status": 200,
+    "cached": true,
+    "provider": "nvidia",
+    "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+    "cost": {
+      "calls": 0,
+      "inputTokens": 287,
+      "outputTokens": 176,
+      "billedUsd": null
+    }
+  },
+  {
+    "name": "desktop",
+    "route": "/assistant",
+    "status": 200,
+    "overflow": 0,
+    "h1": "Ask EdgeBounty AI",
+    "mainCount": 1,
+    "focusOutline": "none",
+    "errors": [],
+    "screenshot": "desktop-assistant.png"
+  },
+  {
+    "name": "desktop",
+    "route": "/",
+    "status": 200,
+    "overflow": 0,
+    "h1": "Find the data your AI needs. Fund the data that doesn’t exist.",
+    "mainCount": 1,
+    "focusOutline": "none",
+    "errors": [],
+    "screenshot": "desktop-home.png"
+  },
+  {
+    "name": "desktop",
+    "route": "/policies",
+    "status": 200,
+    "overflow": 0,
+    "h1": "Data rights, privacy and the test-network MVP",
+    "mainCount": 1,
+    "focusOutline": "none",
+    "errors": [],
+    "screenshot": "desktop-policies.png"
+  },
+  {
+    "name": "desktop",
+    "route": "/assistant?mode=metadata",
+    "status": 200,
+    "overflow": 0,
+    "h1": "Ask EdgeBounty AI",
+    "mainCount": 1,
+    "focusOutline": "none",
+    "errors": [],
+    "screenshot": "desktop-assistant-mode-metadata.png"
+  },
+  {
+    "name": "desktop",
+    "route": "/assistant?mode=verification",
+    "status": 200,
+    "overflow": 0,
+    "h1": "Ask EdgeBounty AI",
+    "mainCount": 1,
+    "focusOutline": "none",
+    "errors": [],
+    "screenshot": "desktop-assistant-mode-verification.png"
+  }
+]

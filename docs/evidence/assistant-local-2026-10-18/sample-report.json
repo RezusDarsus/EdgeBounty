@@ -1,0 +1,9 @@
+{
+  "realLocalUpload": true,
+  "finalizedImmutableVersion": true,
+  "boundedPreviewBytes": 4096,
+  "explicitOptInDefault": false,
+  "clearedOnContextChange": true,
+  "cloudCalls": 0,
+  "aiCalls": 0
+}

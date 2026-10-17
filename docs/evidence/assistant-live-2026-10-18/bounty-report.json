@@ -1,0 +1,14 @@
+{
+  "status": 200,
+  "draftPreviewed": true,
+  "explicitApply": true,
+  "budgetPreserved": true,
+  "deadlinePreserved": true,
+  "financialTransactions": 0,
+  "cost": {
+    "calls": 1,
+    "inputTokens": 147,
+    "outputTokens": 339,
+    "billedUsd": null
+  }
+}

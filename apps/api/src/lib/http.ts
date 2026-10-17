@@ -58,7 +58,13 @@ export async function resolveSession(ctx: AppContext, req: FastifyRequest): Prom
   const h = req.headers.authorization;
   if (h?.startsWith('Bearer ')) {
     const s = await verifySession(ctx.cfg.JWT_SECRET, h.slice(7));
-    if (s) return s;
+    if (s) {
+      const [account] = await ctx.db.select().from(schema.accounts).where(eq(schema.accounts.id, s.accountId));
+      if (account && !account.deletedAt && account.wallet === s.wallet) {
+        const configuredAdmin = ctx.cfg.ADMIN_WALLETS.split(',').map(v => v.trim()).includes(account.wallet);
+        return { ...s, roles: configuredAdmin ? [...new Set([...account.roles, 'admin'])] : account.roles };
+      }
+    }
   }
   const key = req.headers['x-api-key'];
   if (typeof key === 'string' && key.startsWith('eb_')) {
@@ -68,7 +74,7 @@ export async function resolveSession(ctx: AppContext, req: FastifyRequest): Prom
       .where(and(eq(schema.apiKeys.keyHash, hashApiKey(key)), isNull(schema.apiKeys.revokedAt)));
     if (k) {
       const [a] = await ctx.db.select().from(schema.accounts).where(eq(schema.accounts.id, k.accountId));
-      if (a) {
+      if (a && !a.deletedAt) {
         await ctx.db.update(schema.apiKeys).set({ lastUsedAt: new Date() }).where(eq(schema.apiKeys.id, k.id));
         // API keys never carry admin power and are limited to their scopes
         return { accountId: a.id, wallet: a.wallet, roles: [], scopes: k.scopes };

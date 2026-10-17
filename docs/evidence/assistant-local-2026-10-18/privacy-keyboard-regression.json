@@ -1,0 +1,10 @@
+{
+  "offlineFixture": true,
+  "providerCalls": 0,
+  "lateReplyDiscardedAfterSignOut": true,
+  "transcriptKeyboardFocus": {
+    "focused": true,
+    "outline": "solid",
+    "width": "2px"
+  }
+}

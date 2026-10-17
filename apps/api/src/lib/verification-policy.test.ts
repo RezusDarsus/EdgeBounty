@@ -3,12 +3,13 @@ import { randomUUID } from 'node:crypto';
 import { createDb, schema } from '../db/index.js';
 import type { AppContext } from '../context.js';
 import { requireListingVerification, requestVerificationQuote } from './verification-policy.js';
+import { loadConfig } from '../config.js';
 
 let ctx: AppContext;
 let close: () => Promise<void>;
 beforeAll(async () => {
   const database = await createDb({ memory: true });
-  ctx = { db: database.db } as AppContext;
+  ctx = { db: database.db, cfg: loadConfig({ NODE_ENV: 'test', MALWARE_SCAN_REQUIRED: '0' }) } as AppContext;
   close = database.close;
 });
 afterAll(async () => close());
@@ -32,6 +33,16 @@ describe('listing verification gate', () => {
     const version = randomUUID();
     await result(version, 'L2', 'completed', true);
     await expect(requireListingVerification(ctx, version)).resolves.toBeUndefined();
+  });
+  it('quarantines publication until the exact commitment has a clean malware scan', async () => {
+    const versionId = randomUUID();
+    await result(versionId, 'L2', 'completed', true);
+    ctx.cfg.MALWARE_SCAN_REQUIRED = '1';
+    await expect(requireListingVerification(ctx, versionId)).rejects.toThrow('malware scanning');
+    const [asset] = await ctx.db.insert(schema.assets).values({ ownerId: randomUUID(), name: 'private fixture', kind: 'dataset', purpose: 'listing' }).returning();
+    await ctx.db.insert(schema.assetVersions).values({ id: versionId, assetId: asset.id, version: 1, commitment: 'a'.repeat(64), metadata: { malware: { status: 'clean', policy: 'clamav-bounded/1', commitment: 'b'.repeat(64) } } });
+    await expect(requireListingVerification(ctx, versionId)).rejects.toThrow('malware scanning');
+    ctx.cfg.MALWARE_SCAN_REQUIRED = '0';
   });
 });
 

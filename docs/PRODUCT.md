@@ -1,5 +1,7 @@
 # EdgeBounty product truth
 
+2026-10-18 follow-up: the NVIDIA assistant now implements four task modes with account/global daily caps, private cached responses and human-only financial authority. The earlier default-off drafting and missing durable-quota statements below describe the initial pass; current scope and production gates are in MASTER_IMPLEMENTATION_STATUS.md.
+
 EdgeBounty helps buyers find AI datasets/models and commission missing data through funded bounties. Sellers publish metadata, license declarations and version-specific check reports. Contributors deliver against agreed criteria; reviewers assess the delivery; administrators handle moderation and disputes through authorized workflows.
 
 The current target is a test-network MVP. Historical reports describe mock-USDC settlement on a private validator. They do not establish public Devnet/Mainnet readiness, independent audit, genuine redeemable USDC or legal approval.

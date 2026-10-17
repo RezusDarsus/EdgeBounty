@@ -10,6 +10,7 @@ import { Mark } from './brand';
 import { buttonCls } from './ui';
 const WalletMultiButton = dynamic(() => import('@solana/wallet-adapter-react-ui').then((m) => m.WalletMultiButton), { ssr: false });
 const LINKS = [
+  ['/assistant', 'Ask AI'],
   ['/datasets', 'Datasets'],
   ['/models', 'Models'],
   ['/bounties', 'Funded requests'],
@@ -44,7 +45,7 @@ export function Nav() {
           EdgeBounty
         </Link>
         <nav aria-label="Marketplace" className="hidden flex-1 items-center gap-1 lg:flex">
-          {LINKS.map(([href, label]) => {
+          {LINKS.filter(([href]) => !['/failure-bounties', '/providers'].includes(href)).map(([href, label]) => {
             const on = path?.startsWith(href);
             return (
               <Link key={href} href={href} aria-current={on ? 'page' : undefined} className={`relative px-2.5 py-2 text-sm transition-colors ${on ? 'text-ink' : 'text-ink-2 hover:text-ink'}`}>

@@ -164,6 +164,25 @@ describe('access control', () => {
 });
 
 describe('CORS (browser clients)', () => {
+  it('uses current administrator configuration rather than stale JWT roles', async () => {
+    const kp = Keypair.generate(); const previous = ctx.cfg.ADMIN_WALLETS;
+    try {
+      ctx.cfg.ADMIN_WALLETS = kp.publicKey.toBase58();
+      const s = await signIn(kp);
+      expect((await req('GET', '/me', s.token)).json().roles).toContain('admin');
+      ctx.cfg.ADMIN_WALLETS = '';
+      expect((await req('GET', '/me', s.token)).json().roles).not.toContain('admin');
+    } finally { ctx.cfg.ADMIN_WALLETS = previous; }
+  });
+  it('revokes JWT and API-key access immediately after account deletion', async () => {
+    const s = await signIn();
+    const token = s.token;
+    const key = (await req('POST', '/me/api-keys', token, { name: 'delete regression', scopes: ['read'] })).json();
+    expect((await req('GET', '/me', token)).statusCode).toBe(200);
+    expect((await req('DELETE', '/me', token)).statusCode).toBe(200);
+    expect((await req('GET', '/me', token)).statusCode).toBe(401);
+    expect((await req('GET', '/me', undefined, undefined, { 'x-api-key': key.key })).statusCode).toBe(401);
+  });
   it('preflight allows the methods and headers the web app uses', async () => {
     for (const method of ['PUT', 'PATCH', 'DELETE']) {
       const r = await app.inject({ method: 'OPTIONS', url: '/uploads/x/parts/1', headers: { origin: 'http://localhost:3000', 'access-control-request-method': method, 'access-control-request-headers': 'authorization,content-type,x-part-sha256' } });

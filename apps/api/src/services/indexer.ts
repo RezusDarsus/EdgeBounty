@@ -1,5 +1,5 @@
 import { applyPaidInvoice } from '../lib/billing.js';
-import { and, eq, inArray, lt } from 'drizzle-orm';
+import { and, asc, eq, inArray, lt } from 'drizzle-orm';
 import { PublicKey } from '@solana/web3.js';
 import { TERMINAL_ORDER_STATES } from '@edgebounty/shared-types';
 import { AcceptanceCriteria, hexToBytes } from '@edgebounty/verification-schemas';
@@ -185,6 +185,19 @@ export async function confirmPaidInvoices(ctx: AppContext) {
   const open = await ctx.db.select().from(schema.invoices).where(eq(schema.invoices.status, 'open'));
   for (const inv of open) await confirmInvoice(ctx, inv);
   await ctx.db.update(schema.invoices).set({ status: 'expired' }).where(and(eq(schema.invoices.status, 'open'), lt(schema.invoices.expiresAt, new Date())));
+  // Bounded rotating reconciliation also discovers delayed receipts after expiry, without requiring a browser callback.
+  const key = 'billing:expired-reconciliation';
+  const [cursor] = await ctx.db.select().from(schema.operationCounters).where(eq(schema.operationCounters.key, key));
+  if (!cursor || Date.now() - cursor.updatedAt.getTime() >= 60_000) {
+    const offset = Number(cursor?.count ?? 0n);
+    const rows = await ctx.db.select().from(schema.invoices).where(eq(schema.invoices.status, 'expired')).orderBy(asc(schema.invoices.createdAt), asc(schema.invoices.id)).limit(25).offset(offset);
+    for (const inv of rows) {
+      try { await confirmInvoice(ctx, inv); }
+      catch { console.error('Expired invoice reconciliation failed; invoice retained for a later retry.'); }
+    }
+    const count = rows.length === 25 ? BigInt(offset + 25) : 0n;
+    await ctx.db.insert(schema.operationCounters).values({ key, count, updatedAt: new Date() }).onConflictDoUpdate({ target: schema.operationCounters.key, set: { count, updatedAt: new Date() } });
+  }
 }
 
 export async function confirmInvoice(ctx: AppContext, inv: typeof schema.invoices.$inferSelect): Promise<boolean> {
@@ -193,29 +206,36 @@ export async function confirmInvoice(ctx: AppContext, inv: typeof schema.invoice
   if (!receipt) return false;
   const [acct] = await ctx.db.select().from(schema.accounts).where(eq(schema.accounts.id, inv.accountId));
   if (receipt.amount < inv.amountMicro || receipt.payer !== acct?.wallet) return false;
-  const [paid] = await ctx.db
+  return ctx.db.transaction(async tx => {
+  const txCtx = { ...ctx, db: tx as unknown as AppContext['db'] };
+  const [paid] = await tx
     .update(schema.invoices)
     .set({ status: 'paid', paidAt: new Date(receipt.paidAt * 1000), receiptAddress: receipt.address })
-    .where(and(eq(schema.invoices.id, inv.id), eq(schema.invoices.status, 'open')))
+    // A receipt may arrive after the quote was marked expired; honor its immutable paid terms.
+    .where(and(eq(schema.invoices.id, inv.id), inArray(schema.invoices.status, ['open', 'expired'])))
     .returning();
-  if (!paid) return true;
-  await applyPaidInvoice(ctx, paid);
+  if (!paid) {
+    const [current] = await tx.select().from(schema.invoices).where(eq(schema.invoices.id, inv.id));
+    return current?.status === 'paid';
+  }
+  await applyPaidInvoice(txCtx, paid);
   if (inv.kind === 'storage') {
-    const [alloc] = await ctx.db.select().from(schema.storageAllocations).where(eq(schema.storageAllocations.invoiceId, inv.id));
+    const [alloc] = await tx.select().from(schema.storageAllocations).where(eq(schema.storageAllocations.invoiceId, inv.id));
     if (alloc) {
       const now = new Date();
       // extend from the later of now / current active expiry
       const expiresAt = new Date(now.getTime() + alloc.termDays * 86_400_000);
-      await ctx.db.update(schema.storageAllocations).set({ status: 'active', startsAt: now, expiresAt, graceUntil: null }).where(eq(schema.storageAllocations.id, alloc.id));
+      await tx.update(schema.storageAllocations).set({ status: 'active', startsAt: now, expiresAt, graceUntil: null }).where(eq(schema.storageAllocations.id, alloc.id));
     }
   }
   if (inv.kind === 'other' && (inv.metadata as any)?.credits) {
-    await ctx.db.insert(schema.credits).values({ accountId: inv.accountId, amountMicro: inv.amountMicro, reason: `credit purchase ${inv.id}` });
+    await tx.insert(schema.credits).values({ accountId: inv.accountId, amountMicro: inv.amountMicro, reason: `credit purchase ${inv.id}` });
   }
   if (inv.kind === 'verification') {
-    await ctx.db.update(schema.verificationJobs).set({ status: 'queued' }).where(and(eq(schema.verificationJobs.invoiceId, inv.id), eq(schema.verificationJobs.status, 'awaiting_payment')));
+    await tx.update(schema.verificationJobs).set({ status: 'queued' }).where(and(eq(schema.verificationJobs.invoiceId, inv.id), eq(schema.verificationJobs.status, 'awaiting_payment')));
   }
   return true;
+  });
 }
 
 /** Permissionless settlement crank: settles orders whose review window passed in silence. */

@@ -1,5 +1,9 @@
 # Implementation evidence — 2026-10-18
 
+Latest assistant release: [deployments/2026-10-18-assistant.md](deployments/2026-10-18-assistant.md) records the deployed NVIDIA chat, drafting/report flows, security fixes, live checks and remaining production gates. The full current scope is in [MASTER_IMPLEMENTATION_STATUS.md](MASTER_IMPLEMENTATION_STATUS.md); earlier inventories below are historical.
+
+Subsequent deployment: after explicit user authorization, the incremental update was published and checked. See [deployments/2026-10-18-edge2.md](deployments/2026-10-18-edge2.md). Statements below about no deployment describe the earlier local implementation run.
+
 ## Scope and ownership
 
 The repository began with extensive tracked and untracked user work. That work was preserved. Existing contract initialization fixes, media/semantic verification, growth/analytics, infringement, operations changes and historical remote deployments are not attributed to this run.
