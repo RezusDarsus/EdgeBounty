@@ -65,7 +65,7 @@ export default function Pricing() {
             ['100 GB', '$4.50'],
             ['500 GB', '$22.50'],
           ]}
-          note="All storage is paid; there is no free storage allowance. Billing rounds each asset up to a whole GiB (1,073,741,824 bytes), with a $0.30 monthly minimum, for prepaid 30-day months. A 10 GiB asset costs $0.45/month; 100 GiB costs $4.50/month."
+          note="All storage is paid; there is no free storage allowance. We total the files in each asset version, then round that total up to a whole GiB (1,073,741,824 bytes) once. A $0.30 monthly minimum applies per version for prepaid 30-day months. A 10 GiB version costs $0.45/month; 100 GiB costs $4.50/month."
         />
 
         <Table
@@ -75,7 +75,7 @@ export default function Pricing() {
             ['Included download capacity', 'priced in the checkout quote'],
             ['Additional capacity, per started GB', '$0.15'],
           ]}
-          note="The access period includes a paid, size-based download capacity: one complete copy for 1 month, two for 3 months, or three for 6 months. Additional capacity is $0.15 per started GiB. Range requests support resuming; the gateway reserves requested bytes, so an interrupted request may still consume the reservation."
+          note="The access period includes a paid, size-based download capacity: one complete copy for 1 month, two for 3 months, or three for 6 months. Additional capacity is $0.15 per started GiB. This is EdgeBounty's download-capacity service price, not a Cloudflare R2 egress charge. Range requests support resuming; the gateway reserves requested bytes, so an interrupted request may still consume the reservation."
         />
 
         <Table
