@@ -2,16 +2,16 @@
 import { use } from 'react';
 import { useApi } from '@/lib/hooks';
 import { sol } from '@/lib/format';
-import { Badge, Card, ErrorNote, Hash, KV, LinkCard, Page } from '@/components/ui';
+import { Badge, Card, ErrorNote, Hash, KV, LinkCard, Page, PageLoading } from '@/components/ui';
 
 export default function Profile({ params }: { params: Promise<{ wallet: string }> }) {
   const { wallet } = use(params);
   const { data: p, error } = useApi<any>(`/profiles/${wallet}`);
   const { data: listings } = useApi<{ items: any[] }>(`/listings?seller=${wallet}`);
-  if (error) return <Page title="Profile"><ErrorNote error={error} /></Page>;
-  if (!p) return <Page title="Loading…"><span /></Page>;
+  if (error) return <Page kicker="Profile" title="Profile"><ErrorNote error={error} /></Page>;
+  if (!p) return <PageLoading />;
   return (
-    <Page title={p.profile?.displayName ?? p.alias} subtitle={<span><Hash value={p.wallet} /> · {p.mode === 'public' ? 'public professional profile' : 'pseudonymous account'}</span>}>
+    <Page kicker="Profile" title={p.profile?.displayName ?? p.alias} subtitle={<span><Hash value={p.wallet} /> · {p.mode === 'public' ? 'public professional profile' : 'pseudonymous account'}</span>}>
       <div className="grid gap-4 md:grid-cols-[1fr_2fr]">
         <div className="space-y-4">
           {p.profile && (

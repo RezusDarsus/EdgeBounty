@@ -77,8 +77,9 @@ export function AssetUploader({ kind, purpose, name, onDone, accept, allowEncryp
 
   if (done)
     return (
-      <div className="rounded-lg border border-good/40 bg-good/10 p-4 text-sm">
-        <p className="font-medium">
+      <div className="rounded-md border border-good/35 bg-good/6 p-4 text-sm" role="status">
+        <p className="font-medium text-ink">
+          <span aria-hidden="true" className="mr-1.5 text-good">●</span>
           Uploaded {done.fileCount} files ({bytes(done.totalSize)}) and sealed the version.
         </p>
         <p className="mt-1">
@@ -89,14 +90,22 @@ export function AssetUploader({ kind, purpose, name, onDone, accept, allowEncryp
 
   return (
     <div className="space-y-3">
-      <div className="flex flex-wrap gap-2">
-        <label className="cursor-pointer rounded-lg border border-line bg-panel px-3 py-2 text-sm hover:bg-code">
+      <div
+        className="flex flex-wrap items-center gap-2 rounded-md border border-dashed border-ink/25 bg-sunk/50 p-4"
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={(e) => {
+          e.preventDefault();
+          if (!uploading) chooseFiles(Array.from(e.dataTransfer.files ?? []));
+        }}
+      >
+        <span className="mr-auto w-full text-sm text-ink-2 sm:w-auto">Drop files here, or</span>
+        <label className="inline-flex h-9 cursor-pointer items-center rounded-md border border-line bg-panel px-3 text-sm font-medium transition-colors focus-within:outline focus-within:outline-2 focus-within:outline-accent hover:border-ink/40">
           Choose files
-          <input type="file" multiple accept={accept} className="hidden" disabled={uploading} onChange={(e) => chooseFiles(Array.from(e.target.files ?? []))} />
+          <input type="file" multiple accept={accept} className="sr-only" disabled={uploading} onChange={(e) => chooseFiles(Array.from(e.target.files ?? []))} />
         </label>
-        <label className="cursor-pointer rounded-lg border border-line bg-panel px-3 py-2 text-sm hover:bg-code">
+        <label className="inline-flex h-9 cursor-pointer items-center rounded-md border border-line bg-panel px-3 text-sm font-medium transition-colors focus-within:outline focus-within:outline-2 focus-within:outline-accent hover:border-ink/40">
           Choose folder
-          <input type="file" className="hidden" {...({ webkitdirectory: '', directory: '' } as any)} disabled={uploading} onChange={(e) => chooseFiles(Array.from(e.target.files ?? []))} />
+          <input type="file" className="sr-only" {...({ webkitdirectory: '', directory: '' } as any)} disabled={uploading} onChange={(e) => chooseFiles(Array.from(e.target.files ?? []))} />
         </label>
         {allowEncryption && (
           <label className="flex items-center gap-1.5 text-sm" title="Advanced private mode: files are encrypted in your browser; the platform cannot analyse or preview them.">
@@ -112,12 +121,15 @@ export function AssetUploader({ kind, purpose, name, onDone, accept, allowEncryp
           {files.length} files · {bytes(total)} · files go to private storage; nothing is published until you list it.
         </p>
       )}
-      <ul className="max-h-48 space-y-1 overflow-auto text-xs">
+      <ul className="max-h-56 space-y-2.5 overflow-auto text-xs" aria-label="Upload progress">
         {Object.values(progress).map((p) => (
-          <li key={p.file} className="flex items-center gap-2">
-            <span className="mono flex-1 truncate">{p.file}</span>
-            <span className="text-muted" title={p.error}>{p.phase}</span>
-            <span className="w-10 text-right">{Math.round(p.progress * 100)}%</span>
+          <li key={p.file} className="grid grid-cols-[1fr_auto_44px] items-center gap-x-3 gap-y-1">
+            <span className="mono truncate text-ink-2">{p.file}</span>
+            <span className={p.error ? 'text-bad' : 'text-muted'} title={p.error}>{p.phase}</span>
+            <span className="num text-right">{Math.round(p.progress * 100)}%</span>
+            <span className="col-span-3 h-[3px] overflow-hidden rounded-[1px] bg-sunk" aria-hidden="true">
+              <span className={`block h-full origin-left transition-transform duration-300 ${p.error ? 'bg-bad' : 'bg-ink'}`} style={{ transform: `scaleX(${p.progress})` }} />
+            </span>
           </li>
         ))}
       </ul>

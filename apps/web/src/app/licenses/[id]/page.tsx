@@ -7,7 +7,7 @@ export default function License({ params }: { params: Promise<{ id: string }> })
   const { id } = use(params);
   const { data, error } = useApi<any>(`/licenses/${id}`);
   return (
-    <Page title={data?.name ?? 'License'} subtitle={data && <>License hash recorded on-chain: <Hash value={data.hash} /></>}>
+    <Page kicker="License" title={data?.name ?? 'License'} subtitle={data && <>License hash recorded on-chain: <Hash value={data.hash} /></>}>
       <ErrorNote error={error} />
       {data && (
         <Card>

@@ -16,7 +16,7 @@ export default function ProviderDashboard() {
   const [err, setErr] = useState<unknown>(null);
   return (
     <RequireSession>
-      <Page title="Provider dashboard" subtitle="Offer verification services, accept jobs, evaluate inputs in your controlled environment, and sign results on-chain.">
+      <Page kicker="Verifier workspace" title="Provider dashboard" subtitle="Offer verification services, accept jobs, evaluate inputs in your controlled environment, and sign results on-chain.">
         <ErrorNote error={err} />
         <div className="grid gap-4 lg:grid-cols-[1fr_2fr]">
           <Register current={data?.provider} onDone={reload} onError={setErr} />
@@ -58,7 +58,7 @@ function Register({ current, onDone, onError }: { current: any; onDone: () => vo
         <Field label="Security capabilities" hint="comma separated"><input className={inputCls} value={f.security} onChange={set('security')} placeholder="no egress, encrypted disks" /></Field>
         <div className="flex flex-wrap gap-1.5">
           {(Object.keys(CAPABILITIES) as Capability[]).map((c) => (
-            <button key={c} onClick={() => setCaps(caps.includes(c) ? caps.filter((x) => x !== c) : [...caps, c])} className={`rounded-full border px-2 py-0.5 text-xs ${caps.includes(c) ? 'border-accent bg-accent/10' : 'border-line'}`}>{c}</button>
+            <button key={c} onClick={() => setCaps(caps.includes(c) ? caps.filter((x) => x !== c) : [...caps, c])} className={`rounded-[2px] border px-2 py-1 text-xs transition-colors ${caps.includes(c) ? 'border-ink bg-ink text-paper' : 'border-line'}`}>{c}</button>
           ))}
         </div>
         <Button

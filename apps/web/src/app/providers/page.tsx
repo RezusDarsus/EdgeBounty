@@ -9,7 +9,7 @@ export default function Providers() {
     <Page
       title="Verification providers"
       subtitle="Approved providers who sell reproducible evaluations. Registration alone grants no trust: providers are approved by capability, audited by random re-runs, and excluded when conflicted."
-      actions={<Link href="/provider" className="rounded-lg border border-line bg-panel px-3 py-2 text-sm">Provider dashboard</Link>}
+      actions={<Link href="/provider" className="inline-flex h-9 items-center rounded-md border border-line bg-panel px-4 text-sm font-medium transition-colors hover:border-ink/40">Provider dashboard</Link>}
     >
       {data?.length === 0 && <Empty>No approved providers yet.</Empty>}
       <div className="grid gap-3 md:grid-cols-2">

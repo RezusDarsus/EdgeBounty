@@ -54,7 +54,7 @@ export default function JobPage({ params }: { params: Promise<{ id: string }> })
 
   return (
     <RequireSession>
-      <Page title="Verification job" subtitle={j && <span className="flex items-center gap-2"><Badge tone={j.status === 'completed' ? 'good' : j.status === 'failed' ? 'bad' : 'warn'}>{j.status}</Badge> Level {j.level.slice(1)} · quoted {sol(j.quoteMicro)}</span>}>
+      <Page kicker="Verification job" title="Verification job" subtitle={j && <span className="flex items-center gap-2"><Badge tone={j.status === 'completed' ? 'good' : j.status === 'failed' ? 'bad' : 'warn'}>{j.status}</Badge> Level {j.level.slice(1)} · quoted {sol(j.quoteMicro)}</span>}>
         <ErrorNote error={error} />
         {j && (
           <div className="grid gap-4 lg:grid-cols-[2fr_1fr]">

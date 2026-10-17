@@ -20,7 +20,7 @@ export default function Storage() {
   const used = data ? Math.min(100, (data.usedBytes / Math.max(data.quotaBytes, 1)) * 100) : 0;
   return (
     <RequireSession>
-      <Page title="Storage" subtitle="Rent private storage for datasets and models. Expired storage enters a read-only grace period, then deletion — but assets backing active orders, listings or disputes are never deleted.">
+      <Page kicker="Storage" title="Storage" subtitle="Rent private storage for datasets and models. Expired storage enters a read-only grace period, then deletion — but assets backing active orders, listings or disputes are never deleted.">
         <div className="grid gap-4 lg:grid-cols-2">
           <Card title="Usage">
             {data && (

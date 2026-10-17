@@ -7,7 +7,7 @@ import { useApi } from '@/lib/hooks';
 import { CURRENCY, toMicro, sol } from '@/lib/format';
 import { chainClient, hexBytes, pk, platformConfig, sendWithWallet } from '@/lib/chain';
 import { RequireSession } from '@/components/nav';
-import { Button, Card, ErrorNote, Field, Notice, Page, inputCls } from '@/components/ui';
+import { Button, Card, ErrorNote, Field, LedgerLine, Page, inputCls } from '@/components/ui';
 type Kind = 'image_dataset' | 'tabular_dataset' | 'model';
 export default function NewBounty() {
   const router = useRouter();
@@ -96,7 +96,7 @@ export default function NewBounty() {
   })();
   return (
     <RequireSession>
-      <Page title="Fund a custom request" subtitle="Set a fixed USDC reward and the requirements. Contributors accept the stated reward; the platform does not set the price of their work. Funds stay in escrow until settlement.">
+      <Page kicker="New funded request" title="Fund a custom request" subtitle="Set a fixed USDC reward and the requirements. Contributors accept the stated reward; the platform does not set the price of their work. Funds stay in escrow until settlement.">
         <div className="grid gap-4 lg:grid-cols-2">
           <Card title="The work">
             <div className="space-y-3">
@@ -138,7 +138,7 @@ export default function NewBounty() {
           <Card title="Acceptance criteria">
             <div className="mb-3 flex flex-wrap gap-2">
               {(['image_dataset', 'tabular_dataset', 'model'] as Kind[]).map((k) => (
-                <button key={k} onClick={() => setKind(k)} className={`rounded-lg border px-3 py-1.5 text-sm ${kind === k ? 'border-accent bg-accent/10' : 'border-line'}`}>
+                <button key={k} onClick={() => setKind(k)} className={`rounded-[2px] border px-3 py-1.5 text-sm transition-colors ${kind === k ? 'border-ink bg-ink text-paper' : 'border-line'}`}>
                   {k.replace('_', ' ')}
                 </button>
               ))}
@@ -216,12 +216,39 @@ export default function NewBounty() {
             </Field>
           </div>
         </Card>
-        <div className="mt-4 flex flex-wrap items-center gap-4">
-          <Button onClick={submit} disabled={f.title.length < 3 || f.description.length < 10 || !quoteReady}>
-            Fund {total !== null ? sol(total) : ''} into escrow
-          </Button>
-          <Notice>Funding includes the contributor reward and fixed verification fee; wallet network fees are separate. Rejection is only possible when the agreed verifier fails a submission. If you stay silent through the review window, the seller is paid.</Notice>
-        </div>
+        <section className="mt-6 grid gap-6 rounded-md border border-line bg-panel p-5 sm:p-6 lg:grid-cols-[1fr_380px]" aria-label="Escrow summary">
+          <div>
+            <h2 className="kicker !text-ink-2">Before you sign</h2>
+            <p className="mt-3 max-w-[60ch] text-sm text-ink-2">
+              Your wallet will show one transaction. It moves the total on the right into the escrow program — nothing goes to EdgeBounty or a contributor until settlement. Solana network fees are paid separately in SOL.
+            </p>
+            <p className="mt-3 max-w-[60ch] text-sm text-ink-2">
+              You can only reject a delivery when the agreed verifier fails it. If you stay silent through the review window, the contributor is paid.
+            </p>
+          </div>
+          <div>
+            {(() => {
+              const n = f.structure === 'slots' ? Number(f.slots) || 1 : 1;
+              let reward: string | null = null;
+              try {
+                reward = f.structure === 'milestones' ? toMicro(f.milestones.split('\n')[0].split(':')[1]?.trim() ?? '') : toMicro(f.budget);
+              } catch {}
+              return (
+                <LedgerLine
+                  rows={[
+                    [f.structure === 'milestones' ? 'First milestone reward' : 'Contributor reward', reward ? sol(reward) : '—', f.structure === 'milestones' ? 'later milestones are funded as each one settles' : 'held in escrow, released at settlement'],
+                    [`Verification fee${n > 1 ? ` × ${n} slots` : ''}`, quoteReady ? sol(BigInt(verificationQuote!.feeMicro) * BigInt(n)) : "calculating…", 'fixed platform rate, locked when funded'],
+                  ]}
+                  total={['Moves into escrow', total !== null ? sol(total) : '—']}
+                />
+              );
+            })()}
+            <Button onClick={submit} disabled={f.title.length < 3 || f.description.length < 10 || !quoteReady} className="mt-4 h-11 w-full">
+              {total !== null ? `Sign and fund ${sol(total)}` : 'Waiting for the fee quote…'}
+            </Button>
+            {(f.title.length < 3 || f.description.length < 10) && <p className="mt-2 text-xs text-muted">Add a title and a description of at least 10 characters to continue.</p>}
+          </div>
+        </section>
         <div className="mt-3">
           <ErrorNote error={err} />
         </div>

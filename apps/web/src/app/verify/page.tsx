@@ -56,12 +56,12 @@ export default function Verify() {
 
   return (
     <RequireSession>
-      <Page title="Verify a dataset or model" subtitle="Analyse a private asset without selling it. You get a report that separates confirmed errors, suspected issues, estimates and untested requirements.">
+      <Page kicker="Private verification" title="Verify a dataset or model" subtitle="Analyse a private asset without selling it. You get a report that separates confirmed errors, suspected issues, estimates and untested requirements.">
         <div className="grid gap-4 lg:grid-cols-2">
           <Card title="1 · Asset">
             <div className="mb-3 flex gap-2">
               {(['dataset', 'model'] as const).map((k) => (
-                <button key={k} disabled={!!asset} onClick={() => setKind(k)} className={`rounded-lg border px-3 py-1.5 text-sm ${kind === k ? 'border-accent bg-accent/10' : 'border-line'}`}>{k}</button>
+                <button key={k} disabled={!!asset} onClick={() => setKind(k)} className={`rounded-[2px] border px-3 py-1.5 text-sm transition-colors ${kind === k ? 'border-ink bg-ink text-paper' : 'border-line'}`}>{k}</button>
               ))}
             </div>
             <AssetUploader kind={kind} purpose="verification" name="verification upload" accept={kind === 'model' ? '.onnx,.safetensors' : undefined} onDone={setAsset} />
@@ -69,7 +69,7 @@ export default function Verify() {
           <Card title="2 · Analysis">
             <div className="space-y-2">
               {LEVELS.map(([l, t, d]) => (
-                <label key={l} className={`block cursor-pointer rounded-lg border p-3 ${level === l ? 'border-accent bg-accent/5' : 'border-line'}`}>
+                <label key={l} className={`block cursor-pointer rounded-md border p-3 ${level === l ? 'border-ink bg-panel shadow-[inset_3px_0_0_var(--accent)]' : 'border-line'}`}>
                   <input type="radio" className="mr-2" checked={level === l} onChange={() => { setLevel(l); setQuote(null); }} />
                   <b>Level {l.slice(1)} · {t}</b>
                   <p className="text-sm text-muted">{d}</p>

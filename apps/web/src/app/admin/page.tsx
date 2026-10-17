@@ -13,20 +13,29 @@ import { Badge, Button, Card, Empty, ErrorNote, Field, Hash, KV, Page, Tabs, inp
 
 const TABS = ['Overview', 'Disputes', 'Providers', 'Moderation', 'Escrow', 'Economics', 'Fraud', 'Audit log'];
 
+function InfringementQueue() {
+ const {data,error,reload}=useApi<any[]>('/admin/infringement-reports');
+ return <Card title="Infringement reports"><ErrorNote error={error}/>{!data?.length?<Empty>No reports.</Empty>:data.map(r=><InfringementReview key={r.id} report={r} reload={reload}/>)}</Card>;
+}
+function InfringementReview({report:r,reload}:{report:any;reload:()=>Promise<void>}) {
+ const [resolution,setResolution]=useState(''),[error,setError]=useState<unknown>(null);
+ return <div className="space-y-3 border-t border-line py-4"><Link className="underline" href={`/listings/${r.listingId}`}>View reported listing</Link><p className="whitespace-pre-wrap text-sm">{r.reason}</p><a className="text-sm underline" href={r.evidenceUrl} target="_blank" rel="noopener noreferrer">Open reporter-supplied evidence</a><p className="text-sm">Status: {r.status}</p>{r.status==='open'&&<><Field label="Review decision and explanation"><textarea className={inputCls} value={resolution} onChange={e=>setResolution(e.target.value)} maxLength={2000}/></Field><div className="flex gap-3">{(['upheld','rejected'] as const).map(status=><Button key={status} disabled={resolution.trim().length<10} onClick={async()=>{try{await api(`/admin/infringement-reports/${r.id}/review`,{body:{status,resolution}});await reload();}catch(e){setError(e);}}}>{status==='upheld'?'Uphold report':'Reject report'}</Button>)}</div><p className="text-sm text-muted">For upheld reports, use listing moderation below to remove content and sign on-chain moderation.</p></>}<ErrorNote error={error}/></div>;
+}
+
 export default function Admin() {
   const { isAdmin } = useSession();
   const [tab, setTab] = useState(TABS[0]);
   return (
     <RequireSession>
       {!isAdmin ? (
-        <Page title="Admin"><Empty>Administrator wallets only.</Empty></Page>
+        <Page kicker="Operations" title="Admin"><Empty>Administrator wallets only.</Empty></Page>
       ) : (
-        <Page title="Administration" subtitle="Every action here is recorded in the audit log. Administrative powers are limited by the program: no one can redirect escrowed funds.">
+        <Page kicker="Operations" title="Administration" subtitle="Every action here is recorded in the audit log. Administrative powers are limited by the program: no one can redirect escrowed funds.">
           <Tabs tabs={TABS} active={tab} onChange={setTab} />
           {tab === 'Overview' && <Overview />}
           {tab === 'Disputes' && <Disputes />}
           {tab === 'Providers' && <ProvidersAdmin />}
-          {tab === 'Moderation' && <Moderation />}
+          {tab === 'Moderation' && <><InfringementQueue /><Moderation /></>}
           {tab === 'Escrow' && <Escrow />}
           {tab === 'Economics' && <Economics />}
           {tab === 'Fraud' && <Fraud />}

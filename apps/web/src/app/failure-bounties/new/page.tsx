@@ -49,7 +49,7 @@ export default function NewFailureBounty() {
 
   return (
     <RequireSession>
-      <Page title="New failure bounty" subtitle="Escrow rewards for verified failures of a specific model version. Contributors submit inputs + expected labels; the verifier re-runs your committed model in a sandbox.">
+      <Page kicker="New failure bounty" title="New failure bounty" subtitle="Escrow rewards for verified failures of a specific model version. Contributors submit inputs + expected labels; the verifier re-runs your committed model in a sandbox.">
         <div className="grid gap-4 lg:grid-cols-2">
           <Card title="Target model (private)">
             <AssetUploader kind="model" purpose="verification" name="failure bounty target" accept=".onnx" onDone={setModel} />

@@ -7,7 +7,7 @@ import { date, sol } from '@/lib/format';
 import { chainClient, hexBytes, pk, sendWithWallet } from '@/lib/chain';
 import { useSession } from '@/app/providers';
 import { AssetUploader, type UploadedAsset } from '@/components/uploader';
-import { Badge, Button, Card, ErrorNote, Hash, KV, Notice, Page } from '@/components/ui';
+import { Badge, Button, Card, ErrorNote, Hash, KV, Notice, Page, PageLoading } from '@/components/ui';
 
 export default function FailureBountyPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -16,8 +16,8 @@ export default function FailureBountyPage({ params }: { params: Promise<{ id: st
   const wallet = useWallet();
   const [ex, setEx] = useState<UploadedAsset | null>(null);
   const [err, setErr] = useState<unknown>(null);
-  if (error) return <Page title="Failure bounty"><ErrorNote error={error} /></Page>;
-  if (!b) return <Page title="Loading…"><span /></Page>;
+  if (error) return <Page kicker="Failure bounty" title="Failure bounty"><ErrorNote error={error} /></Page>;
+  if (!b) return <PageLoading />;
   const isCreator = account?.wallet === b.creatorWallet;
 
   async function submit() {
@@ -36,7 +36,7 @@ export default function FailureBountyPage({ params }: { params: Promise<{ id: st
   }
 
   return (
-    <Page title={b.title} subtitle={<>{sol(b.rewardMicro)} per verified failure · {b.accepted}/{b.maxExamples} paid · expires {date(b.expiresAt)}</>}>
+    <Page kicker="Failure bounty" title={b.title} subtitle={<>{sol(b.rewardMicro)} per verified failure · {b.accepted}/{b.maxExamples} paid · expires {date(b.expiresAt)}</>}>
       <div className="grid gap-4 lg:grid-cols-[2fr_1fr]">
         <div className="space-y-4">
           <Card title="What counts as a failure">

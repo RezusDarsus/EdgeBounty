@@ -38,9 +38,9 @@ export default function Dashboard() {
 
           <>
 
-            <Link href="/bounties/new" className="rounded-lg bg-accent px-3 py-2 text-sm font-medium text-accent-ink">New request</Link>
+            <Link href="/bounties/new" className="inline-flex h-9 items-center rounded-md bg-accent px-4 text-sm font-medium text-accent-ink transition-colors hover:bg-[color-mix(in_oklab,var(--accent),var(--ink)_18%)]">New request</Link>
 
-            <Link href="/sell" className="rounded-lg border border-line bg-panel px-3 py-2 text-sm">Sell</Link>
+            <Link href="/sell" className="inline-flex h-9 items-center rounded-md border border-line bg-panel px-4 text-sm font-medium transition-colors hover:border-ink/40">Sell</Link>
 
           </>
 

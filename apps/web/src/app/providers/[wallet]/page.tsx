@@ -1,16 +1,16 @@
 'use client';
 import { use } from 'react';
 import { useApi } from '@/lib/hooks';
-import { Badge, Card, ErrorNote, Hash, KV, Page } from '@/components/ui';
+import { Badge, Card, ErrorNote, Hash, KV, Page, PageLoading } from '@/components/ui';
 
 export default function ProviderPage({ params }: { params: Promise<{ wallet: string }> }) {
   const { wallet } = use(params);
   const { data: p, error } = useApi<any>(`/providers/${wallet}`);
-  if (error) return <Page title="Provider"><ErrorNote error={error} /></Page>;
-  if (!p) return <Page title="Loading…"><span /></Page>;
+  if (error) return <Page kicker="Verifier" title="Provider"><ErrorNote error={error} /></Page>;
+  if (!p) return <PageLoading />;
   const pr = p.profile ?? {};
   return (
-    <Page title={pr.name ?? 'Provider'} subtitle={<Hash value={p.wallet} />}>
+    <Page kicker="Verifier" title={pr.name ?? 'Provider'} subtitle={<Hash value={p.wallet} />}>
       <div className="grid gap-4 md:grid-cols-2">
         <Card title="Profile">
           <KV

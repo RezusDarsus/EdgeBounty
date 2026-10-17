@@ -10,7 +10,7 @@ export default function FailureBounties() {
     <Page
       title="AI failure bounties"
       subtitle="Model owners pay contributors for independently verified examples where their model fails. Exact duplicates are rejected on-chain; each example is re-run against the committed model version."
-      actions={<Link href="/failure-bounties/new" className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-ink">New failure bounty</Link>}
+      actions={<Link href="/failure-bounties/new" className="inline-flex h-9 items-center rounded-md bg-accent px-4 text-sm font-medium text-accent-ink transition-colors hover:bg-[color-mix(in_oklab,var(--accent),var(--ink)_18%)]">New failure bounty</Link>}
     >
       {data?.length === 0 && <Empty>No open failure bounties.</Empty>}
       <div className="grid gap-3 md:grid-cols-2">

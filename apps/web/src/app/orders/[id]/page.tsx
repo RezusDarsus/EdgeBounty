@@ -4,12 +4,12 @@ import Link from 'next/link';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { api, downloadFile } from '@/lib/api';
 import { useApi } from '@/lib/hooks';
-import { date, sol } from '@/lib/format';
+import { date, dateTime, sol } from '@/lib/format';
 import { chainClient, hexBytes, pk, sendWithWallet } from '@/lib/chain';
 import { useSession } from '@/app/providers';
 import { AssetUploader, type UploadedAsset } from '@/components/uploader';
 import { ReportView } from '@/components/report';
-import { AuthImg, Badge, Button, Card, ErrorNote, Field, Hash, KV, Notice, Page, StateBadge, inputCls } from '@/components/ui';
+import { AuthImg, Badge, Button, Card, ErrorNote, EscrowTrack, Field, Hash, KV, Notice, Page, StateBadge, inputCls, PageLoading } from '@/components/ui';
 
 export default function OrderWorkspace({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -33,8 +33,8 @@ export default function OrderWorkspace({ params }: { params: Promise<{ id: strin
     }
   }
 
-  if (error) return <Page title="Order"><ErrorNote error={error} /></Page>;
-  if (!o) return <Page title="Loading…"><span /></Page>;
+  if (error) return <Page kicker="Order" title="Order"><ErrorNote error={error} /></Page>;
+  if (!o) return <PageLoading />;
 
   const me = account?.wallet;
   const role: string | null = o.role;
@@ -47,9 +47,10 @@ export default function OrderWorkspace({ params }: { params: Promise<{ id: strin
   const correctionsLeft = chain.submissionCount < (chain.maxCorrections ?? 0) + 1;
 
   return (
-    <Page title={o.title} subtitle={<span className="flex flex-wrap items-center gap-2"><StateBadge state={state} /> {o.kind === 'bounty' ? 'Custom request' : 'Purchase'} · {sol(o.amountMicro)} · {role ? `you are the ${role}` : 'public view'}</span>}>
+    <Page kicker="Order" title={o.title} subtitle={<span className="flex flex-wrap items-center gap-2"><StateBadge state={state} /> {o.kind === 'bounty' ? 'Custom request' : 'Purchase'} · {sol(o.amountMicro)} · {role ? `you are the ${role}` : 'public view'}</span>}>
       <div className="grid gap-4 lg:grid-cols-[2fr_1fr]">
-        <div className="space-y-4">
+        <div className="min-w-0 space-y-4">
+          <EscrowTrack state={state} kind={o.kind} />
           {msg && <Notice>{msg}</Notice>}
           <ErrorNote error={err} />
 
@@ -69,7 +70,7 @@ export default function OrderWorkspace({ params }: { params: Promise<{ id: strin
 
           {/* ------------------------------------------------ buyer review */}
           {role === 'buyer' && state === 'under_review' && (
-            <Card title="Your review" right={<span className="text-xs text-muted">window closes {date(chain.reviewDeadline)}</span>}>
+            <Card title="Your review" right={<span className="text-xs text-muted">window closes {dateTime(chain.reviewDeadline)}</span>}>
               <div className="flex flex-wrap gap-2">
                 <Button onClick={() => act('Approved', async () => (await chainClient()).acceptDeliverable(wallet.publicKey!, addr))}>Approve &amp; release payment</Button>
                 {verdictFailed && correctionsLeft && <Button variant="ghost" onClick={() => act('Correction requested', async () => (await chainClient()).rejectDeliverable(wallet.publicKey!, addr))}>Request correction (verifier failed it)</Button>}

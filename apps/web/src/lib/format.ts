@@ -1,7 +1,14 @@
 import { formatSol, formatUsdc, usdc } from '@edgebounty/pricing-engine';
 
 export const CURRENCY = process.env.NEXT_PUBLIC_PAYMENT_CURRENCY === 'USDC' ? 'USDC' : 'SOL';
-export const sol = (micro: string | bigint | number | null | undefined) => (micro === null || micro === undefined ? '—' : `${CURRENCY === 'USDC' ? formatUsdc(BigInt(micro)) : formatSol(BigInt(micro))} ${CURRENCY}`);
+/** Exact amount for display: thousands separators and at least two decimals. Never rounds — extra precision is kept. */
+const grouped = (exact: string) => {
+  const neg = exact.startsWith('-');
+  const [i, f = ''] = (neg ? exact.slice(1) : exact).split('.');
+  return `${neg ? '-' : ''}${i.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}.${f.padEnd(2, '0')}`;
+};
+export const amount = (micro: string | bigint | number | null | undefined) => (micro === null || micro === undefined ? '—' : grouped(CURRENCY === 'USDC' ? formatUsdc(BigInt(micro)) : formatSol(BigInt(micro))));
+export const sol = (micro: string | bigint | number | null | undefined) => (micro === null || micro === undefined ? '—' : `${amount(micro)} ${CURRENCY}`);
 export const short = (s?: string | null, n = 4) => (s ? `${s.slice(0, n)}…${s.slice(-n)}` : '—');
 export const bytes = (n?: number | null) => {
   if (n === null || n === undefined) return '—';
@@ -14,7 +21,9 @@ export const bytes = (n?: number | null) => {
   }
   return `${v.toFixed(i ? 1 : 0)} ${u[i]}`;
 };
-export const date = (d?: string | number | Date | null) => (d ? new Date(typeof d === 'number' ? d * 1000 : d).toLocaleString() : '—');
+const toDate = (d: string | number | Date) => new Date(typeof d === 'number' ? d * 1000 : d);
+export const date = (d?: string | number | Date | null) => (d ? toDate(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—');
+export const dateTime = (d?: string | number | Date | null) => (d ? toDate(d).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—');
 export const pct = (bps?: number | null) => (bps === null || bps === undefined ? '—' : `${(bps / 100).toFixed(1)}%`);
 export const toMicro = (usd: string) => {
   if (CURRENCY === 'USDC') return usdc(usd.trim()).toString();

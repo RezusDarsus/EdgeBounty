@@ -12,7 +12,7 @@ export default function AttestationPage({ params }: { params: Promise<{ address:
   const [check, setCheck] = useState<any>(null);
   const [err, setErr] = useState<unknown>(null);
   return (
-    <Page title="Verification attestation" subtitle={<Hash value={address} />}>
+    <Page kicker="On-chain record" title="Verification attestation" subtitle={<Hash value={address} />}>
       <ErrorNote error={error} />
       {a && (
         <div className="grid gap-4 md:grid-cols-2">

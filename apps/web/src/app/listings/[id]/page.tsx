@@ -5,11 +5,26 @@ import Link from 'next/link';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { api, previewUrl } from '@/lib/api';
 import { useApi } from '@/lib/hooks';
-import { CURRENCY, bytes, date, toMicro, sol } from '@/lib/format';
+import { CURRENCY, amount, bytes, date, toMicro, sol } from '@/lib/format';
 import { chainClient, pk, sendWithWallet } from '@/lib/chain';
 import { useSession } from '@/app/providers';
-import { Badge, Button, Card, ErrorNote, Field, Hash, KV, Notice, Page, inputCls } from '@/components/ui';
-import { ReportView } from '@/components/report';
+import { Badge, Button, Card, ErrorNote, EvidenceLadder, Field, Hash, KV, Notice, Page, Skeleton, inputCls } from '@/components/ui';
+import { BPS, DEFAULT_FEE_BPS, computePayout } from '@edgebounty/pricing-engine';
+import { EvidenceTable, ReportView } from '@/components/report';
+
+function InfringementForm({listingId,signedIn}:{listingId:string;signedIn:boolean}) {
+ const [reason,setReason]=useState(''),[evidenceUrl,setEvidenceUrl]=useState(''),[goodFaith,setGoodFaith]=useState(false),[sent,setSent]=useState(false),[error,setError]=useState<unknown>(null);
+ return <details className="border-t border-line pt-4"><summary className="cursor-pointer text-sm text-muted hover:text-ink">Report copyright or data-rights infringement</summary>
+ <div className="mt-4 space-y-3">
+ <p className="text-sm text-muted">Reports are reviewed privately by moderators. A report does not automatically remove content. Do not include private keys or sensitive personal data.</p>
+ {!signedIn ? <p>Sign in with your wallet to submit a report.</p> : sent ? <p role="status">Report received. A review notice will appear in your dashboard.</p> : <>
+ <Field label="Describe the work and the rights you believe were infringed"><textarea className={inputCls} value={reason} maxLength={2000} onChange={e=>setReason(e.target.value)} /></Field>
+ <Field label="HTTPS link to supporting evidence"><input className={inputCls} type="url" value={evidenceUrl} onChange={e=>setEvidenceUrl(e.target.value)} /></Field>
+ <label className="flex items-start gap-2 text-sm"><input type="checkbox" checked={goodFaith} onChange={e=>setGoodFaith(e.target.checked)} />I believe this report is accurate and submitted in good faith.</label>
+ <Button disabled={!goodFaith||reason.trim().length<20||!evidenceUrl} onClick={async()=>{try{await api(`/listings/${listingId}/report`,{body:{reason,evidenceUrl,goodFaith}});setSent(true);}catch(e){setError(e);}}}>Submit report</Button><ErrorNote error={error}/>
+ </>}
+ </div></details>;
+}
 
 export default function ListingDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -46,15 +61,33 @@ export default function ListingDetail({ params }: { params: Promise<{ id: string
     }
   }
 
-  if (error) return <Page title="Listing"><ErrorNote error={error} /></Page>;
-  if (!l) return <Page title="Loading…"><span /></Page>;
+  if (error) return <Page kicker="Listing" title="This listing couldn’t be loaded"><ErrorNote error={error} /></Page>;
+  if (!l)
+    return (
+      <main className="mx-auto max-w-6xl px-4 pt-14 sm:px-6" aria-busy="true">
+        <Skeleton className="h-3 w-40" />
+        <Skeleton className="mt-4 h-10 w-2/3" />
+        <div className="mt-10 grid gap-6 lg:grid-cols-[1fr_360px]"><Skeleton className="h-80" /><Skeleton className="h-80" /></div>
+      </main>
+    );
   const mine = account?.wallet === l.seller.wallet;
+  const levels: string[] = (l.verification ?? []).map((v: any) => v.level);
+  const anyFailed = (l.verification ?? []).some((v: any) => v.passed === false);
   return (
-    <Page title={l.title} subtitle={<>{l.kind} · {l.category.replace(/_/g, ' ')} · version {l.version} · listed {date(l.createdAt)}</>}>
-      <div className="grid gap-4 lg:grid-cols-[2fr_1fr]">
-        <div className="space-y-4">
-          <Card title="Preview" right={<span className="text-xs text-muted">limited, downscaled and watermarked</span>}>
-            {l.previews.length === 0 && <p className="text-sm text-muted">{l.previewStatus === 'pending' ? 'Preview is being generated…' : 'No preview available.'}</p>}
+    <Page
+      kicker={<>{l.kind === 'model' ? 'Model' : 'Dataset'} · {l.category.replace(/_/g, ' ')}</>}
+      title={l.title}
+      actions={!mine ? <a href="#purchase" className="inline-flex h-9 items-center gap-2 rounded-md border border-line bg-panel px-3 text-sm lg:hidden"><span className="num">{sol(l.priceMicro)}</span><span className="text-muted">· Buy ↓</span></a> : undefined}
+      subtitle={<>Version {l.version ?? '—'} · listed {date(l.createdAt)} by <Link className="underline" href={`/profile/${l.seller.wallet}`}>{l.seller.alias ?? 'seller'}</Link></>}
+    >
+      <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
+        <div className="min-w-0 space-y-6">
+          <Card title="Preview" right="limited, downscaled and watermarked">
+            {l.previews.length === 0 && (
+              <div>
+                <p className="text-sm text-muted">{l.previewStatus === 'pending' ? 'A preview is being generated from the uploaded files…' : 'No preview was generated for these files. Judge the listing by the schema, the reports below, and the seller’s description.'}</p>
+              </div>
+            )}
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
               {l.previews.filter((p: any) => p.kind === 'image').map((p: any) => (
                 <figure key={p.url}>
@@ -66,31 +99,58 @@ export default function ListingDetail({ params }: { params: Promise<{ id: string
             </div>
             {l.previews.some((p: any) => p.kind === 'table') && <TablePreview url={l.previews.find((p: any) => p.kind === 'table').url} />}
           </Card>
-          <Card title="Description">
-            <p className="whitespace-pre-wrap text-sm">{l.description}</p>
+          <Card title="Seller’s description" right="claims by the seller — not checked unless a report below covers them">
+            <p className="max-w-[68ch] whitespace-pre-wrap text-[15px] leading-relaxed text-ink">{l.description}</p>
           </Card>
           {l.kind === 'model' && l.details?.inference && account && !mine && <InferenceTrial listingId={id} />}
-          <Card title="Verification">
+          <Card title="Evidence on file" right={levels.length ? 'reports for this exact version' : undefined}>
+            <EvidenceLadder levels={levels} passed={anyFailed ? false : levels.length ? true : null} />
+            <div className="mt-5" />
             {l.verification?.length ? (
-              l.verification.map((v: any, i: number) => (
+              <>
+              <EvidenceTable reports={l.verification} />
+              {l.verification.filter((v: any) => v.metrics?.totalFiles === undefined).map((v: any, i: number) => (
                 <div key={i} className="mb-3 border-b border-line pb-3 last:border-0">
                   <ReportView report={{ ...v, criteria: [], tools: [], sampling: '', verifier: 'edgebounty-platform', datasetMetrics: v.metrics?.totalFiles !== undefined ? v.metrics : null, modelMetrics: v.metrics?.format ? v.metrics : null, untested: [] }} reportHash={v.reportHash} attestation={v.attestation} />
                 </div>
-              ))
+              ))}
+              </>
             ) : (
-              <p className="text-sm text-muted">No verification report yet.</p>
+              <p className="text-sm text-muted">No check reports are on file for this version. Everything above is the seller’s own description.</p>
             )}
           </Card>
         </div>
-        <div className="space-y-4">
-          <Card title="Purchase">
-            <p className="text-2xl font-semibold">{sol(l.priceMicro)}</p>
+        <div className="space-y-4 lg:sticky lg:top-24 lg:self-start">
+          <Card title="Purchase" className="scroll-mt-24">
+            <span id="purchase" />
+            {(() => {
+              const price = BigInt(l.priceMicro);
+              const split = computePayout(price, 0n, DEFAULT_FEE_BPS, BPS, false);
+              const sellerPct = Number(((split.sellerNet * 1000n) / (price || 1n))) / 10;
+              return (
+                <div className="mb-5">
+                  <div className="flex items-baseline justify-between">
+                    <span className="kicker">You pay into escrow</span>
+                  </div>
+                  <p className="num mt-2 text-[30px] leading-none tracking-tight">{sol(l.priceMicro)}</p>
+                  <div className="mt-4 flex h-2 overflow-hidden rounded-[1px]" aria-hidden="true">
+                    <span className="h-full bg-ink" style={{ width: `${sellerPct}%` }} />
+                    <span className="h-full flex-1 bg-accent" />
+                  </div>
+                  <div className="mt-2 flex justify-between text-xs text-ink-2">
+                    <span>Seller on settlement <span className="num text-ink">{amount(split.sellerNet)}</span></span>
+                    <span>Platform 6% <span className="num text-ink">{amount(split.platformFee)}</span></span>
+                  </div>
+                  {verifier && <p className="mt-2 text-xs text-muted">Plus the verifier fee you set below, paid from your deposit.</p>}
+                </div>
+              );
+            })()}
             <KV
               rows={[
                 ['License', <Link key="l" className="underline" href={`/licenses/${l.licenseId}`}>{l.licenseId}</Link>],
-                ['Size', `${l.asset.fileCount} files · ${bytes(l.asset.totalSize)}`],
+                ['Size', `${l.asset.fileCount?.toLocaleString('en-US')} files · ${bytes(l.asset.totalSize)}`],
                 ['Formats', l.formats.join(', ') || '—'],
-                ['Records', l.recordCount ?? '—'],
+                ['Records', l.recordCount?.toLocaleString('en-US') ?? '—'],
                 ['Commitment', <Hash key="c" value={l.asset.commitment} />],
                 ['Seller', <Link key="s" className="underline" href={`/profile/${l.seller.wallet}`}>{l.seller.alias}</Link>],
               ]}
@@ -123,11 +183,14 @@ export default function ListingDetail({ params }: { params: Promise<{ id: string
                     <input className={inputCls} value={verifierFee} onChange={(e) => setVerifierFee(e.target.value)} />
                   </Field>
                 )}
-                <Button onClick={buy} disabled={!account || !wallet.connected} className="w-full">
-                  Fund escrow &amp; buy
+                <Button onClick={buy} disabled={!account || !wallet.connected} className="h-11 w-full">
+                  Pay into escrow and buy †
                 </Button>
-                {!account && <p className="text-xs text-muted">Sign in to buy.</p>}
-                <Notice>Funds go into escrow. The full dataset is delivered after you approve or the review window passes.</Notice>
+                {!account && <p className="text-xs text-muted">Sign in with your wallet to buy. Your wallet will ask you to approve the payment before anything moves.</p>}
+                {account && !wallet.connected && <p className="text-xs text-warn">Your wallet is disconnected. Reconnect it from the menu to continue.</p>}
+                <p className="border-t border-line pt-3 text-xs leading-relaxed text-ink-2">
+                  <span className="mr-1 font-serif text-sm text-ink">†</span>Your USDC is held by the escrow program, not by the seller. You get the full files after you approve the delivery or the review window passes. Solana network fees are separate.
+                </p>
               </div>
             )}
             {mine && <Badge>Your listing</Badge>}
@@ -135,6 +198,7 @@ export default function ListingDetail({ params }: { params: Promise<{ id: string
           </Card>
         </div>
       </div>
+      <div className="mt-10"><InfringementForm listingId={id} signedIn={!!account} /></div>
     </Page>
   );
 }

@@ -21,7 +21,7 @@ export function ReportView({ report, reportHash, attestation }: { report: any; r
           </a>
         )}
       </div>
-      {report.summary && <p className="rounded-lg bg-code/60 p-3 text-sm">{report.summary}</p>}
+      {report.summary && <p className="rounded-md bg-code/60 p-3 text-sm">{report.summary}</p>}
       {report.criteria.length > 0 && (
         <table className="w-full text-left">
           <thead className="text-xs text-muted">
@@ -52,8 +52,8 @@ export function ReportView({ report, reportHash, attestation }: { report: any; r
       {d && (
         <KV
           rows={[
-            ['Files', `${d.totalFiles} (${bytes(d.totalSize)}), ${d.dataFiles} data files`],
-            ['Readable / corrupted', `${d.readableFiles} / ${d.corruptedFiles}`],
+            ['Files', `${d.totalFiles?.toLocaleString('en-US')} total (${bytes(d.totalSize)}) · ${d.dataFiles?.toLocaleString('en-US')} data files${d.totalFiles > d.dataFiles ? ` · ${(d.totalFiles - d.dataFiles).toLocaleString('en-US')} non-data (labels, manifests)` : ''}`],
+            ['Readable / corrupted', `${d.readableFiles?.toLocaleString('en-US')} / ${d.corruptedFiles?.toLocaleString('en-US')}`],
             ['Exact duplicates', d.exactDuplicates],
             ['Near duplicates', d.nearDuplicates ?? 'not tested (Level 2)'],
             ...(d.minWidth !== null ? ([['Smallest image', `${d.minWidth}×${d.minHeight}`]] as [string, string][]) : []),
@@ -94,8 +94,8 @@ export function ReportView({ report, reportHash, attestation }: { report: any; r
       )}
       {report.untested?.length > 0 && <p className="text-warn">Untested requirements: {report.untested.join(', ')}</p>}
       <div className="text-xs text-muted">
-        <p>Sampling: {report.sampling}</p>
-        <p>Tools: {report.tools.map((t: any) => `${t.name} ${t.version}`).join(', ')}</p>
+        {report.sampling && <p>Sampling: {report.sampling}</p>}
+        {report.tools?.length > 0 && <p>Tools: {report.tools.map((t: any) => `${t.name} ${t.version}`).join(', ')}</p>}
         <ul className="mt-1 list-disc pl-4">{report.limitations.map((l: string, i: number) => <li key={i}>{l}</li>)}</ul>
         {reportHash && (
           <p className="mt-1">
@@ -103,6 +103,101 @@ export function ReportView({ report, reportHash, attestation }: { report: any; r
           </p>
         )}
       </div>
+    </div>
+  );
+}
+
+const n = (v: any) => (v === null || v === undefined ? null : typeof v === 'number' ? v.toLocaleString('en-US') : String(v));
+const DATASET_ROWS: [string, (d: any) => string | null][] = [
+  ['Data files', (d) => n(d.dataFiles)],
+  ['Other files (labels, manifests)', (d) => (d.totalFiles > d.dataFiles ? n(d.totalFiles - d.dataFiles) : '0')],
+  ['Total size', (d) => bytes(d.totalSize)],
+  ['Readable', (d) => n(d.readableFiles)],
+  ['Corrupted', (d) => n(d.corruptedFiles)],
+  ['Exact duplicates', (d) => n(d.exactDuplicates)],
+  ['Near duplicates', (d) => n(d.nearDuplicates)],
+  ['Smallest image', (d) => (d.minWidth != null ? `${d.minWidth}×${d.minHeight}` : null)],
+  ['Rows / columns', (d) => (d.rows != null ? `${n(d.rows)} / ${d.columns?.length ?? '—'}` : null)],
+  ['Null cells', (d) => n(d.nullCells)],
+  ['Relevance (estimate)', (d) => (d.relevance ? `${pct(d.relevance.estimateBps)}` : null)],
+];
+
+/** Dataset check reports for one version, side by side by level: what each level measured, and what it did not. */
+export function EvidenceTable({ reports }: { reports: any[] }) {
+  const ds = [...reports].filter((r) => r.metrics?.totalFiles !== undefined).sort((a, b) => a.level.localeCompare(b.level));
+  if (!ds.length) return null;
+  const rows = DATASET_ROWS.filter(([, f]) => ds.some((r) => f(r.metrics) !== null));
+  const rel = ds.find((r) => r.metrics.relevance)?.metrics.relevance;
+  return (
+    <div className="space-y-6">
+      <div>
+        <dl className="border-y-[3px] border-ink text-sm sm:hidden">
+          {rows.map(([label, f]) => (
+            <div key={label} className="border-b border-line py-2 last:border-0">
+              <dt className="text-ink-2">{label}</dt>
+              <dd className="mt-1 flex flex-wrap gap-x-4 gap-y-0.5">
+                {ds.map((r) => {
+                  const v = f(r.metrics);
+                  return (
+                    <span key={r.level} className="num text-[13px]">
+                      <span className="text-muted">{r.level}</span> <span className={v === null ? 'text-muted' : 'text-ink'}>{v ?? 'not tested'}</span>
+                    </span>
+                  );
+                })}
+              </dd>
+            </div>
+          ))}
+        </dl>
+        <table className="hidden w-full border-y-[3px] border-ink text-sm sm:table">
+          <thead>
+            <tr className="border-b border-ink text-left">
+              <th className="py-2 pr-3 text-xs font-normal text-muted">Measured</th>
+              {ds.map((r) => (
+                <th key={r.level} className="py-2 pl-3 text-right font-normal">
+                  <span className="num rounded-[2px] bg-ink px-1.5 py-0.5 text-[11px] text-paper">{r.level}</span>
+                  <span className={`ml-2 text-xs ${r.passed === false ? 'text-bad' : 'text-good'}`}>{r.passed === false ? 'criteria not met' : 'criteria met'}</span>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map(([label, f]) => {
+              const vals = ds.map((r) => f(r.metrics));
+              const changed = vals.some((v, i) => i > 0 && v !== vals[i - 1]);
+              return (
+                <tr key={label} className="border-b border-line last:border-0">
+                  <td className="py-2 pr-3 text-ink-2">{label}</td>
+                  {vals.map((v, i) => (
+                    <td key={i} className={`num py-2 pl-3 text-right ${v === null ? 'text-muted' : changed && i > 0 && v !== vals[i - 1] ? 'font-medium text-ink' : 'text-ink-2'}`}>
+                      {v ?? 'not tested'}
+                    </td>
+                  ))}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+        {rel && <p className="mt-2 text-xs text-muted">Relevance: 95% CI {pct(rel.lowBps)}–{pct(rel.highBps)}, from a random sample of n={rel.sampleSize.toLocaleString('en-US')}.</p>}
+      </div>
+      {ds.map((r) => (
+        (r.findings?.length > 0 || r.limitations?.length > 0) && (
+          <div key={r.level} className="grid gap-x-4 gap-y-1 text-sm sm:grid-cols-[48px_1fr]">
+            <span className="num pt-0.5 text-xs text-muted">{r.level}</span>
+            <div>
+              {r.findings?.map((f: any, i: number) => (
+                <p key={i} className={f.severity === 'confirmed' ? 'text-bad' : 'text-ink'}>
+                  <span className="mr-1.5 text-xs text-muted">{f.severity === 'confirmed' ? 'Confirmed' : 'Suspected'}</span>
+                  {f.message}
+                </p>
+              ))}
+              {r.limitations?.map((x: string, i: number) => (
+                <p key={i} className="text-xs text-muted">Limitation: {x}</p>
+              ))}
+              {r.reportHash && <p className="mt-1 text-xs text-muted">Report fingerprint <Hash value={r.reportHash} />{r.attestation && <> · <a className="underline" href={`/attestations/${r.attestation}`}>on-chain attestation</a></>}</p>}
+            </div>
+          </div>
+        )
+      ))}
     </div>
   );
 }

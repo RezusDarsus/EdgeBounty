@@ -96,12 +96,12 @@ export default function Sell() {
   }
   return (
     <RequireSession>
-      <Page title="Sell a dataset or model" subtitle="Upload privately, then publish an immutable, versioned listing. Buyers see limited previews and verification reports; the full asset is delivered only after settlement.">
+      <Page kicker="Sell" title="Sell a dataset or model" subtitle="Upload privately, then publish an immutable, versioned listing. Buyers see limited previews and verification reports; the full asset is delivered only after settlement.">
         <div className="grid gap-4 lg:grid-cols-2">
           <Card title="1 · Upload">
             <div className="mb-3 flex gap-2">
               {(['dataset', 'model'] as const).map((k) => (
-                <button key={k} disabled={!!asset} onClick={() => setKind(k)} className={`rounded-lg border px-3 py-1.5 text-sm ${kind === k ? 'border-accent bg-accent/10' : 'border-line'}`}>
+                <button key={k} disabled={!!asset} onClick={() => setKind(k)} className={`rounded-[2px] border px-3 py-1.5 text-sm transition-colors ${kind === k ? 'border-ink bg-ink text-paper' : 'border-line'}`}>
                   {k}
                 </button>
               ))}
@@ -163,7 +163,7 @@ export default function Sell() {
                   <input className={inputCls} value={f.price} onChange={set('price')} />
                 </Field>
               </div>
-              <div className="space-y-3 rounded-lg border border-line p-3">
+              <div className="space-y-3 rounded-md border border-line p-3">
                 <p className="font-medium">Verify before publishing</p>
                 <Field label="Checks" hint="Reports describe the tested scope and any limitations; a pass is not a guarantee of every use case.">
                   <select className={inputCls} value={level} disabled={!!jobId} onChange={(e) => setLevel(e.target.value as 'L2' | 'L3')}>

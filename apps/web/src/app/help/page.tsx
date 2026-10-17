@@ -2,7 +2,7 @@ import { Card, Page } from '@/components/ui';
 
 export default function Help() {
   return (
-    <Page title="Help & dispute policy">
+    <Page kicker="Help" title="Help & dispute policy">
       <div className="grid gap-4 md:grid-cols-2">
         <Card title="Opening a dispute">
           <ul className="list-disc space-y-1 pl-5 text-sm">
