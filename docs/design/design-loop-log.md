@@ -1,7 +1,7 @@
 # Design loop log — Datasheet redesign
 
-Method: the `design-loop` skill (github.com/devonbweaver/design-loop, installed at
-`~/.claude/skills/design-loop`, invoked as `/design-loop`). Critics ran as independent
+Method: the `design-loop` skill (github.com/devonbweaver/design-loop),
+invoked as `/design-loop`. Critics ran as independent
 fresh-context agents that saw only rendered screenshots (never code), plus the bar (DESIGN.md
 and the skill's `craft-standards.md`). The limit was five repair rounds.
 

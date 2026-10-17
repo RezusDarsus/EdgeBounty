@@ -24,7 +24,7 @@ Removed or avoided everywhere: "seamless", "unlock the power", "revolutionary", 
 
 Discrepancies found between the brief and the repository (documented, not changed):
 - The brief says the MVP verifier is the NVIDIA API, with Gemini planned. The architecture doc
-  (`docs/architecture/overview.md`) names Claude multimodal for L3, and the master-plan notes name
+  (`docs/architecture/overview.md`) names a multimodal LLM reviewer for L3, and the master-plan notes name
   NVIDIA embeddings for L3 similarity. Copy names no AI vendor.
 - The brief implies listing is open. In the code, listing requires a passing L2 or L3 report on
   the exact version. The homepage says so.
