@@ -19,24 +19,7 @@
   --ease-io: cubic-bezier(0.6, 0, 0.2, 1);
   color-scheme: light;
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
-    --paper: #0c0f17;
-    --panel: #131826;
-    --sunk: #090c13;
-    --ink: #e8eaf0;
-    --ink-2: #b7bdcb;
-    --muted: #8c93a5;
-    --line: #232a3b;
-    --accent: #8a99ff;
-    --accent-ink: #0c0f17;
-    --accent-wash: #1a2142;
-    --good: #4cc38a;
-    --warn: #e3a548;
-    --bad: #f07a70;
-    color-scheme: dark;
-  }
-}
+/* The marketplace is always light. Dark tokens remain only for previewing on /design-system. */
 :root[data-theme='dark'] {
   --paper: #0c0f17;
   --panel: #131826;

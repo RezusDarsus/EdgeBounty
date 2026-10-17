@@ -47,7 +47,7 @@ order and request page.
 
 ## Color
 
-Light ("Paper") is primary. Dark ("Night ledger") is designed separately, not inverted.
+The product is always light ("Paper"): a marketplace handling money should feel open and daylit. Dark ("Night ledger") tokens exist only for preview on /design-system.
 
 | Token | Light | Dark | For | Never |
 |---|---|---|---|---|
