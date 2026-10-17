@@ -1,0 +1,13 @@
+preview.13-61-207-211.sslip.io {
+    reverse_proxy 127.0.0.1:3003
+}
+
+api.preview.13-61-207-211.sslip.io {
+    reverse_proxy 127.0.0.1:4003
+}
+
+rpc.preview.13-61-207-211.sslip.io {
+    @ws header Connection *Upgrade*
+    reverse_proxy @ws 127.0.0.1:8902
+    reverse_proxy 127.0.0.1:8901
+}

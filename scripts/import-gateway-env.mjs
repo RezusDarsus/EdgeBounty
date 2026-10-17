@@ -1,0 +1,11 @@
+import { readFileSync, writeFileSync } from 'node:fs';
+import { parseEnv } from 'node:util';
+import { join } from 'node:path';
+const values = parseEnv(readFileSync(process.argv[2], 'utf8'));
+const allowed = ['DOWNLOAD_GATEWAY_URL', 'GATEWAY_SHARED_SECRET'];
+if (Object.keys(values).some((key) => !allowed.includes(key))) throw new Error('Only gateway configuration may be imported');
+if (!values.DOWNLOAD_GATEWAY_URL?.startsWith('https://') || values.GATEWAY_SHARED_SECRET?.length < 32) throw new Error('Incomplete gateway configuration');
+const path = join(import.meta.dirname, '../apps/api/.env');
+const old = readFileSync(path, 'utf8');
+writeFileSync(path, [...old.split(/\r?\n/).filter((line) => line && !Object.hasOwn(values, line.split('=')[0])), ...Object.entries(values).map(([k,v]) => `${k}=${v}`), ''].join('\n'), { mode: 0o600 });
+console.log('Gateway runtime configuration imported; values withheld.');

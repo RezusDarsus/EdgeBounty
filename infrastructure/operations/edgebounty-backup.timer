@@ -1,0 +1,8 @@
+[Unit]
+Description=Daily EdgeBounty database backup
+[Timer]
+OnCalendar=*-*-* 02:15:00 UTC
+RandomizedDelaySec=300
+Persistent=true
+[Install]
+WantedBy=timers.target

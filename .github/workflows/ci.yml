@@ -1,0 +1,33 @@
+name: ci
+on: [push, pull_request]
+
+jobs:
+  program:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Solana + Anchor
+        run: |
+          sh -c "$(curl -sSfL https://release.anza.xyz/v3.1.10/install)"
+          echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
+          cargo install --git https://github.com/solana-foundation/anchor avm --locked
+          avm install 1.1.2 && avm use 1.1.2
+      - name: Build + LiteSVM tests
+        run: mkdir -p keys && bash scripts/build-program.sh all
+
+  typescript:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.13' }
+      - run: python -m venv .venv && .venv/bin/pip install pillow numpy pyarrow onnx onnxruntime
+      - run: npm ci
+      - run: npx tsc -p tsconfig.json --noEmit
+      - run: npx tsc -p apps/web --noEmit
+      # end-to-end suites skip automatically when no local validator is running
+      - run: npx vitest run
+      - run: cd services/dataset-validator && ../../.venv/bin/python -m unittest
+      - run: cd services/model-validator && ../../.venv/bin/python -m unittest

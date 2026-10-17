@@ -1,0 +1,8 @@
+{
+  "name": "edgebounty-downloads",
+  "main": "download-worker.mjs",
+  "compatibility_date": "2026-10-17",
+  "r2_buckets": [{ "binding": "DATASETS", "bucket_name": "edgebounty-datasets-dev" }],
+  "vars": { "API_ORIGIN": "https://api.example.com" },
+  "observability": { "enabled": false }
+}

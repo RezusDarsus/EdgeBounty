@@ -1,0 +1,9 @@
+[
+  {
+    "AllowedOrigins": ["http://localhost:3000", "http://127.0.0.1:3000", "https://13-61-207-211.sslip.io", "https://preview.13-61-207-211.sslip.io"],
+    "AllowedMethods": ["GET", "HEAD", "PUT"],
+    "AllowedHeaders": ["content-type", "content-md5"],
+    "ExposeHeaders": ["ETag", "Content-Length", "Content-Range"],
+    "MaxAgeSeconds": 3600
+  }
+]

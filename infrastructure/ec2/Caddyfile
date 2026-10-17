@@ -1,0 +1,15 @@
+# {HOST} is replaced by setup.sh with <public-ip>.sslip.io; Caddy fetches Let's Encrypt certs automatically.
+{HOST} {
+	reverse_proxy 127.0.0.1:3000
+}
+
+api.{HOST} {
+	reverse_proxy 127.0.0.1:4000
+}
+
+# browser wallets need the chain too: HTTP JSON-RPC on 8899, websocket subscriptions on 8900
+rpc.{HOST} {
+	@ws header Connection *Upgrade*
+	reverse_proxy @ws 127.0.0.1:8900
+	reverse_proxy 127.0.0.1:8899
+}

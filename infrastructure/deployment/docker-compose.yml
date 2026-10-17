@@ -1,0 +1,56 @@
+# Staging stack: Postgres + API + web. Object storage = AWS S3 (instance role) or Cloudflare R2 (S3 API).
+# Secrets come from an env file / secrets manager — never commit them.
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: edgebounty
+      POSTGRES_USER: edgebounty
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck: { test: ['CMD-SHELL', 'pg_isready -U edgebounty'], interval: 5s, retries: 10 }
+
+  api:
+    build: { context: ../.., dockerfile: infrastructure/docker/api.Dockerfile }
+    depends_on: { postgres: { condition: service_healthy } }
+    environment:
+      DATABASE_URL: postgres://edgebounty:${POSTGRES_PASSWORD}@postgres:5432/edgebounty
+      SOLANA_RPC_URL: ${SOLANA_RPC_URL:-https://api.devnet.solana.com}
+      PROGRAM_ID: ${PROGRAM_ID}
+      APP_DOMAIN: ${APP_DOMAIN}
+      CORS_ORIGINS: https://${APP_DOMAIN}
+      JWT_SECRET: ${JWT_SECRET:?}
+      DOWNLOAD_TOKEN_SECRET: ${DOWNLOAD_TOKEN_SECRET:?}
+      STORAGE_DRIVER: s3
+      # AWS S3: leave S3_ENDPOINT and the keys empty - the SDK uses the EC2 instance role
+      # (needs IMDS hop limit 2 for containers). R2: set endpoint + keys.
+      S3_ENDPOINT: ${S3_ENDPOINT:-}
+      S3_REGION: ${S3_REGION:-}
+      AWS_REGION: ${AWS_REGION:-eu-north-1}
+      S3_BUCKET: ${S3_BUCKET}
+      S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID:-}
+      S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY:-}
+      PLATFORM_VERIFIER_KEY: ${PLATFORM_VERIFIER_KEY}
+      DISPUTE_AUTHORITY_KEY: ${DISPUTE_AUTHORITY_KEY}
+      ADMIN_WALLETS: ${ADMIN_WALLETS}
+      AI_PROVIDER: ${AI_PROVIDER:-nvidia}
+      NVIDIA_API_KEY: ${NVIDIA_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      SANDBOX: docker
+    volumes:
+      # the API launches sandbox containers; mount the host docker socket only on dedicated worker hosts
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports: ['4000:4000']
+
+  web:
+    image: node:26-slim
+    working_dir: /repo
+    command: sh -c "npm ci --ignore-scripts && npm run build -w @edgebounty/web && npm run start -w @edgebounty/web"
+    environment:
+      NEXT_PUBLIC_API_URL: https://api.${APP_DOMAIN}
+      NEXT_PUBLIC_SOLANA_RPC_URL: ${SOLANA_RPC_URL:-https://api.devnet.solana.com}
+    volumes: [../..:/repo]
+    ports: ['3000:3000']
+
+volumes:
+  pgdata:

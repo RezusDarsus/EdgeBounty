@@ -1,0 +1,39 @@
+{
+  "name": "@edgebounty/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "tsx src/server.ts",
+    "db:generate": "drizzle-kit generate"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.133.0",
+    "@aws-sdk/client-s3": "^3.1000.0",
+    "@aws-sdk/s3-request-presigner": "^3.1000.0",
+    "@edgebounty/blockchain-client": "*",
+    "@edgebounty/pricing-engine": "*",
+    "@edgebounty/shared-types": "*",
+    "@edgebounty/verification-schemas": "*",
+    "@electric-sql/pglite": "^0.5.9",
+    "@fastify/cors": "^11.0.0",
+    "@fastify/rate-limit": "^11.0.0",
+    "@solana/web3.js": "^1.98.0",
+    "bs58": "^6.0.0",
+    "drizzle-orm": "^0.45.0",
+    "fastify": "^5.6.0",
+    "jose": "^6.0.0",
+    "openai": "^7.33.0",
+    "pg": "^8.16.0",
+    "tweetnacl": "^1.0.3",
+    "yauzl": "^3.2.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.15.0",
+    "@types/yauzl": "^2.10.3",
+    "drizzle-kit": "^0.31.0"
+  }
+}

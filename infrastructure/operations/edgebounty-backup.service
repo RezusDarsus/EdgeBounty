@@ -1,0 +1,11 @@
+[Unit]
+Description=Encrypted EdgeBounty PostgreSQL backup to private R2
+After=docker.service network-online.target
+[Service]
+Type=oneshot
+User=ubuntu
+WorkingDirectory=/home/ubuntu/edgebounty-usdc-20261017-master
+ExecStart=/usr/bin/env node node_modules/tsx/dist/cli.mjs scripts/database-backup.ts
+Environment=PATH=/usr/local/bin:/usr/bin:/bin
+UMask=0077
+TimeoutStartSec=600

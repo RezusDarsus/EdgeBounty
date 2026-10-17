@@ -1,0 +1,32 @@
+{
+  "name": "edgebounty",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Solana-native marketplace for AI assets, development work and independent verification",
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*",
+    "services/verification-orchestrator",
+    "services/chain-indexer",
+    "services/delivery-service"
+  ],
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "dev:api": "npm run dev -w @edgebounty/api",
+    "dev:web": "npm run dev -w @edgebounty/web",
+    "program:build": "wsl -d Ubuntu -- bash -l scripts/build-program.sh build",
+    "program:test": "wsl -d Ubuntu -- bash -l scripts/build-program.sh test",
+    "sync-idl": "node scripts/sync-idl.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "tsx": "^4.20.0",
+    "typescript": "~5.9.3",
+    "vitest": "^4.0.0"
+  },
+  "engines": {
+    "node": ">=26"
+  }
+}

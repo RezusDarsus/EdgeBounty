@@ -1,0 +1,36 @@
+{
+  "name": "@edgebounty/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start -p 3000"
+  },
+  "dependencies": {
+    "@edgebounty/blockchain-client": "*",
+    "@edgebounty/pricing-engine": "*",
+    "@edgebounty/shared-types": "*",
+    "@edgebounty/verification-schemas": "*",
+    "@noble/hashes": "^2.0.0",
+    "@solana/wallet-adapter-base": "^0.9.28",
+    "@solana/wallet-adapter-phantom": "^0.9.30",
+    "@solana/wallet-adapter-react": "^0.15.40",
+    "@solana/wallet-adapter-react-ui": "^0.9.40",
+    "@solana/wallet-adapter-solflare": "^0.6.34",
+    "@solana/web3.js": "^1.98.0",
+    "bs58": "^6.0.0",
+    "buffer": "^6.0.3",
+    "next": "^16.0.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "tweetnacl": "^1.0.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "tailwindcss": "^4.1.0"
+  }
+}

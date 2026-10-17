@@ -1,0 +1,4857 @@
+{
+  "address": "6L6441Vus4rUdQXLiGfFtXUtRWbjqg3Lk1AfCjj6x3E",
+  "metadata": {
+    "name": "edgebounty_marketplace",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "EdgeBounty Solana marketplace program"
+  },
+  "instructions": [
+    {
+      "name": "accept_admin",
+      "discriminator": [
+        112,
+        42,
+        45,
+        90,
+        116,
+        181,
+        13,
+        170
+      ],
+      "accounts": [
+        {
+          "name": "new_admin",
+          "signer": true
+        },
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "accept_bounty",
+      "discriminator": [
+        165,
+        37,
+        99,
+        130,
+        123,
+        244,
+        67,
+        35
+      ],
+      "accounts": [
+        {
+          "name": "seller",
+          "signer": true
+        },
+        {
+          "name": "order",
+          "writable": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "accept_deliverable",
+      "discriminator": [
+        225,
+        151,
+        217,
+        255,
+        133,
+        179,
+        243,
+        38
+      ],
+      "accounts": [
+        {
+          "name": "buyer",
+          "signer": true,
+          "relations": [
+            "order"
+          ]
+        },
+        {
+          "name": "order",
+          "writable": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "accept_verification_job",
+      "discriminator": [
+        120,
+        3,
+        99,
+        222,
+        117,
+        230,
+        135,
+        132
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "provider",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  118,
+                  105,
+                  100,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "authority"
+              }
+            ]
+          }
+        },
+        {
+          "name": "job",
+          "writable": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "add_dispute_evidence",
+      "discriminator": [
+        154,
+        54,
+        114,
+        31,
+        211,
+        6,
+        111,
+        187
+      ],
+      "accounts": [
+        {
+          "name": "party",
+          "signer": true
+        },
+        {
+          "name": "order"
+        },
+        {
+          "name": "dispute",
+          "writable": true
+        }
+      ],
+      "args": [
+        {
+          "name": "evidence_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "cancel_order",
+      "discriminator": [
+        95,
+        129,
+        237,
+        240,
+        8,
+        49,
+        223,
+        132
+      ],
+      "accounts": [
+        {
+          "name": "buyer",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "order"
+          ]
+        },
+        {
+          "name": "order",
+          "writable": true
+        },
+        {
+          "name": "vault",
+          "docs": [
+            "Required only when the order is funded."
+          ],
+          "writable": true,
+          "optional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "order"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint",
+          "optional": true
+        },
+        {
+          "name": "buyer_token",
+          "writable": true,
+          "optional": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "close_failure_bounty",
+      "discriminator": [
+        110,
+        124,
+        225,
+        148,
+        233,
+        158,
+        188,
+        3
+      ],
+      "accounts": [
+        {
+          "name": "creator",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "bounty"
+          ]
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "bounty",
+          "writable": true
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "bounty"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "creator_token",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "create_bounty",
+      "discriminator": [
+        122,
+        90,
+        14,
+        143,
+        8,
+        125,
+        200,
+        2
+      ],
+      "accounts": [
+        {
+          "name": "buyer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "order",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  111,
+                  114,
+                  100,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "buyer"
+              },
+              {
+                "kind": "arg",
+                "path": "order_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "verifier_provider",
+          "optional": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "order_id",
+          "type": "u64"
+        },
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "BountyParams"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "create_failure_bounty",
+      "discriminator": [
+        158,
+        123,
+        199,
+        3,
+        189,
+        115,
+        32,
+        69
+      ],
+      "accounts": [
+        {
+          "name": "creator",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "bounty",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  98,
+                  111,
+                  117,
+                  110,
+                  116,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "creator"
+              },
+              {
+                "kind": "arg",
+                "path": "bounty_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "bounty"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "creator_token",
+          "writable": true
+        },
+        {
+          "name": "verifier_provider"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "bounty_id",
+          "type": "u64"
+        },
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "FailureBountyParams"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "create_listing",
+      "discriminator": [
+        18,
+        168,
+        45,
+        24,
+        191,
+        31,
+        117,
+        54
+      ],
+      "accounts": [
+        {
+          "name": "seller",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "listing",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  105,
+                  115,
+                  116,
+                  105,
+                  110,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "seller"
+              },
+              {
+                "kind": "arg",
+                "path": "listing_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "listing_id",
+          "type": "u64"
+        },
+        {
+          "name": "kind",
+          "type": {
+            "defined": {
+              "name": "AssetKind"
+            }
+          }
+        },
+        {
+          "name": "terms",
+          "type": {
+            "defined": {
+              "name": "ListingTerms"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "create_order",
+      "discriminator": [
+        141,
+        54,
+        37,
+        207,
+        237,
+        210,
+        250,
+        215
+      ],
+      "accounts": [
+        {
+          "name": "buyer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "listing",
+          "writable": true
+        },
+        {
+          "name": "order",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  111,
+                  114,
+                  100,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "buyer"
+              },
+              {
+                "kind": "arg",
+                "path": "order_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "order"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "buyer_token",
+          "writable": true
+        },
+        {
+          "name": "verifier_provider",
+          "optional": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "order_id",
+          "type": "u64"
+        },
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "PurchaseParams"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "create_verification_job",
+      "discriminator": [
+        253,
+        7,
+        68,
+        12,
+        87,
+        172,
+        204,
+        171
+      ],
+      "accounts": [
+        {
+          "name": "requester",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "job",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  106,
+                  111,
+                  98
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "requester"
+              },
+              {
+                "kind": "arg",
+                "path": "job_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  106,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "job"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "requester_token",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "job_id",
+          "type": "u64"
+        },
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "JobParams"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "dispute_verification_job",
+      "discriminator": [
+        122,
+        27,
+        106,
+        183,
+        64,
+        117,
+        99,
+        179
+      ],
+      "accounts": [
+        {
+          "name": "requester",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "job"
+          ]
+        },
+        {
+          "name": "job",
+          "writable": true
+        },
+        {
+          "name": "dispute",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "reason_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "fund_bounty",
+      "discriminator": [
+        36,
+        148,
+        139,
+        239,
+        172,
+        37,
+        58,
+        255
+      ],
+      "accounts": [
+        {
+          "name": "buyer",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "order"
+          ]
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "order",
+          "writable": true
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "order"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "buyer_token",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initialize_platform",
+      "discriminator": [
+        119,
+        201,
+        101,
+        45,
+        75,
+        122,
+        89,
+        3
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "payment_mint"
+        },
+        {
+          "name": "treasury"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "PlatformParams"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "moderate_listing",
+      "discriminator": [
+        25,
+        14,
+        97,
+        227,
+        22,
+        0,
+        19,
+        168
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "listing",
+          "writable": true
+        }
+      ],
+      "args": [
+        {
+          "name": "moderated",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "open_dispute",
+      "discriminator": [
+        137,
+        25,
+        99,
+        119,
+        23,
+        223,
+        161,
+        42
+      ],
+      "accounts": [
+        {
+          "name": "opener",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "order",
+          "writable": true
+        },
+        {
+          "name": "dispute",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "reason_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "pay_service",
+      "discriminator": [
+        181,
+        29,
+        236,
+        80,
+        246,
+        226,
+        34,
+        174
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "receipt",
+          "docs": [
+            "One receipt per invoice reference: an invoice can never be paid (or counted) twice."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  99,
+                  101,
+                  105,
+                  112,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "reference"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "payer_token",
+          "writable": true
+        },
+        {
+          "name": "treasury",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "reference",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "kind",
+          "type": "u8"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "propose_admin",
+      "discriminator": [
+        121,
+        214,
+        199,
+        212,
+        87,
+        39,
+        117,
+        234
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        },
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "new_admin",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "refund_order",
+      "discriminator": [
+        164,
+        168,
+        47,
+        144,
+        154,
+        1,
+        241,
+        255
+      ],
+      "accounts": [
+        {
+          "name": "buyer",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "order"
+          ]
+        },
+        {
+          "name": "order",
+          "writable": true
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "order"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "buyer_token",
+          "writable": true
+        },
+        {
+          "name": "verifier_token",
+          "writable": true,
+          "optional": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "refund_verification_job",
+      "discriminator": [
+        178,
+        167,
+        244,
+        219,
+        221,
+        242,
+        234,
+        127
+      ],
+      "accounts": [
+        {
+          "name": "requester",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "job"
+          ]
+        },
+        {
+          "name": "job",
+          "writable": true
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  106,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "job"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "requester_token",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "register_provider",
+      "discriminator": [
+        254,
+        209,
+        54,
+        184,
+        46,
+        197,
+        109,
+        78
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "provider",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  118,
+                  105,
+                  100,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "authority"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "metadata_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "requested_capabilities",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "reject_deliverable",
+      "discriminator": [
+        79,
+        39,
+        42,
+        174,
+        74,
+        211,
+        205,
+        193
+      ],
+      "accounts": [
+        {
+          "name": "buyer",
+          "signer": true,
+          "relations": [
+            "order"
+          ]
+        },
+        {
+          "name": "order",
+          "writable": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "resolve_dispute",
+      "discriminator": [
+        231,
+        6,
+        202,
+        6,
+        96,
+        103,
+        12,
+        230
+      ],
+      "accounts": [
+        {
+          "name": "dispute_authority",
+          "docs": [
+            "The platform dispute authority, or the order's agreed independent arbitrator."
+          ],
+          "signer": true
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "order",
+          "writable": true
+        },
+        {
+          "name": "dispute",
+          "writable": true
+        }
+      ],
+      "args": [
+        {
+          "name": "resolution",
+          "type": {
+            "defined": {
+              "name": "DisputeResolution"
+            }
+          }
+        },
+        {
+          "name": "seller_bps",
+          "type": "u16"
+        }
+      ]
+    },
+    {
+      "name": "resolve_verification_dispute",
+      "discriminator": [
+        54,
+        174,
+        241,
+        180,
+        142,
+        92,
+        79,
+        159
+      ],
+      "accounts": [
+        {
+          "name": "dispute_authority",
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "job",
+          "writable": true
+        },
+        {
+          "name": "dispute",
+          "writable": true
+        },
+        {
+          "name": "provider",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  118,
+                  105,
+                  100,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "job.provider",
+                "account": "VerificationJob"
+              }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "provider_bps",
+          "type": "u16"
+        }
+      ]
+    },
+    {
+      "name": "review_provider",
+      "discriminator": [
+        29,
+        72,
+        164,
+        99,
+        141,
+        47,
+        186,
+        139
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "provider",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  118,
+                  105,
+                  100,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "provider.authority",
+                "account": "Provider"
+              }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "approved",
+          "type": "bool"
+        },
+        {
+          "name": "capabilities",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "revoke_attestation",
+      "discriminator": [
+        12,
+        156,
+        103,
+        161,
+        194,
+        246,
+        211,
+        179
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "attestation",
+          "writable": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "set_listing_active",
+      "discriminator": [
+        197,
+        68,
+        14,
+        217,
+        62,
+        57,
+        28,
+        145
+      ],
+      "accounts": [
+        {
+          "name": "seller",
+          "signer": true,
+          "relations": [
+            "listing"
+          ]
+        },
+        {
+          "name": "listing",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  105,
+                  115,
+                  116,
+                  105,
+                  110,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "seller"
+              },
+              {
+                "kind": "account",
+                "path": "listing.listing_id",
+                "account": "Listing"
+              }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "active",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "set_paused",
+      "discriminator": [
+        91,
+        60,
+        125,
+        192,
+        176,
+        225,
+        166,
+        218
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        },
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "paused",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "set_treasury",
+      "discriminator": [
+        57,
+        97,
+        196,
+        95,
+        195,
+        206,
+        106,
+        136
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        },
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "treasury"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "settle_order",
+      "discriminator": [
+        80,
+        74,
+        204,
+        34,
+        12,
+        183,
+        66,
+        66
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "docs": [
+            "Anyone may crank settlement (pays rent for receipts)."
+          ],
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "order",
+          "writable": true
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "order"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "seller_token",
+          "writable": true
+        },
+        {
+          "name": "buyer_token",
+          "writable": true
+        },
+        {
+          "name": "treasury",
+          "writable": true
+        },
+        {
+          "name": "verifier_token",
+          "writable": true,
+          "optional": true
+        },
+        {
+          "name": "buyer",
+          "writable": true
+        },
+        {
+          "name": "license_receipt",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  105,
+                  99,
+                  101,
+                  110,
+                  115,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "order"
+              }
+            ]
+          }
+        },
+        {
+          "name": "seller_reputation",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  112,
+                  117,
+                  116,
+                  97,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "order.seller",
+                "account": "Order"
+              }
+            ]
+          }
+        },
+        {
+          "name": "buyer_reputation",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  112,
+                  117,
+                  116,
+                  97,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "order.buyer",
+                "account": "Order"
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "settle_verification_job",
+      "discriminator": [
+        52,
+        133,
+        80,
+        191,
+        92,
+        166,
+        130,
+        193
+      ],
+      "accounts": [
+        {
+          "name": "caller",
+          "signer": true
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "job",
+          "writable": true
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  106,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "job"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "provider_token",
+          "writable": true
+        },
+        {
+          "name": "requester_token",
+          "writable": true
+        },
+        {
+          "name": "treasury",
+          "writable": true
+        },
+        {
+          "name": "requester",
+          "writable": true
+        },
+        {
+          "name": "provider",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  118,
+                  105,
+                  100,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "job.provider",
+                "account": "VerificationJob"
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "submit_deliverable",
+      "discriminator": [
+        38,
+        137,
+        64,
+        44,
+        237,
+        11,
+        125,
+        101
+      ],
+      "accounts": [
+        {
+          "name": "seller",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "order"
+          ]
+        },
+        {
+          "name": "order",
+          "writable": true
+        },
+        {
+          "name": "submission",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "commitment",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "version",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "submit_failure_example",
+      "discriminator": [
+        97,
+        174,
+        159,
+        234,
+        24,
+        205,
+        130,
+        229
+      ],
+      "accounts": [
+        {
+          "name": "contributor",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "bounty",
+          "writable": true
+        },
+        {
+          "name": "example",
+          "docs": [
+            "Seeded by the content commitment: identical submissions collide and fail."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  101,
+                  120,
+                  97,
+                  109,
+                  112,
+                  108,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "bounty"
+              },
+              {
+                "kind": "arg",
+                "path": "commitment"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "commitment",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "submit_order_verification",
+      "discriminator": [
+        24,
+        7,
+        51,
+        54,
+        82,
+        134,
+        66,
+        117
+      ],
+      "accounts": [
+        {
+          "name": "verifier",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "order"
+          ]
+        },
+        {
+          "name": "order",
+          "writable": true
+        },
+        {
+          "name": "provider",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  118,
+                  105,
+                  100,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "verifier"
+              }
+            ]
+          }
+        },
+        {
+          "name": "attestation",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "verdict",
+          "type": {
+            "defined": {
+              "name": "VerdictParams"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "submit_verification_job_result",
+      "discriminator": [
+        28,
+        129,
+        17,
+        242,
+        143,
+        245,
+        62,
+        200
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "provider",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  118,
+                  105,
+                  100,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "authority"
+              }
+            ]
+          }
+        },
+        {
+          "name": "job",
+          "writable": true
+        },
+        {
+          "name": "attestation",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "result",
+          "type": {
+            "defined": {
+              "name": "JobResultParams"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "update_config",
+      "discriminator": [
+        29,
+        158,
+        252,
+        191,
+        10,
+        83,
+        219,
+        99
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        },
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "PlatformParams"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "update_listing_version",
+      "discriminator": [
+        82,
+        183,
+        222,
+        39,
+        124,
+        237,
+        9,
+        7
+      ],
+      "accounts": [
+        {
+          "name": "seller",
+          "signer": true,
+          "relations": [
+            "listing"
+          ]
+        },
+        {
+          "name": "listing",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  105,
+                  115,
+                  116,
+                  105,
+                  110,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "seller"
+              },
+              {
+                "kind": "account",
+                "path": "listing.listing_id",
+                "account": "Listing"
+              }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "terms",
+          "type": {
+            "defined": {
+              "name": "ListingTerms"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "update_provider",
+      "discriminator": [
+        52,
+        208,
+        141,
+        191,
+        164,
+        54,
+        108,
+        150
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "signer": true,
+          "relations": [
+            "provider"
+          ]
+        },
+        {
+          "name": "provider",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  118,
+                  105,
+                  100,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "authority"
+              }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "metadata_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "requested_capabilities",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "verify_failure_example",
+      "discriminator": [
+        141,
+        226,
+        228,
+        252,
+        15,
+        237,
+        92,
+        82
+      ],
+      "accounts": [
+        {
+          "name": "verifier",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "bounty"
+          ]
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "bounty",
+          "writable": true,
+          "relations": [
+            "example"
+          ]
+        },
+        {
+          "name": "example",
+          "writable": true
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "bounty"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "contributor_token",
+          "writable": true
+        },
+        {
+          "name": "verifier_token",
+          "writable": true
+        },
+        {
+          "name": "treasury",
+          "writable": true
+        },
+        {
+          "name": "provider",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  118,
+                  105,
+                  100,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "verifier"
+              }
+            ]
+          }
+        },
+        {
+          "name": "attestation",
+          "writable": true
+        },
+        {
+          "name": "contributor_reputation",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  112,
+                  117,
+                  116,
+                  97,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "example.contributor",
+                "account": "FailureExample"
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "passed",
+          "type": "bool"
+        },
+        {
+          "name": "result_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Attestation",
+      "discriminator": [
+        152,
+        125,
+        183,
+        86,
+        36,
+        146,
+        121,
+        73
+      ]
+    },
+    {
+      "name": "Dispute",
+      "discriminator": [
+        36,
+        49,
+        241,
+        67,
+        40,
+        36,
+        241,
+        74
+      ]
+    },
+    {
+      "name": "FailureBounty",
+      "discriminator": [
+        77,
+        205,
+        39,
+        186,
+        217,
+        143,
+        45,
+        192
+      ]
+    },
+    {
+      "name": "FailureExample",
+      "discriminator": [
+        68,
+        81,
+        194,
+        10,
+        132,
+        55,
+        111,
+        28
+      ]
+    },
+    {
+      "name": "LicenseReceipt",
+      "discriminator": [
+        190,
+        248,
+        58,
+        152,
+        158,
+        41,
+        96,
+        139
+      ]
+    },
+    {
+      "name": "Listing",
+      "discriminator": [
+        218,
+        32,
+        50,
+        73,
+        43,
+        134,
+        26,
+        58
+      ]
+    },
+    {
+      "name": "Order",
+      "discriminator": [
+        134,
+        173,
+        223,
+        185,
+        77,
+        86,
+        28,
+        51
+      ]
+    },
+    {
+      "name": "PlatformConfig",
+      "discriminator": [
+        160,
+        78,
+        128,
+        0,
+        248,
+        83,
+        230,
+        160
+      ]
+    },
+    {
+      "name": "Provider",
+      "discriminator": [
+        164,
+        180,
+        71,
+        17,
+        75,
+        216,
+        80,
+        195
+      ]
+    },
+    {
+      "name": "Reputation",
+      "discriminator": [
+        55,
+        148,
+        90,
+        71,
+        68,
+        183,
+        193,
+        28
+      ]
+    },
+    {
+      "name": "ServiceReceipt",
+      "discriminator": [
+        153,
+        94,
+        22,
+        87,
+        76,
+        254,
+        54,
+        233
+      ]
+    },
+    {
+      "name": "Submission",
+      "discriminator": [
+        58,
+        194,
+        159,
+        158,
+        75,
+        102,
+        178,
+        197
+      ]
+    },
+    {
+      "name": "VerificationJob",
+      "discriminator": [
+        223,
+        132,
+        167,
+        162,
+        78,
+        8,
+        58,
+        13
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "AttestationIssued",
+      "discriminator": [
+        173,
+        237,
+        90,
+        123,
+        155,
+        224,
+        231,
+        242
+      ]
+    },
+    {
+      "name": "FailureExampleEvaluated",
+      "discriminator": [
+        154,
+        213,
+        31,
+        23,
+        220,
+        201,
+        13,
+        221
+      ]
+    },
+    {
+      "name": "JobStateChanged",
+      "discriminator": [
+        107,
+        94,
+        145,
+        221,
+        172,
+        199,
+        255,
+        31
+      ]
+    },
+    {
+      "name": "OrderPaidOut",
+      "discriminator": [
+        79,
+        230,
+        115,
+        173,
+        102,
+        121,
+        159,
+        189
+      ]
+    },
+    {
+      "name": "OrderStateChanged",
+      "discriminator": [
+        145,
+        183,
+        104,
+        91,
+        34,
+        139,
+        177,
+        240
+      ]
+    },
+    {
+      "name": "ServicePaid",
+      "discriminator": [
+        216,
+        238,
+        208,
+        194,
+        12,
+        54,
+        84,
+        226
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "Unauthorized",
+      "msg": "Signer is not authorized for this action"
+    },
+    {
+      "code": 6001,
+      "name": "Paused",
+      "msg": "Platform is paused for new commitments"
+    },
+    {
+      "code": 6002,
+      "name": "FeeTooHigh",
+      "msg": "Fee exceeds the hard maximum"
+    },
+    {
+      "code": 6003,
+      "name": "InvalidWindow",
+      "msg": "Window duration out of range"
+    },
+    {
+      "code": 6004,
+      "name": "ZeroAmount",
+      "msg": "Amount must be greater than zero"
+    },
+    {
+      "code": 6005,
+      "name": "Overflow",
+      "msg": "Arithmetic overflow"
+    },
+    {
+      "code": 6006,
+      "name": "InvalidState",
+      "msg": "Invalid state transition for this order"
+    },
+    {
+      "code": 6007,
+      "name": "DeadlinePassed",
+      "msg": "Deadline has passed"
+    },
+    {
+      "code": 6008,
+      "name": "DeadlineNotReached",
+      "msg": "Deadline has not passed yet"
+    },
+    {
+      "code": 6009,
+      "name": "InvalidDeadline",
+      "msg": "Deadline must be in the future"
+    },
+    {
+      "code": 6010,
+      "name": "ConflictOfInterest",
+      "msg": "Buyer, seller and verifier must be distinct wallets"
+    },
+    {
+      "code": 6011,
+      "name": "VerifierNotApproved",
+      "msg": "Verifier is not an approved provider"
+    },
+    {
+      "code": 6012,
+      "name": "MissingCapability",
+      "msg": "Provider lacks the required capability"
+    },
+    {
+      "code": 6013,
+      "name": "VerifierMismatch",
+      "msg": "Verifier account does not match the order"
+    },
+    {
+      "code": 6014,
+      "name": "ListingUnavailable",
+      "msg": "Listing is not available for purchase"
+    },
+    {
+      "code": 6015,
+      "name": "ListingChanged",
+      "msg": "Listing price or version changed"
+    },
+    {
+      "code": 6016,
+      "name": "NoCorrectionsLeft",
+      "msg": "No corrections remaining"
+    },
+    {
+      "code": 6017,
+      "name": "RejectionNotAllowed",
+      "msg": "Verification has not failed; rejection requires a failed verdict"
+    },
+    {
+      "code": 6018,
+      "name": "InvalidBps",
+      "msg": "Invalid basis points value"
+    },
+    {
+      "code": 6019,
+      "name": "TokenOwnerMismatch",
+      "msg": "Token account owner mismatch"
+    },
+    {
+      "code": 6020,
+      "name": "TreasuryMismatch",
+      "msg": "Treasury account mismatch"
+    },
+    {
+      "code": 6021,
+      "name": "VerifierTokenRequired",
+      "msg": "Verifier token account required"
+    },
+    {
+      "code": 6022,
+      "name": "TooManyCorrections",
+      "msg": "Too many corrections requested"
+    },
+    {
+      "code": 6023,
+      "name": "BountyFull",
+      "msg": "Bounty is full"
+    },
+    {
+      "code": 6024,
+      "name": "BountyClosed",
+      "msg": "Bounty is not open"
+    },
+    {
+      "code": 6025,
+      "name": "EvaluationBudgetExhausted",
+      "msg": "Evaluation budget exhausted"
+    },
+    {
+      "code": 6026,
+      "name": "ExampleAlreadyEvaluated",
+      "msg": "Example already evaluated"
+    },
+    {
+      "code": 6027,
+      "name": "CannotCloseYet",
+      "msg": "Bounty cannot be closed yet"
+    },
+    {
+      "code": 6028,
+      "name": "ListingModerated",
+      "msg": "Listing has been moderated and cannot be reactivated"
+    },
+    {
+      "code": 6029,
+      "name": "NoPendingAdmin",
+      "msg": "No pending admin transfer"
+    },
+    {
+      "code": 6030,
+      "name": "InvalidResolution",
+      "msg": "Invalid resolution"
+    },
+    {
+      "code": 6031,
+      "name": "AlreadyRevoked",
+      "msg": "Attestation already revoked"
+    }
+  ],
+  "types": [
+    {
+      "name": "AssetKind",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Dataset"
+          },
+          {
+            "name": "Model"
+          },
+          {
+            "name": "Code"
+          },
+          {
+            "name": "Other"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Attestation",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "subject",
+            "docs": [
+              "Order, verification job, or failure example this attestation is about."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "verifier",
+            "type": "pubkey"
+          },
+          {
+            "name": "asset_commitment",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "asset_version",
+            "type": "u32"
+          },
+          {
+            "name": "spec_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "benchmark_version",
+            "type": "u32"
+          },
+          {
+            "name": "result_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "passed",
+            "type": "bool"
+          },
+          {
+            "name": "issued_at",
+            "type": "i64"
+          },
+          {
+            "name": "expires_at",
+            "docs": [
+              "0 = no expiry."
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "revoked",
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AttestationIssued",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "attestation",
+            "type": "pubkey"
+          },
+          {
+            "name": "subject",
+            "type": "pubkey"
+          },
+          {
+            "name": "verifier",
+            "type": "pubkey"
+          },
+          {
+            "name": "passed",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BountyParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "verifier",
+            "type": "pubkey"
+          },
+          {
+            "name": "verifier_fee",
+            "type": "u64"
+          },
+          {
+            "name": "verifier_capability",
+            "type": "u32"
+          },
+          {
+            "name": "terms_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "criteria_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "license_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "deadline",
+            "type": "i64"
+          },
+          {
+            "name": "max_corrections",
+            "type": "u8"
+          },
+          {
+            "name": "designated_seller",
+            "docs": [
+              "Default pubkey = open to any seller."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "arbitrator",
+            "docs": [
+              "Default pubkey = platform dispute authority only."
+            ],
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Dispute",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "subject",
+            "type": "pubkey"
+          },
+          {
+            "name": "opened_by",
+            "type": "pubkey"
+          },
+          {
+            "name": "reason_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "buyer_evidence",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "seller_evidence",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "evidence_count",
+            "type": "u16"
+          },
+          {
+            "name": "resolution",
+            "type": {
+              "defined": {
+                "name": "DisputeResolution"
+              }
+            }
+          },
+          {
+            "name": "seller_bps",
+            "type": "u16"
+          },
+          {
+            "name": "opened_at",
+            "type": "i64"
+          },
+          {
+            "name": "resolved_at",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DisputeResolution",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Pending"
+          },
+          {
+            "name": "Correction"
+          },
+          {
+            "name": "Split"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ExampleState",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Pending"
+          },
+          {
+            "name": "Accepted"
+          },
+          {
+            "name": "Rejected"
+          }
+        ]
+      }
+    },
+    {
+      "name": "FailureBounty",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "creator",
+            "type": "pubkey"
+          },
+          {
+            "name": "bounty_id",
+            "type": "u64"
+          },
+          {
+            "name": "verifier",
+            "type": "pubkey"
+          },
+          {
+            "name": "model_commitment",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "spec_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "terms_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "reward_per_example",
+            "type": "u64"
+          },
+          {
+            "name": "verifier_fee",
+            "type": "u64"
+          },
+          {
+            "name": "fee_bps",
+            "type": "u16"
+          },
+          {
+            "name": "max_examples",
+            "type": "u16"
+          },
+          {
+            "name": "max_evaluations",
+            "type": "u16"
+          },
+          {
+            "name": "accepted",
+            "type": "u16"
+          },
+          {
+            "name": "evaluations",
+            "type": "u16"
+          },
+          {
+            "name": "pending",
+            "type": "u16"
+          },
+          {
+            "name": "expires_at",
+            "type": "i64"
+          },
+          {
+            "name": "open",
+            "type": "bool"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "FailureBountyParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "verifier",
+            "type": "pubkey"
+          },
+          {
+            "name": "model_commitment",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "spec_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "terms_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "reward_per_example",
+            "type": "u64"
+          },
+          {
+            "name": "verifier_fee",
+            "type": "u64"
+          },
+          {
+            "name": "max_examples",
+            "type": "u16"
+          },
+          {
+            "name": "max_evaluations",
+            "type": "u16"
+          },
+          {
+            "name": "expires_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "FailureExample",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bounty",
+            "type": "pubkey"
+          },
+          {
+            "name": "contributor",
+            "type": "pubkey"
+          },
+          {
+            "name": "commitment",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "state",
+            "type": {
+              "defined": {
+                "name": "ExampleState"
+              }
+            }
+          },
+          {
+            "name": "result_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "submitted_at",
+            "type": "i64"
+          },
+          {
+            "name": "evaluated_at",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "FailureExampleEvaluated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bounty",
+            "type": "pubkey"
+          },
+          {
+            "name": "example",
+            "type": "pubkey"
+          },
+          {
+            "name": "accepted",
+            "type": "bool"
+          },
+          {
+            "name": "reward_paid",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "JobParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "provider",
+            "docs": [
+              "Default pubkey = open to any approved provider with `required_capability`."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "required_capability",
+            "type": "u32"
+          },
+          {
+            "name": "asset_commitment",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "spec_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "price",
+            "type": "u64"
+          },
+          {
+            "name": "deadline",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "JobResultParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "result_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "passed",
+            "type": "bool"
+          },
+          {
+            "name": "asset_version",
+            "type": "u32"
+          },
+          {
+            "name": "benchmark_version",
+            "type": "u32"
+          },
+          {
+            "name": "expires_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "JobState",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Open"
+          },
+          {
+            "name": "Accepted"
+          },
+          {
+            "name": "ResultSubmitted"
+          },
+          {
+            "name": "Disputed"
+          },
+          {
+            "name": "Resolved"
+          },
+          {
+            "name": "Completed"
+          },
+          {
+            "name": "Refunded"
+          }
+        ]
+      }
+    },
+    {
+      "name": "JobStateChanged",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "job",
+            "type": "pubkey"
+          },
+          {
+            "name": "state",
+            "type": {
+              "defined": {
+                "name": "JobState"
+              }
+            }
+          },
+          {
+            "name": "at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LicenseReceipt",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "order",
+            "type": "pubkey"
+          },
+          {
+            "name": "buyer",
+            "type": "pubkey"
+          },
+          {
+            "name": "seller",
+            "type": "pubkey"
+          },
+          {
+            "name": "listing",
+            "type": "pubkey"
+          },
+          {
+            "name": "asset_commitment",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "asset_version",
+            "type": "u32"
+          },
+          {
+            "name": "license_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "terms_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "granted",
+            "docs": [
+              "False when the order settled with a full refund (no entitlement)."
+            ],
+            "type": "bool"
+          },
+          {
+            "name": "issued_at",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Listing",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "seller",
+            "type": "pubkey"
+          },
+          {
+            "name": "listing_id",
+            "type": "u64"
+          },
+          {
+            "name": "kind",
+            "type": {
+              "defined": {
+                "name": "AssetKind"
+              }
+            }
+          },
+          {
+            "name": "version",
+            "type": "u32"
+          },
+          {
+            "name": "asset_commitment",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "terms_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "license_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "price",
+            "type": "u64"
+          },
+          {
+            "name": "active",
+            "type": "bool"
+          },
+          {
+            "name": "moderated",
+            "type": "bool"
+          },
+          {
+            "name": "sales",
+            "type": "u64"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "updated_at",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ListingTerms",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "asset_commitment",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "terms_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "license_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "price",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Order",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "buyer",
+            "type": "pubkey"
+          },
+          {
+            "name": "seller",
+            "docs": [
+              "Default pubkey until a seller accepts a bounty."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "verifier",
+            "docs": [
+              "Default pubkey when no independent verifier is required."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "listing",
+            "docs": [
+              "Default pubkey for custom bounties."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "order_id",
+            "type": "u64"
+          },
+          {
+            "name": "kind",
+            "type": {
+              "defined": {
+                "name": "OrderKind"
+              }
+            }
+          },
+          {
+            "name": "state",
+            "type": {
+              "defined": {
+                "name": "OrderState"
+              }
+            }
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "verifier_fee",
+            "type": "u64"
+          },
+          {
+            "name": "fee_bps",
+            "docs": [
+              "Platform fee locked at funding time."
+            ],
+            "type": "u16"
+          },
+          {
+            "name": "terms_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "criteria_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "license_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "deadline",
+            "type": "i64"
+          },
+          {
+            "name": "review_window_secs",
+            "type": "i64"
+          },
+          {
+            "name": "correction_window_secs",
+            "type": "i64"
+          },
+          {
+            "name": "review_deadline",
+            "type": "i64"
+          },
+          {
+            "name": "correction_deadline",
+            "type": "i64"
+          },
+          {
+            "name": "submitted_at",
+            "type": "i64"
+          },
+          {
+            "name": "max_corrections",
+            "type": "u8"
+          },
+          {
+            "name": "submission_count",
+            "type": "u8"
+          },
+          {
+            "name": "current_commitment",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "current_version",
+            "type": "u32"
+          },
+          {
+            "name": "verifications_done",
+            "type": "u8"
+          },
+          {
+            "name": "verdict_current",
+            "type": "bool"
+          },
+          {
+            "name": "verdict_passed",
+            "type": "bool"
+          },
+          {
+            "name": "disputed",
+            "type": "bool"
+          },
+          {
+            "name": "dispute_count",
+            "type": "u8"
+          },
+          {
+            "name": "designated_seller",
+            "docs": [
+              "If set, only this wallet may accept the bounty (milestone continuations, direct hires)."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "arbitrator",
+            "docs": [
+              "If set, this agreed independent arbitrator may resolve disputes on this order",
+              "(in addition to the platform dispute authority)."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "seller_bps",
+            "type": "u16"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "funded_at",
+            "type": "i64"
+          },
+          {
+            "name": "closed_at",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "OrderKind",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Purchase"
+          },
+          {
+            "name": "Bounty"
+          }
+        ]
+      }
+    },
+    {
+      "name": "OrderPaidOut",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "order",
+            "type": "pubkey"
+          },
+          {
+            "name": "seller_net",
+            "type": "u64"
+          },
+          {
+            "name": "platform_fee",
+            "type": "u64"
+          },
+          {
+            "name": "verifier_paid",
+            "type": "u64"
+          },
+          {
+            "name": "buyer_refund",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "OrderState",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Created"
+          },
+          {
+            "name": "Funded"
+          },
+          {
+            "name": "Assigned"
+          },
+          {
+            "name": "Submitted"
+          },
+          {
+            "name": "UnderReview"
+          },
+          {
+            "name": "Approved"
+          },
+          {
+            "name": "Disputed"
+          },
+          {
+            "name": "CorrectionRequired"
+          },
+          {
+            "name": "Settled"
+          },
+          {
+            "name": "Refunded"
+          },
+          {
+            "name": "Cancelled"
+          }
+        ]
+      }
+    },
+    {
+      "name": "OrderStateChanged",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "order",
+            "type": "pubkey"
+          },
+          {
+            "name": "buyer",
+            "type": "pubkey"
+          },
+          {
+            "name": "seller",
+            "type": "pubkey"
+          },
+          {
+            "name": "state",
+            "type": {
+              "defined": {
+                "name": "OrderState"
+              }
+            }
+          },
+          {
+            "name": "at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PlatformConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "pending_admin",
+            "docs": [
+              "Two-step admin transfer target (default = none)."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "dispute_authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "payment_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "treasury",
+            "type": "pubkey"
+          },
+          {
+            "name": "fee_bps",
+            "type": "u16"
+          },
+          {
+            "name": "review_window_secs",
+            "type": "i64"
+          },
+          {
+            "name": "correction_window_secs",
+            "type": "i64"
+          },
+          {
+            "name": "failure_bounty_grace_secs",
+            "type": "i64"
+          },
+          {
+            "name": "paused",
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PlatformParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "fee_bps",
+            "type": "u16"
+          },
+          {
+            "name": "review_window_secs",
+            "type": "i64"
+          },
+          {
+            "name": "correction_window_secs",
+            "type": "i64"
+          },
+          {
+            "name": "failure_bounty_grace_secs",
+            "type": "i64"
+          },
+          {
+            "name": "dispute_authority",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Provider",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "approved",
+            "type": "bool"
+          },
+          {
+            "name": "capabilities",
+            "docs": [
+              "Capabilities granted by the admin."
+            ],
+            "type": "u32"
+          },
+          {
+            "name": "requested_capabilities",
+            "docs": [
+              "Capabilities the provider asked for."
+            ],
+            "type": "u32"
+          },
+          {
+            "name": "metadata_hash",
+            "docs": [
+              "Hash of the off-chain provider profile (hardware, pricing, methods)."
+            ],
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "jobs_completed",
+            "type": "u64"
+          },
+          {
+            "name": "jobs_disputed",
+            "type": "u64"
+          },
+          {
+            "name": "registered_at",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PurchaseParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "expected_price",
+            "type": "u64"
+          },
+          {
+            "name": "expected_version",
+            "type": "u32"
+          },
+          {
+            "name": "verifier",
+            "type": "pubkey"
+          },
+          {
+            "name": "verifier_fee",
+            "type": "u64"
+          },
+          {
+            "name": "verifier_capability",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Reputation",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "wallet",
+            "type": "pubkey"
+          },
+          {
+            "name": "sales_completed",
+            "type": "u32"
+          },
+          {
+            "name": "purchases_completed",
+            "type": "u32"
+          },
+          {
+            "name": "volume_sold",
+            "type": "u64"
+          },
+          {
+            "name": "volume_bought",
+            "type": "u64"
+          },
+          {
+            "name": "disputed_orders",
+            "type": "u32"
+          },
+          {
+            "name": "refunded_orders",
+            "type": "u32"
+          },
+          {
+            "name": "verified_contributions",
+            "type": "u32"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ServicePaid",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "receipt",
+            "type": "pubkey"
+          },
+          {
+            "name": "payer",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "kind",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ServiceReceipt",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "payer",
+            "type": "pubkey"
+          },
+          {
+            "name": "reference",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "kind",
+            "docs": [
+              "Service kind (1 = storage, 2 = automated verification, 3 = other)."
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "paid_at",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Submission",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "order",
+            "type": "pubkey"
+          },
+          {
+            "name": "seller",
+            "type": "pubkey"
+          },
+          {
+            "name": "index",
+            "type": "u8"
+          },
+          {
+            "name": "commitment",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "version",
+            "type": "u32"
+          },
+          {
+            "name": "submitted_at",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VerdictParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "result_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "spec_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "benchmark_version",
+            "type": "u32"
+          },
+          {
+            "name": "passed",
+            "type": "bool"
+          },
+          {
+            "name": "expires_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VerificationJob",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "requester",
+            "type": "pubkey"
+          },
+          {
+            "name": "job_id",
+            "type": "u64"
+          },
+          {
+            "name": "provider",
+            "docs": [
+              "Default = open to any approved provider with the capability."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "required_capability",
+            "type": "u32"
+          },
+          {
+            "name": "asset_commitment",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "spec_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "price",
+            "type": "u64"
+          },
+          {
+            "name": "fee_bps",
+            "type": "u16"
+          },
+          {
+            "name": "deadline",
+            "type": "i64"
+          },
+          {
+            "name": "review_window_secs",
+            "type": "i64"
+          },
+          {
+            "name": "review_deadline",
+            "type": "i64"
+          },
+          {
+            "name": "state",
+            "type": {
+              "defined": {
+                "name": "JobState"
+              }
+            }
+          },
+          {
+            "name": "result_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "passed",
+            "type": "bool"
+          },
+          {
+            "name": "provider_bps",
+            "type": "u16"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ]
+}

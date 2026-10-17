@@ -1,0 +1,48 @@
+/** A separate local validator and database. Never rewrites a SOL ledger or mints real USDC. */
+import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { join } from 'node:path';
+import { Connection, Keypair, PublicKey } from '@solana/web3.js';
+import { NATIVE_MINT, getMint, getOrCreateAssociatedTokenAccount } from '@solana/spl-token';
+import { EdgeBountyClient, createTestUsdc } from '@edgebounty/blockchain-client';
+import { fundSol } from './sol-platform.js';
+const root = join(import.meta.dirname, '..');
+const rpc = process.env.USDC_RPC_URL ?? 'http://127.0.0.1:8901';
+if (!/^http:\/\/(127\.0\.0\.1|localhost):\d+\/?$/.test(rpc)) throw new Error('This mock USDC bootstrap is local-validator only');
+const connection = new Connection(rpc, 'confirmed');
+const client = new EdgeBountyClient(connection);
+const load = (name: string) => Keypair.fromSecretKey(Uint8Array.from(JSON.parse(readFileSync(join(root, 'keys', name), 'utf8'))));
+const admin = load('localnet-authority.json');
+const key = (name: string) => {
+  if (existsSync(join(root, 'keys', name))) return load(name);
+  const kp = Keypair.generate();
+  writeFileSync(join(root, 'keys', name), JSON.stringify(Array.from(kp.secretKey)), { mode: 0o600 });
+  return kp;
+};
+const authority = key('usdc-dispute-authority.json');
+const verifier = key('usdc-platform-verifier.json');
+let config = await client.config();
+if (config?.paymentMint.equals(NATIVE_MINT)) throw new Error('SOL ledger detected: use the separate USDC validator');
+let mint: PublicKey;
+if (!config) {
+  mint = await createTestUsdc(connection, admin);
+  const treasury = (await getOrCreateAssociatedTokenAccount(connection, admin, mint, admin.publicKey)).address;
+  await client.send(await client.initializePlatform(admin.publicKey, mint, treasury, { feeBps: 600, reviewWindowSecs: 60, correctionWindowSecs: 60, failureBountyGraceSecs: 60, disputeAuthority: authority.publicKey }), [admin]);
+  config = (await client.config())!;
+} else mint = config.paymentMint;
+if ((await getMint(connection, mint)).decimals !== 6 || config.feeBps !== 600 || !config.admin.equals(admin.publicKey)) throw new Error('Existing platform differs from the USDC plan');
+if ((await connection.getBalance(verifier.publicKey)) < 1e9) await fundSol(connection, admin, verifier.publicKey, 5);
+if (!await client.provider(verifier.publicKey)) await client.send(await client.registerProvider(verifier.publicKey, new Uint8Array(32), 0x7f), [verifier]);
+if (!(await client.provider(verifier.publicKey))?.approved) await client.send(await client.reviewProvider(admin.publicKey, verifier.publicKey, true, 0x7f), [admin]);
+const envPath = join(root, 'apps/api/.env');
+const old = readFileSync(envPath, 'utf8');
+const serialize = (kp: Keypair) => JSON.stringify(Array.from(kp.secretKey));
+const values: Record<string, string> = { NODE_ENV: 'development', PAYMENT_CURRENCY: 'USDC', PAYMENT_MINT: mint.toBase58(), SOLANA_RPC_URL: rpc, DATA_DIR: join(root, '.data/usdc').replace(/\\/g, '/'), DATABASE_URL: '', PLATFORM_VERIFIER_KEY: serialize(verifier), DISPUTE_AUTHORITY_KEY: serialize(authority), ADMIN_WALLETS: admin.publicKey.toBase58(), DEV_FAUCET_KEY: serialize(admin), PROGRAM_ID: client.programId.toBase58() };
+mkdirSync(join(root, '.data/config-backups'), { recursive: true });
+writeFileSync(join(root, '.data/config-backups', `pre-usdc-${Date.now()}.env`), old, { mode: 0o600 });
+writeFileSync(envPath, [...old.split(/\r?\n/).filter((l) => l && !Object.hasOwn(values, l.split('=')[0])), ...Object.entries(values).map(([k,v]) => `${k}=${v}`), ''].join('\n'), { mode: 0o600 });
+const webPath = join(root, 'apps/web/.env.local');
+const previous = existsSync(webPath) ? readFileSync(webPath, 'utf8') : '';
+writeFileSync(join(root, '.data/config-backups', `web-pre-usdc-${Date.now()}.env`), previous, { mode: 0o600 });
+const publicValues = { NEXT_PUBLIC_PAYMENT_CURRENCY: 'USDC', NEXT_PUBLIC_SOLANA_RPC_URL: rpc, NEXT_PUBLIC_API_URL: 'http://127.0.0.1:4000', NEXT_PUBLIC_DEV_BURNER: '1' };
+writeFileSync(webPath, Object.entries(publicValues).map(([k,v]) => `${k}=${v}`).join('\n') + '\n');
+console.log(JSON.stringify({ ready: true, currency: 'mock USDC', mint: mint.toBase58(), feeBps: config.feeBps, rpc, separateDataDir: true }));

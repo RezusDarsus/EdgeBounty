@@ -1,0 +1,12 @@
+import { readFileSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+const root = join(import.meta.dirname, '..');
+if (!root.startsWith('/home/ubuntu/edgebounty-usdc-')) throw new Error('Run only in the isolated EC2 release');
+const env = join(root, 'apps/api/.env');
+const values = { APP_DOMAIN: '13-61-207-211.sslip.io', CORS_ORIGINS: 'https://13-61-207-211.sslip.io,https://preview.13-61-207-211.sslip.io' };
+writeFileSync(env, [...readFileSync(env, 'utf8').split(/\r?\n/).filter((l) => l && !Object.hasOwn(values, l.split('=')[0])), ...Object.entries(values).map(([k,v]) => `${k}=${v}`), ''].join('\n'), { mode: 0o600 });
+const caddy = readFileSync('/etc/caddy/Caddyfile', 'utf8');
+if (!caddy.includes('127.0.0.1:3002') || !caddy.includes('127.0.0.1:4002')) throw new Error('Unexpected existing public routes; inspect before promotion');
+const updated = caddy.replace('127.0.0.1:3002', '127.0.0.1:3003').replace('127.0.0.1:4002', '127.0.0.1:4003').replace('127.0.0.1:11001', '127.0.0.1:8902').replace('127.0.0.1:11000', '127.0.0.1:8901');
+writeFileSync(join(root, '.data/Caddyfile.usdc-main'), updated);
+console.log('Prepared main-domain USDC routes; prior ledger and database preserved.');
