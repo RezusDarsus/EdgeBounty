@@ -337,6 +337,7 @@ function DeliveryPanel({ orderId, checkout, onCheckoutPaid }: { orderId: string;
   const [d, setD] = useState<any>(null);
   const [err, setErr] = useState<unknown>(null);
   const [paying, setPaying] = useState(false);
+  const [downloading, setDownloading] = useState<string | null>(null);
   const needsCheckoutPayment = checkout?.status === 'awaiting_payment';
   return (
     <Card title="Download">
@@ -370,7 +371,13 @@ function DeliveryPanel({ orderId, checkout, onCheckoutPaid }: { orderId: string;
           <ul className="mono mt-2 max-h-64 overflow-auto text-xs">
             {d.files.map((f: any) => (
               <li key={f.path} className="flex justify-between gap-2 py-0.5">
-                <button className="truncate text-left underline" onClick={() => downloadFile(f.url, f.path.split('/').pop())}>{f.path}</button>
+                <button className="truncate text-left underline disabled:opacity-60" disabled={downloading === f.path} onClick={async () => {
+                  setErr(null);
+                  setDownloading(f.path);
+                  try { await downloadFile(f.url, f.path.split('/').pop()); }
+                  catch (e) { setErr(e); }
+                  finally { setDownloading(null); }
+                }}>{downloading === f.path ? `Preparing ${f.path}…` : f.path}</button>
                 <span className="text-muted">{f.sha256.slice(0, 10)}</span>
               </li>
             ))}

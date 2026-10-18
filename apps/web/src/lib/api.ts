@@ -58,10 +58,16 @@ export async function downloadFile(url: string, filename: string) {
   if (!res.ok) throw new ApiError(res.status, 'download_failed', await res.text());
   const blob = await res.blob();
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
+  const objectUrl = URL.createObjectURL(blob);
+  a.href = objectUrl;
   a.download = filename;
+  a.style.display = 'none';
+  document.body.appendChild(a);
   a.click();
-  URL.revokeObjectURL(a.href);
+  a.remove();
+  // Browsers may start consuming a download only after the click handler returns.
+  // Revoking the blob URL synchronously can therefore produce an empty/failed download.
+  window.setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000);
 }
 
 export function previewUrl(path: string) {
