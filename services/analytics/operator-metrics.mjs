@@ -31,7 +31,7 @@ export async function operatorMetrics(pool,days=7) {
 
   const transactions=await q(`SELECT status,count(*)::text AS n FROM analytics_operator_transactions GROUP BY 1`);
 
-  const jobs=await q(`SELECT level,status,count(*)::text AS n,coalesce(sum(quote_micro),0)::text AS quoted,coalesce(sum(actual_cost_micro),0)::text AS service_charge,
+  const jobs=await q(`SELECT level,status,count(*)::text AS n,coalesce(sum(quote_micro),0)::text AS quoted,coalesce(sum(actual_cost_micro),0)::text AS processing_estimate_raw,
 
    count(*) FILTER(WHERE cached)::text AS cached,count(*) FILTER(WHERE passed)::text AS passed,count(*) FILTER(WHERE passed=false)::text AS failed_quality,
 

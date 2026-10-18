@@ -35,11 +35,11 @@ export class AnalyticsStore {
       if(event.pageView===true) this.db.prepare('INSERT INTO pageviews VALUES (?,?,1) ON CONFLICT(day,page) DO UPDATE SET n=n+1').run(day,event.page);
     } else if(event.kind==='request') {
       if(!/^\/[a-zA-Z0-9/_.:-]{0,140}$/.test(event.route??'') || !['GET','POST','PUT','PATCH','DELETE','HEAD'].includes(event.method) || !Number.isInteger(event.status) || event.status<100 || event.status>599) throw Error('Invalid request metric');
-      const duration=event.durationMs??0;
-      if(!Number.isFinite(duration)||duration<0||duration>86400000)throw Error('Invalid latency');
+      const duration=event.durationMs;
+      if(duration!==undefined&&(!Number.isFinite(duration)||duration<0||duration>86400000))throw Error('Invalid latency');
       const client=['browser_session','api_key','anonymous_or_automated'].includes(event.client)?event.client:'anonymous_or_automated';
       const bucket=[10,50,100,250,500,1000,2500,5000,15000,60000,120000,86400000].find(b=>duration<=b);
-      this.db.prepare('INSERT INTO request_metrics VALUES (?,?,?,?,?,1) ON CONFLICT(day,route,client,status,bucket) DO UPDATE SET n=n+1').run(day,event.route,client,event.status,bucket);
+      if(duration!==undefined)this.db.prepare('INSERT INTO request_metrics VALUES (?,?,?,?,?,1) ON CONFLICT(day,route,client,status,bucket) DO UPDATE SET n=n+1').run(day,event.route,client,event.status,bucket);
       const steps={'POST /listings/:id/purchase':'purchase_prepared','POST /orders/:id/confirm':'order_confirm_requested','POST /verification/quote':'verification_quoted','POST /verification/jobs':'verification_created','POST /agents/chat':'assistant_answer','POST /assets':'asset_created','POST /versions/:id/finalize':'version_finalized','POST /listings':'listing_prepared','POST /listings/:id/confirm':'listing_confirm_requested','POST /bounties/verification-quote':'bounty_quoted','POST /bounties':'bounty_prepared','POST /orders/:id/submissions':'submission_prepared','GET /orders/:id/delivery':'download_links'};
       const step=steps[event.method+' '+event.route];
       if(step&&event.status<400&&/^[a-f0-9-]{36}$/i.test(event.accountId??''))this.db.prepare('INSERT OR IGNORE INTO journeys VALUES (?,?,?)').run(this.hash('account:'+event.accountId),step,now);
