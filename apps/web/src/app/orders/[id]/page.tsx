@@ -371,6 +371,8 @@ function DeliveryPanel({ orderId, checkout, onCheckoutPaid }: { orderId: string;
       <ErrorNote error={err} />
       {d && (
         <>
+          {d.zipUrl && <Button className="mt-3" onClick={() => downloadFile(d.zipUrl, 'edgebounty-dataset.zip')}>Download all as ZIP</Button>}
+          {d.zipUrl && <p className="mt-2 text-xs text-muted">All files in one archive. Download capacity is charged for the full dataset when the ZIP starts.</p>}
           <p className="mt-2 text-xs">Licensed commitment <Hash value={d.commitment} /> · receipt <Hash value={d.licenseReceipt} /></p>
           <ul className="mono mt-2 max-h-64 overflow-auto text-xs">
             {d.files.map((f: any) => (
