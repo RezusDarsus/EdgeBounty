@@ -361,7 +361,11 @@ function DeliveryPanel({ orderId, checkout, onCheckoutPaid }: { orderId: string;
       ) : (
         <>
           <p className="mb-2 text-sm text-muted">Download links are bound to your wallet and expire in 10 minutes; request new ones any time.</p>
-          <Button onClick={async () => setD(await api(`/orders/${orderId}/delivery`).catch((e) => (setErr(e), null)))}>Get download links</Button>
+          <Button onClick={async () => {
+            setErr(null);
+            try { setD(await api(`/orders/${orderId}/delivery`)); }
+            catch (e) { setErr(e); }
+          }}>Get download links</Button>
         </>
       )}
       <ErrorNote error={err} />
