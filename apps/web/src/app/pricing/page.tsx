@@ -28,7 +28,7 @@ function Table({ caption, head, rows, note }: { caption: string; head: [string, 
 
 export default function Pricing() {
   return (
-    <Page kicker="Fees and pricing" title="Pricing" subtitle="Review an exact quote before you pay. Solana network fees are charged separately in SOL.">
+    <Page kicker="Fees and pricing" title="Pricing" subtitle="Marketplace escrow, hosting and verification use the payment token configured for this deployment (USDC or SOL). Solana network fees are separate and paid in SOL; checkout shows the exact charge before you sign.">
       <div className="grid gap-x-12 gap-y-14 lg:grid-cols-2">
         <section>
           <table className="w-full border-y-[3px] border-ink text-[15px]">
@@ -97,7 +97,7 @@ export default function Pricing() {
           <p><b>2. Hosting.</b> Storage is always paid. The monthly price is the greater of $0.30 or $0.045 per started GiB. A small file still uses one billable GiB. Examples: 1 GiB costs $0.30/month; 10 GiB costs $0.45/month; 100 GiB costs $4.50/month. Hosting is prepaid for the selected term. Sellers can prepay listing hosting; at checkout buyers pay only any uncovered hosting period.</p>
           <p><b>3. Downloads.</b> The checkout quote includes paid capacity for one complete copy for a 1-month access period, two copies for 3 months, or three copies for 6 months. Capacity is priced at $0.15 per started GiB per included copy. A 10 GiB asset therefore has download charges of $1.50, $3.00 or $4.50 for those terms. Extra capacity is prepaid in whole GiB at $0.15 each. The checkout shows the actual amount before payment.</p>
           <p><b>4. Verification.</b> L1 technical checks are included with listing verification, within the published file and processing limits. L2–L3 sampled reviews are prepaid from a quote and capped to the work shown. L4 human review is quoted individually. Reusable reports may avoid charging for a repeat run on the same version and settings.</p>
-          <p><b>5. Network fees and currency.</b> Solana transaction fees are paid separately in SOL to the network. USD-denominated services are converted to SOL at the rate locked into the quote. Review the amount, rate and breakdown on the checkout screen before signing.</p>
+          <p><b>5. Network fees and currency.</b> Escrow, hosting and verification are charged in the configured payment token (USDC or SOL). USD-denominated service prices are converted to that token at the rate locked into the quote. Solana transaction fees are separate and always paid in SOL. Review the amount, rate and breakdown before signing.</p>
           <p>Prices above describe this test-network MVP. Quotes show the charge for your specific asset, access term, hosting coverage and verification request. For help with a quote, email <a className="underline" href="mailto:darsavelidzerezo@gmail.com">darsavelidzerezo@gmail.com</a>.</p>
         </div>
       </section>

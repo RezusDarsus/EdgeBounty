@@ -78,7 +78,8 @@ export default function OrderWorkspace({ params }: { params: Promise<{ id: strin
 
           {/* ------------------------------------------------ buyer review */}
           {!collaborative && role === 'buyer' && state === 'under_review' && (
-            <Card title="Your review" right={<span className="text-xs text-muted">window closes {dateTime(chain.reviewDeadline)}</span>}>
+            <Card title="Your review" right={<span className="text-xs font-medium text-warn">Review closes {dateTime(chain.reviewDeadline)}</span>}>
+              <Notice tone="warn">Review the delivery preview and verification report below before this deadline. If you take no action, the escrow may be settled to the seller after the review window expires. Set a reminder to review this order in time.</Notice>
               <div className="flex flex-wrap gap-2">
                 <Button onClick={() => act('Approved', async () => (await chainClient()).acceptDeliverable(wallet.publicKey!, addr))}>Approve &amp; release payment</Button>
                 {verdictFailed && correctionsLeft && <Button variant="ghost" onClick={() => act('Correction requested', async () => (await chainClient()).rejectDeliverable(wallet.publicKey!, addr))}>Request correction (verifier failed it)</Button>}

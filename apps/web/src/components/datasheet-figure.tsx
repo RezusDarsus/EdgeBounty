@@ -15,8 +15,8 @@ const SPEC: [string, string][] = [
 
 const RUNGS: [string, string, string, boolean][] = [
   ['L1', 'Technical checks', '0 corrupt · 14 exact duplicates', true],
-  ['L2', 'Sampled AI review', 'relevance 96.1% · 95% CI 94.0–97.6 · n=400', true],
-  ['L3', 'Advanced review', 'not run', false],
+  ['L2', 'Full-dataset quality checks', 'passed', true],
+  ['L3', 'Sampled AI review', 'relevance 96.1% · 95% CI 94.0–97.6 · n=400', true],
   ['L4', 'Human review', 'not run', false],
 ];
 

@@ -190,7 +190,7 @@ export default function ListingDetail({ params }: { params: Promise<{ id: string
                 {!account && <p className="text-xs text-muted">Sign in with your wallet to buy. Your wallet will ask you to approve the payment before anything moves.</p>}
                 {account && !wallet.connected && <p className="text-xs text-warn">Your wallet is disconnected. Reconnect it from the menu to continue.</p>}
                 <p className="border-t border-line pt-3 text-xs leading-relaxed text-ink-2">
-                  <span className="mr-1 font-serif text-sm text-ink">†</span>Your USDC is held by the escrow program, not by the seller. You get the full files after you approve the delivery or the review window passes. Solana network fees are separate.
+                  <span className="mr-1 font-serif text-sm text-ink">†</span>Your {CURRENCY} payment is held by the escrow program, not by the seller. You get the full files after you approve the delivery or the review window passes. Solana network fees are separate and paid in SOL.
                 </p>
               </div>
             )}

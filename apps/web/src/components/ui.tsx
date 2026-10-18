@@ -232,8 +232,8 @@ export function Notice({ children, tone = 'neutral' }: { children: ReactNode; to
 
 const RUNGS = [
   ['L1', 'Technical checks', 'File readability, format parsing, detected corruption and exact duplicates'],
-  ['L2', 'Sampled AI review', 'Sampled relevance assessment; near-duplicates and outliers may be flagged'],
-  ['L3', 'Advanced review', 'Extended sampled AI analysis within a defined budget'],
+  ['L2', 'Full-dataset quality checks', 'Structural and quality checks within the quoted processing budget'],
+  ['L3', 'Sampled AI review', 'Sampled relevance assessment; advanced analysis and near-duplicate checks may be included'],
   ['L4', 'Human review', 'A reviewer assesses the submission against the stated criteria'],
 ] as const;
 

@@ -16,6 +16,16 @@ export function operationRecorder(db: Db, provider: string) {
 
 export async function retentionNoticeTick(ctx: AppContext, now = new Date()) {
   const until = new Date(now.getTime() + 7 * 86_400_000);
+  const reviewUntil = new Date(now.getTime() + 24 * 60 * 60_000);
+  const reviews = await ctx.db.select().from(schema.orders).where(eq(schema.orders.chainState, 'under_review'));
+  for (const order of reviews) {
+    const deadlineSeconds = Number((order.chain as { reviewDeadline?: number | string } | null)?.reviewDeadline);
+    if (!Number.isFinite(deadlineSeconds)) continue;
+    const deadline = new Date(deadlineSeconds * 1000);
+    if (deadline > now && deadline < reviewUntil) {
+      await notify(ctx.db, order.buyerId, `review-deadline:${order.id}:${deadlineSeconds}`, 'Buyer review closes within 24 hours', `Review the delivery and available evidence for “${order.title}” by ${deadline.toISOString()}. If you take no action, the escrow may be settled to the seller after the deadline.`, `/orders/${order.id}`);
+    }
+  }
   const allocations = await ctx.db.select().from(schema.storageAllocations).where(and(eq(schema.storageAllocations.status, 'active'), gt(schema.storageAllocations.expiresAt, now), lt(schema.storageAllocations.expiresAt, until)));
   for (const a of allocations) await notify(ctx.db, a.accountId, `storage-renewal:${a.id}`, 'Storage expires soon', `Your ${a.gb} GiB plan expires on ${a.expiresAt!.toISOString().slice(0, 10)}. Renew to keep your quota.`);
   const hosting = await ctx.db.select().from(schema.hostingCoverage).where(and(gt(schema.hostingCoverage.endsAt, now), lt(schema.hostingCoverage.endsAt, until)));

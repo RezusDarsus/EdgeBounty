@@ -27,7 +27,20 @@ export function Nav() {
   const [funding, setFunding] = useState(false);
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [networkLabel, setNetworkLabel] = useState('Checking payment network…');
   useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    let active = true;
+    import('@/lib/api').then(({ api }) => api<{ rpcUrl: string; currency: string }>('/config')).then((config) => {
+      if (!active) return;
+      const rpc = config.rpcUrl.toLowerCase();
+      const currency = config.currency === 'USDC' ? 'USDC' : 'SOL';
+      const network = /devnet/.test(rpc) ? 'Public Solana Devnet' : /mainnet/.test(rpc) ? 'Solana Mainnet' : /localhost|127\.0\.0\.1|0\.0\.0\.0|solana-test-validator|validator:/.test(rpc) ? 'Private validator' : 'Configured Solana RPC';
+      const token = network === 'Private validator' && currency === 'USDC' ? 'mock USDC · no monetary value' : network === 'Public Solana Devnet' && currency === 'USDC' ? 'Devnet USDC · test tokens' : `${currency} payments`;
+      setNetworkLabel(`${network} · ${token}`);
+    }).catch(() => { if (active) setNetworkLabel('Network unavailable · do not fund'); });
+    return () => { active = false; };
+  }, []);
   async function getTestFunds() {
     setFunding(true); setErr(null); setSuccess(null);
     try {
@@ -56,6 +69,7 @@ export function Nav() {
           })}
         </nav>
         <div className="ml-auto flex items-center gap-2">
+          <span title="Network and payment token for all funding actions" className="max-w-32 truncate rounded border border-line px-1.5 py-1 text-[9px] text-muted sm:max-w-56 sm:px-2 sm:text-[11px]">{networkLabel}</span>
           {account ? (
             <>
               <Link href="/dashboard" className={`rounded-md px-2.5 py-1.5 text-sm transition-colors hover:bg-sunk ${path?.startsWith('/dashboard') ? 'font-medium text-ink' : 'text-ink-2'}`}>

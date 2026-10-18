@@ -99,6 +99,7 @@ export default function Sell() {
   return (
     <RequireSession>
       <Page kicker="Sell" title="Sell a dataset or model" subtitle="Upload privately, then publish an immutable, versioned listing. Buyers see limited previews and verification reports; the full asset is delivered only after settlement.">
+        <div className="mb-4"><Notice>Listing requires a passing L2 or L3 check on the exact version. L1 technical checks are included within limits but do not qualify a listing. Paid verification starts from 0.005 SOL-equivalent for L2 or 0.007 SOL-equivalent for L3 (up to 200 sampled items); larger files, more items and model setup can raise the quote. The exact amount is calculated after upload and shown in this deployment&apos;s payment token before verification starts.</Notice></div>
         <div className="grid gap-4 lg:grid-cols-2">
           <Card title="1 · Upload">
             <div className="mb-3 flex gap-2">
