@@ -16,6 +16,8 @@ test('presence deduplicates browsers/accounts, expires after five minutes and st
  store.ingest({kind:'heartbeat',visitorId:guest,accountId:null,page:'home',pageView:true});
  store.ingest({kind:'request',route:'/orders/:id',method:'GET',status:402});
  const data=store.snapshot(7);assert.equal(data.active.guests,1);assert.equal(data.active.registered,1);assert.equal(data.visitors.browsers,3);assert.equal(data.visitors.registered,1);assert.equal(data.usage[0].errors,1);
+ store.ingest({kind:'heartbeat',visitorId:first,accountId:randomUUID(),page:'orders',pageView:false});
+ assert.equal(store.snapshot(7).visitors.registered,2);assert.equal(store.snapshot(7).daily[0].registered,2);
  const persisted=JSON.stringify(store.db.prepare('SELECT * FROM presence').all());assert.ok(!persisted.includes(first));assert.ok(!persisted.includes(account));
  now+=300001;assert.equal(store.snapshot(7).active.registered,0);
  now+=31*86400_000;assert.equal(store.snapshot(30).daily.length,0);store.close();
