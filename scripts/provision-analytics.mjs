@@ -7,7 +7,7 @@ const target='services/analytics/.env';
 if(existsSync(target)) { console.log('Analytics already provisioned; preserving credentials');process.exit(0); }
 const apiEnv=readFileSync('apps/api/.env','utf8');
 if(/^ANALYTICS_INGEST_SECRET=/m.test(apiEnv))throw Error('Existing analytics ingestion configuration requires manual reconciliation');
-const pool=new pg.Pool({connectionString:process.env.DATABASE_URL});
+const pool=new pg.Pool({connectionString:process.env.ANALYTICS_PROVISION_DATABASE_URL??process.env.DATABASE_URL});
 const client=await pool.connect();
 const role='edgebounty_analytics_reader';
 const dbPassword=randomBytes(32).toString('hex'), password=randomBytes(24).toString('base64url'), secret=randomBytes(32).toString('hex');
