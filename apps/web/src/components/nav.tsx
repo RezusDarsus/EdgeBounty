@@ -69,7 +69,7 @@ export function Nav() {
           })}
         </nav>
         <div className="ml-auto flex items-center gap-2">
-          <span title="Network and payment token for all funding actions" className="max-w-32 truncate rounded border border-line px-1.5 py-1 text-[9px] text-muted sm:max-w-56 sm:px-2 sm:text-[11px]">{networkLabel}</span>
+          <span title="Network and payment token for all funding actions" className="hidden max-w-56 truncate rounded border border-line px-2 py-1 text-[11px] text-muted sm:inline">{networkLabel}</span>
           {account ? (
             <>
               <Link href="/dashboard" className={`rounded-md px-2.5 py-1.5 text-sm transition-colors hover:bg-sunk ${path?.startsWith('/dashboard') ? 'font-medium text-ink' : 'text-ink-2'}`}>
@@ -114,6 +114,7 @@ export function Nav() {
           </button>
         </div>
       </div>
+      <p className="border-t border-line px-4 py-1 text-center text-[11px] text-muted sm:hidden">{networkLabel}</p>
       {open && (
         <nav aria-label="Mobile" className="rise flex flex-col border-t border-line bg-panel px-4 py-2 sm:px-6 lg:hidden">
           {LINKS.map(([href, label]) => (
