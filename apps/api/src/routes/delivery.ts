@@ -311,7 +311,7 @@ export function deliveryRoutes(app: FastifyInstance, ctx: AppContext) {
   });
 }
 
-const downloadQuotaExhausted = () => new HttpError(402, 'download_quota_exhausted', 'Included downloads are used up. Buy download credits: POST /entitlements/:id/download-credits');
+const downloadQuotaExhausted = () => new HttpError(402, 'download_quota_exhausted', 'There is not enough download capacity for this file or ZIP. Add download credits on your order page, then request fresh links.');
 
 /** Single byte range per RFC 9110 (`bytes=a-b`, `bytes=a-`, `bytes=-n`). Multi-range is not supported. */
 export function parseRange(header: string | undefined, size: number): { start: number; end: number } | null | 'unsatisfiable' {

@@ -211,7 +211,7 @@ export async function deliveryAccess(ctx: AppContext, ent: typeof schema.deliver
         const end = start + BigInt(cq.months) * MONTH_SECS;
         const [activated] = await tx.update(schema.deliveryEntitlements).set({ accessStartsAt: date(start), accessEndsAt: date(end) }).where(and(eq(schema.deliveryEntitlements.id, ent.id), isNull(schema.deliveryEntitlements.accessStartsAt), isNull(schema.deliveryEntitlements.revokedAt))).returning();
         if (activated) {
-          // Honor the full purchased period from first eligible access, including settlement delays.
+          // Honor the full purchased period from settlement/payment eligibility.
           await tx.insert(schema.hostingCoverage).values({ assetVersionId: ent.assetVersionId, source: 'buyer', payerId: ent.buyerId, bytes: cq.objectBytes, startsAt: date(start), endsAt: date(end), amountMicro: 0n, usdMicro: 0n });
           ent.accessStartsAt = activated.accessStartsAt;
           ent.accessEndsAt = activated.accessEndsAt;
