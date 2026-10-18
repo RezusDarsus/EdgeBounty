@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, beforeEach, expect, it, vi } from 'vitest';
 import { randomUUID } from 'node:crypto';
+import { eq } from 'drizzle-orm';
 import { Keypair } from '@solana/web3.js';
 import { loadConfig } from '../../apps/api/src/config.js';
 import { createDb, schema } from '../../apps/api/src/db/index.js';
@@ -103,4 +104,30 @@ it('keeps provider requests bounded and treats prompt-injection text as data, wi
   const body = JSON.parse(fetcher.mock.calls[0][1].body);
   expect(body.max_tokens).toBe(2200); expect(body.tools).toBeUndefined(); expect(body.messages[0].content).toContain('Never sign');
   expect(fetcher).toHaveBeenCalledTimes(1);
+});
+
+it('recovers stale running requests while keeping every provider attempt in daily accounting', async () => {
+  const a = await account();
+  const send = () => app.inject({ method: 'POST', url: '/agents/chat', headers: a.headers, payload });
+  expect((await send()).statusCode).toBe(200);
+  await ctx.db.update(schema.agentRequests).set({ status: 'running', response: null, createdAt: new Date(Date.now() - 181_000) }).where(eq(schema.agentRequests.accountId, a.id));
+  expect((await send()).statusCode).toBe(200);
+  const attempts = await ctx.db.select().from(schema.agentRequests).where(eq(schema.agentRequests.accountId, a.id));
+  expect(attempts).toHaveLength(2);
+  expect(attempts.filter(a => a.status === 'failed')).toHaveLength(1);
+  expect(complete).toHaveBeenCalledTimes(2);
+});
+
+it('lets a user retry a failed request after cooldown without bypassing daily limits', async () => {
+  const a = await account();
+  complete.mockRejectedValueOnce(new Error('provider unavailable'));
+  const send = () => app.inject({ method: 'POST', url: '/agents/chat', headers: a.headers, payload });
+  expect((await send()).statusCode).toBe(502);
+  expect((await send()).statusCode).toBe(409);
+  await ctx.db.update(schema.agentRequests).set({ response: { failedAt: new Date(Date.now() - 31_000).toISOString() } }).where(eq(schema.agentRequests.accountId, a.id));
+  ctx.cfg.AI_AGENT_DAILY_ACCOUNT = 1;
+  expect((await send()).statusCode).toBe(429);
+  ctx.cfg.AI_AGENT_DAILY_ACCOUNT = 2;
+  expect((await send()).statusCode).toBe(200);
+  expect(complete).toHaveBeenCalledTimes(2);
 });

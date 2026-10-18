@@ -1,0 +1,14 @@
+# Billing, delivery and assistant recovery
+
+This release retains the existing private-validator/mock-USDC deployment, 600-bps commission, database, credentials and program. No schema migration or contract upgrade is required.
+
+- New metered entitlements activate once both settlement and checkout payment are confirmed. The complete 1/3/6-month period is anchored to eligibility, not quote creation. Existing started access windows remain unchanged. Additional coverage required to honor the complete term is recorded with zero additional customer charge and is absorbed by the platform.
+- A hosting-bearing checkout cannot open while a live overlapping hosting invoice awaits payment for the same version. Expired invoices release the gate; already-funded coverage is still excluded from new quotes.
+- Signed-download preflight validates entitlement and capacity before browser navigation. Order pages show remaining bytes, disable unaffordable ZIPs, and expose an explicit 1-GiB credit quote/payment flow. Buying capacity never extends access time.
+- ZIP preparation finishes in a private temporary file before capacity is reserved. Preparation/storage errors consume no quota. Interrupted transfer refunds are based on the untransferred proportional source-byte equivalent. Temporary files are removed, and the service allows two archives of at most 2 GiB per API process. Individual-file delivery remains available for larger assets.
+- Failed assistant requests can be explicitly resent after a 30-second cooldown. Running requests become retryable after three minutes, exceeding the provider timeout. Previous attempt records remain in daily accounting; retries still require daily capacity. There are no automatic provider retries and no new financial authority.
+- README walkthrough links the real five-contributor demo, published evidence and two ONNX examples. It distinguishes AI roles, operator-created identities, allocation evidence and completed payments.
+
+Focused checks cover quote serialization, full-term activation, invoice atomicity, ZIP file integrity, preparation failure, socket interruption, assistant recovery and daily caps. Production frontend and API TypeScript checks are required before promotion. Existing customer quota is not silently rewritten and no test payment is made by deployment.
+
+Runtime paths: API `/home/ubuntu/edgebounty-usdc-20261017-master`; web `/home/ubuntu/edgebounty-web-billing-recovery`, PM2 `web-billing-recovery`, loopback port 3020. Prior web releases remain available for recovery. The private backup `/home/ubuntu/backups/pre-billing-recovery-20261018` preserves the four changed API source files and Caddy routing. Rollback restores those source files, restarts the API and restores/reloads the saved Caddyfile; it must not rewind database or chain state.

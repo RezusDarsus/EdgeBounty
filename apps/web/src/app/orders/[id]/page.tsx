@@ -338,6 +338,9 @@ function DeliveryPanel({ orderId, checkout, onCheckoutPaid }: { orderId: string;
   const [err, setErr] = useState<unknown>(null);
   const [paying, setPaying] = useState(false);
   const [downloading, setDownloading] = useState<string | null>(null);
+  const [creditInvoice, setCreditInvoice] = useState<any>(null);
+  const [creditsBusy, setCreditsBusy] = useState(false);
+  const zipFits = !d?.access?.metered || BigInt(d.access.remainingBytes ?? '0') >= BigInt(d.archiveBytes ?? '0');
   const needsCheckoutPayment = checkout?.status === 'awaiting_payment';
   return (
     <Card title="Download">
@@ -371,8 +374,34 @@ function DeliveryPanel({ orderId, checkout, onCheckoutPaid }: { orderId: string;
       <ErrorNote error={err} />
       {d && (
         <>
-          {d.zipUrl && <Button className="mt-3" onClick={() => downloadFile(d.zipUrl, 'edgebounty-dataset.zip')}>Download all as ZIP</Button>}
-          {d.zipUrl && <p className="mt-2 text-xs text-muted">All files in one archive. Download capacity is charged for the full dataset when the ZIP starts.</p>}
+          {d.access?.metered && <p className="mt-3 text-sm">Remaining download capacity: {Number(d.access.remainingBytes).toLocaleString()} bytes. Full dataset: {Number(d.archiveBytes).toLocaleString()} bytes.</p>}
+          {!zipFits && <p className="mt-2 text-sm text-warn">There is not enough capacity for the complete ZIP. Add download credits or download individual files that fit.</p>}
+          {d.zipUrl && <Button className="mt-3" disabled={!zipFits || downloading === 'zip'} onClick={async () => {
+            setErr(null); setDownloading('zip');
+            try { await downloadFile(d.zipUrl, 'edgebounty-dataset.zip'); }
+            catch (e) { setErr(e); }
+            finally { setDownloading(null); }
+          }}>Download all as ZIP</Button>}
+          {d.zipUrl && <p className="mt-2 text-xs text-muted">All files in one archive. ZIP preparation failures use no capacity; interrupted transfers refund the untransferred proportion.</p>}
+          {d.access?.metered && !creditInvoice && <Button className="mt-3" disabled={creditsBusy} onClick={async () => {
+            setErr(null); setCreditsBusy(true);
+            try { const q = await api(`/entitlements/${d.entitlementId}/download-credits`, { body: { gb: 1 } }); setCreditInvoice(q.invoice); }
+            catch (e) { setErr(e); }
+            finally { setCreditsBusy(false); }
+          }}>Quote 1 GiB of extra downloads</Button>}
+          {creditInvoice && <div className="mt-3 text-sm">
+            <p>1 GiB extra download capacity: {sol(creditInvoice.amountMicro)}. Your existing access end date stays the same.</p>
+            <Button disabled={creditsBusy || !wallet.publicKey} onClick={async () => {
+              setErr(null); setCreditsBusy(true);
+              try {
+                const c = await chainClient();
+                await sendWithWallet(wallet, await c.payService(wallet.publicKey!, hexBytes(creditInvoice.reference), creditInvoice.serviceKind, BigInt(creditInvoice.amountMicro)));
+                await api(`/invoices/${creditInvoice.id}/confirm`, { method: 'POST' });
+                setCreditInvoice(null); setD(await api(`/orders/${orderId}/delivery`));
+              } catch (e) { setErr(e); }
+              finally { setCreditsBusy(false); }
+            }}>{creditsBusy ? 'Confirming payment…' : `Pay ${sol(creditInvoice.amountMicro)} for 1 GiB`}</Button>
+          </div>}
           <p className="mt-2 text-xs">Licensed commitment <Hash value={d.commitment} /> · receipt <Hash value={d.licenseReceipt} /></p>
           <ul className="mono mt-2 max-h-64 overflow-auto text-xs">
             {d.files.map((f: any) => (

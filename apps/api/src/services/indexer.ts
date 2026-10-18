@@ -1,4 +1,4 @@
-import { applyPaidInvoice } from '../lib/billing.js';
+import { applyPaidInvoice, deliveryAccess } from '../lib/billing.js';
 import { and, asc, eq, inArray, lt } from 'drizzle-orm';
 import { PublicKey } from '@solana/web3.js';
 import { TERMINAL_ORDER_STATES } from '@edgebounty/shared-types';
@@ -110,9 +110,13 @@ async function onOrderState(ctx: AppContext, row: OrderRow, view: OrderView) {
         .insert(schema.deliveryEntitlements)
         .values({
           orderId: row.id, buyerId: row.buyerId, buyerWallet: row.buyerWallet, assetVersionId: versionId, licenseReceipt: ctx.chain.client.pda.license(new PublicKey(row.onchainAddress)).toBase58(),
-          ...(cq && cq.assetVersionId === versionId ? { accessStartsAt: cq.accessStartsAt, accessEndsAt: cq.accessEndsAt, allowanceBytes: cq.allowanceBytes, checkoutQuoteId: cq.id } : {}),
+          ...(cq && cq.assetVersionId === versionId ? { allowanceBytes: cq.allowanceBytes, checkoutQuoteId: cq.id } : {}),
         })
         .onConflictDoNothing();
+      if (cq?.status === 'paid') {
+        const [ent] = await ctx.db.select().from(schema.deliveryEntitlements).where(eq(schema.deliveryEntitlements.orderId, row.id));
+        if (ent && !ent.revokedAt) await deliveryAccess(ctx, ent);
+      }
       if (row.listingId) {
         const [l] = await ctx.db.select().from(schema.listings).where(eq(schema.listings.id, row.listingId));
         if (l) await ctx.db.update(schema.listings).set({ sales: l.sales + 1 }).where(eq(schema.listings.id, l.id));

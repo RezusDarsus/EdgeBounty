@@ -1,5 +1,5 @@
 import { paymentQuoteRate } from './payments.js';
-import { and, eq, gt, inArray, sql } from 'drizzle-orm';
+import { and, eq, gt, inArray, isNull, sql } from 'drizzle-orm';
 import {
   DEFAULT_MARKETPLACE_PRICING,
   MONTH_SECS,
@@ -13,7 +13,7 @@ import {
 } from '@edgebounty/pricing-engine';
 import type { AppContext } from '../context.js';
 import { schema } from '../db/index.js';
-import { HttpError, badRequest, notFound } from './http.js';
+import { HttpError, badRequest, conflict, notFound } from './http.js';
 import { createInvoice } from '../routes/verification.js';
 
 type Q = Pick<AppContext['db'], 'select' | 'insert' | 'update' | 'execute'>;
@@ -109,6 +109,13 @@ export async function createCheckout(
   const locked = await ctx.db.transaction(async (tx) => {
     // serialize against concurrent checkouts of the same version so gaps are computed on current coverage
     await lockVersion(tx, p.assetVersionId);
+    const pending = await tx.select().from(schema.checkoutQuotes).where(and(eq(schema.checkoutQuotes.assetVersionId, p.assetVersionId), eq(schema.checkoutQuotes.status, 'awaiting_payment'), gt(schema.checkoutQuotes.hostingMicro, 0n)));
+    for (const existing of pending) {
+      const [invoice] = existing.invoiceId ? await tx.select().from(schema.invoices).where(eq(schema.invoices.id, existing.invoiceId)) : [];
+      if ((invoice?.status === 'open' && invoice.expiresAt > new Date()) || (!existing.invoiceId && existing.createdAt > new Date(Date.now() - 300_000))) {
+        throw conflict('Another hosting checkout is awaiting payment for this version. Retry after it is paid or expires; overlapping hosting will not be charged twice.');
+      }
+    }
     const objectBytes = await versionBytes(ctx, p.assetVersionId, tx);
     const quote = checkoutQuote({ priceLamports: p.priceLamports, objectBytes, months: p.months, now: nowSecs(), coverage: await versionCoverage(ctx, p.assetVersionId, tx), solUsdMicro: paymentQuoteRate(ctx.cfg), pricing: marketplacePricing(ctx) });
     const [row] = await tx
@@ -139,6 +146,7 @@ async function fundCheckout(ctx: AppContext, quoteId: string) {
   await ctx.db.transaction(async (tx) => {
     const [cq] = await tx.select().from(schema.checkoutQuotes).where(eq(schema.checkoutQuotes.id, quoteId));
     if (!cq || cq.status === 'paid') return;
+    await lockVersion(tx, cq.assetVersionId);
     await tx.update(schema.checkoutQuotes).set({ status: 'paid', paidAt: new Date() }).where(eq(schema.checkoutQuotes.id, quoteId));
     const total = cq.hostingGaps.reduce((n, g) => n + (BigInt(g.end) - BigInt(g.start)), 0n);
     for (const g of cq.hostingGaps) {
@@ -170,7 +178,11 @@ export async function applyPaidInvoice(ctx: AppContext, inv: typeof schema.invoi
       });
     });
   }
-  if (m.purpose === 'checkout' && m.checkoutQuoteId) await fundCheckout(ctx, m.checkoutQuoteId);
+  if (m.purpose === 'checkout' && m.checkoutQuoteId) {
+    await fundCheckout(ctx, m.checkoutQuoteId);
+    const [ent] = await ctx.db.select().from(schema.deliveryEntitlements).where(eq(schema.deliveryEntitlements.checkoutQuoteId, m.checkoutQuoteId));
+    if (ent && !ent.revokedAt) await deliveryAccess(ctx, ent);
+  }
   // confirmInvoice calls this exactly once per invoice (open -> paid transition is guarded)
   if (m.purpose === 'download_credits' && m.entitlementId) {
     await ctx.db.execute(sql`update delivery_entitlements set extra_bytes = extra_bytes + ${BigInt(m.bytes)} where id = ${m.entitlementId}`);
@@ -192,6 +204,24 @@ export async function deliveryAccess(ctx: AppContext, ent: typeof schema.deliver
   if (ent.checkoutQuoteId) {
     const [cq] = await ctx.db.select().from(schema.checkoutQuotes).where(eq(schema.checkoutQuotes.id, ent.checkoutQuoteId));
     if (cq && cq.status !== 'paid') throw new HttpError(402, 'checkout_unpaid', 'Pay the checkout invoice (hosting and downloads) to download');
+    if (cq && !ent.accessStartsAt) {
+      await ctx.db.transaction(async tx => {
+        await lockVersion(tx, ent.assetVersionId);
+        const start = secs(new Date(Math.max(ent.grantedAt.getTime(), cq.paidAt?.getTime() ?? ent.grantedAt.getTime())));
+        const end = start + BigInt(cq.months) * MONTH_SECS;
+        const [activated] = await tx.update(schema.deliveryEntitlements).set({ accessStartsAt: date(start), accessEndsAt: date(end) }).where(and(eq(schema.deliveryEntitlements.id, ent.id), isNull(schema.deliveryEntitlements.accessStartsAt), isNull(schema.deliveryEntitlements.revokedAt))).returning();
+        if (activated) {
+          // Honor the full purchased period from first eligible access, including settlement delays.
+          await tx.insert(schema.hostingCoverage).values({ assetVersionId: ent.assetVersionId, source: 'buyer', payerId: ent.buyerId, bytes: cq.objectBytes, startsAt: date(start), endsAt: date(end), amountMicro: 0n, usdMicro: 0n });
+          ent.accessStartsAt = activated.accessStartsAt;
+          ent.accessEndsAt = activated.accessEndsAt;
+        } else {
+          const [current] = await tx.select().from(schema.deliveryEntitlements).where(eq(schema.deliveryEntitlements.id, ent.id));
+          if (!current || current.revokedAt) throw new HttpError(403, 'revoked', 'access revoked');
+          ent.accessStartsAt = current.accessStartsAt; ent.accessEndsAt = current.accessEndsAt;
+        }
+      });
+    }
   }
   if (ent.accessEndsAt && ent.accessEndsAt <= new Date()) throw new HttpError(403, 'access_expired', 'The download period for this purchase ended; the license itself is permanent. Renew access to download again.');
   const metered = ent.allowanceBytes !== null;
@@ -201,7 +231,7 @@ export async function deliveryAccess(ctx: AppContext, ent: typeof schema.deliver
 /** Atomic byte reservation against the allowance; returns false when it would exceed it. */
 export async function reserveDownloadBytes(ctx: AppContext, entitlementId: string, n: bigint): Promise<boolean> {
   const r = await ctx.db.execute(sql`update delivery_entitlements set bytes_served = bytes_served + ${n}
-    where id = ${entitlementId} and (allowance_bytes is null or bytes_served + ${n} <= allowance_bytes + extra_bytes) returning id`);
+    where id = ${entitlementId} and revoked_at is null and (access_ends_at is null or access_ends_at > now()) and (allowance_bytes is null or bytes_served + ${n} <= allowance_bytes + extra_bytes) returning id`);
   return ((r as any).rows ?? r).length > 0;
 }
 export async function refundDownloadBytes(ctx: AppContext, entitlementId: string, n: bigint) {

@@ -48,7 +48,15 @@ export async function cachedAgent<T>(ctx: AppContext, accountId: string, mode: s
     await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended('edge-agent-budget', 0))`);
     const [prior] = await tx.select().from(schema.agentRequests).where(and(eq(schema.agentRequests.accountId, accountId), eq(schema.agentRequests.requestHash, hash)));
     if (prior?.status === 'completed') return { cached: prior.response as T, id: prior.id };
-    if (prior) throw new HttpError(409, 'ai_request_exists', prior.status === 'running' ? 'This request is processing. Try the same request again shortly.' : 'This request did not complete. Revise your message before trying again.');
+    if (prior) {
+      const failedAt = (prior.response as { failedAt?: string } | null)?.failedAt;
+      const since = prior.status === 'failed' && failedAt && Number.isFinite(Date.parse(failedAt)) ? Date.parse(failedAt) : prior.createdAt.getTime();
+      const age = Date.now() - since;
+      const wait = prior.status === 'running' ? 180_000 : 30_000;
+      if (age < wait) throw new HttpError(409, 'ai_request_exists', prior.status === 'running' ? 'This request is processing. Retry in three minutes if it does not finish.' : 'The provider request failed. You can retry the same message after 30 seconds.');
+      // Keep the original attempt for daily accounting while releasing its cache key.
+      await tx.update(schema.agentRequests).set({ status: 'failed', requestHash: `${hash}:attempt:${prior.id}` }).where(eq(schema.agentRequests.id, prior.id));
+    }
     const since = new Date(); since.setUTCHours(0, 0, 0, 0);
     const [{ total, mine }] = await tx.select({ total: sql<string>`count(*)`, mine: sql<string>`count(*) filter (where account_id=${accountId}::uuid)` }).from(schema.agentRequests).where(gte(schema.agentRequests.createdAt, since));
     if (Number(total) >= ctx.cfg.AI_AGENT_DAILY_GLOBAL || Number(mine) >= ctx.cfg.AI_AGENT_DAILY_ACCOUNT) throw new HttpError(429, 'ai_daily_limit', 'Daily AI call limit reached. Cached answers remain available; limits reset at 00:00 UTC.');
@@ -64,7 +72,7 @@ export async function cachedAgent<T>(ctx: AppContext, accountId: string, mode: s
   } catch (error) {
     // Never log prompts, response bodies, authorization or raw provider error messages.
     console.warn(JSON.stringify({ event: 'assistant_request_failed', errorType: error instanceof Error ? error.name : 'unknown', ...(error instanceof z.ZodError ? { invalidFields: error.issues.map(i => i.path.join('.')).slice(0, 10) } : {}) }));
-    await ctx.db.update(schema.agentRequests).set({ status: 'failed' }).where(eq(schema.agentRequests.id, reserved.id));
+    await ctx.db.update(schema.agentRequests).set({ status: 'failed', response: { failedAt: new Date().toISOString() } }).where(eq(schema.agentRequests.id, reserved.id));
     if (error instanceof HttpError) throw error;
     throw new HttpError(502, 'ai_failed', 'The AI provider did not produce a valid response. No marketplace action was taken.');
   }

@@ -1,5 +1,10 @@
 import { Transform } from 'node:stream';
 import { Readable } from 'node:stream';
+import { createReadStream, createWriteStream } from 'node:fs';
+import { mkdtemp, rm, stat } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { pipeline } from 'node:stream/promises';
 import { ZipArchive } from 'archiver';
 import { timingSafeEqual } from 'node:crypto';
 import { deliveryAccess, refundDownloadBytes, reserveDownloadBytes } from '../lib/billing.js';
@@ -23,6 +28,7 @@ import { orderAccess } from './marketplace.js';
 export function deliveryRoutes(app: FastifyInstance, ctx: AppContext) {
   const { db, cfg } = ctx;
   const exp = () => Math.floor(Date.now() / 1000) + DOWNLOAD_TTL_SECS;
+  let activeArchives = 0;
   const gatewayAuthenticated = (header: unknown) => {
     if (!cfg.GATEWAY_SHARED_SECRET || typeof header !== 'string') return false;
     const a = Buffer.from(header), b = Buffer.from(cfg.GATEWAY_SHARED_SECRET);
@@ -65,6 +71,8 @@ export function deliveryRoutes(app: FastifyInstance, ctx: AppContext) {
       commitment: v.commitment,
       licenseReceipt: ent.licenseReceipt,
       expiresInSecs: DOWNLOAD_TTL_SECS,
+      entitlementId: ent.id,
+      archiveBytes: files.reduce((n, f) => n + BigInt(f.size), 0n).toString(),
       zipUrl: `/download-archive/${signDownloadToken(cfg.DOWNLOAD_TOKEN_SECRET, { s: 'delivery', g: ent.id, f: 'archive', w: s.wallet, x: exp() })}`,
       access: { endsAt: ent.accessEndsAt, metered: access.metered, remainingBytes: access.remaining?.toString() ?? null, rangeRequests: true },
       proof: { salt: v.salt, manifest: v.manifest },
@@ -81,27 +89,71 @@ export function deliveryRoutes(app: FastifyInstance, ctx: AppContext) {
     const access = await deliveryAccess(ctx, ent);
     const files = await db.select().from(schema.assetFiles).where(eq(schema.assetFiles.versionId, ent.assetVersionId));
     const total = files.reduce((sum, f) => sum + BigInt(f.size), 0n);
-    // Reserve the full source size up front, as for direct object downloads.
-    if (access.metered && !(await reserveDownloadBytes(ctx, ent.id, total))) throw downloadQuotaExhausted();
-    const archive = new ZipArchive({ zlib: { level: 1 } });
-    reply.raw.once('close', () => archive.abort());
+    if (access.metered && access.remaining! < total) throw downloadQuotaExhausted();
+    if (total > 2n * 1024n ** 3n) throw new HttpError(413, 'archive_too_large', 'ZIP downloads support up to 2 GiB. Download larger datasets as individual files.');
+    if (activeArchives >= 2) throw new HttpError(503, 'archive_busy', 'Two archives are already being prepared or downloaded. Please retry shortly.');
+    if ((req.query as any)?.prepare === '1') return { ready: true };
     for (const f of files) {
       const name = f.path.replace(/\\/g, '/');
-      if (name.startsWith('/') || name.split('/').some((part) => part === '..')) {
-        if (access.metered) await refundDownloadBytes(ctx, ent.id, total);
-        throw conflict('invalid archive file path');
-      }
-      archive.append(Readable.from((async function* () {
+      if (name.startsWith('/') || name.split('/').some(part => part === '..')) throw conflict('invalid archive file path');
+    }
+    // Finish private ZIP generation before reserving quota or sending a success response.
+    activeArchives++;
+    let dir: string;
+    try { dir = await mkdtemp(join(tmpdir(), 'edgebounty-zip-')); }
+    catch (error) { activeArchives--; throw error; }
+    const path = join(dir, 'delivery.zip');
+    const archive = new ZipArchive({ zlib: { level: 1 } });
+    let cleaned = false;
+    const cleanup = async () => {
+      if (cleaned) return;
+      cleaned = true; activeArchives--;
+      await rm(dir, { recursive: true, force: true }).catch(() => {});
+    };
+    const writing = pipeline(archive, createWriteStream(path, { mode: 0o600 }));
+    void writing.catch(() => {});
+    const abort = () => archive.destroy(new Error('Download cancelled'));
+    req.raw.once('aborted', abort);
+    reply.raw.once('close', abort);
+    try {
+    for (const f of files) {
+      const name = f.path.replace(/\\/g, '/');
+      const source = Readable.from((async function* () {
         const body = await ctx.storage.get(f.objectKey);
         for await (const chunk of body) yield chunk;
-      })()), { name });
+      })());
+      source.on('error', error => archive.destroy(error));
+      archive.append(source, { name });
     }
+    await Promise.all([archive.finalize(), writing]);
+    req.raw.removeListener('aborted', abort);
+    reply.raw.removeListener('close', abort);
+    if (reply.raw.destroyed) throw new Error('Download cancelled');
+    const zipSize = BigInt((await stat(path)).size);
     await audit(db, null, 'download.archive', ent.id, { fileCount: files.length, sourceBytes: total.toString() });
+    if (access.metered && !(await reserveDownloadBytes(ctx, ent.id, total))) throw downloadQuotaExhausted();
+    let sent = 0n;
+    const counter = new Transform({ transform(chunk: Buffer, _encoding, cb) { sent += BigInt(chunk.length); cb(null, chunk); } });
+    reply.raw.once('close', () => {
+      // Partial ZIP transfers pay only their proportional source-byte equivalent.
+      const charged = reply.raw.writableFinished ? total : (total * (sent > zipSize ? zipSize : sent)) / zipSize;
+      if (access.metered) void refundDownloadBytes(ctx, ent.id, total - charged).catch(() => {});
+      void cleanup();
+    });
     reply.header('content-type', 'application/zip');
     reply.header('content-disposition', `attachment; filename="edgebounty-${ent.orderId}.zip"`);
     reply.header('cache-control', 'private, no-store');
-    void archive.finalize().catch((error: Error) => archive.destroy(error));
-    return reply.send(archive);
+    reply.header('content-length', zipSize.toString());
+    const file = createReadStream(path);
+    file.on('error', error => counter.destroy(error));
+    reply.raw.once('close', () => file.destroy());
+    return reply.send(file.pipe(counter));
+    } catch (error) {
+      archive.destroy();
+      await writing.catch(() => {});
+      await cleanup();
+      throw error;
+    }
   });
 
   /** Token-authenticated streaming download (works with plain links; wallet binding checked when a session is present). */
@@ -155,6 +207,13 @@ export function deliveryRoutes(app: FastifyInstance, ctx: AppContext) {
     const start = range?.start ?? 0;
     const end = range?.end ?? f.size - 1;
     const length = BigInt(end - start + 1);
+    if ((req.query as any)?.prepare === '1') {
+      if (deliveryEnt) {
+        const access = await deliveryAccess(ctx, deliveryEnt);
+        if (access.metered && access.remaining! < length) throw downloadQuotaExhausted();
+      }
+      return { ready: true };
+    }
 
     if (f.objectKey.startsWith('r2/')) {
       if (req.headers['x-gateway-auth'] !== undefined) {

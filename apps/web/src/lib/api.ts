@@ -54,6 +54,12 @@ export async function api<T = any>(path: string, init: { method?: string; body?:
 
 /** Authenticated binary download (download tokens are also bound to the session wallet). */
 export async function downloadFile(url: string, filename: string) {
+  const tab = window.open('about:blank', '_blank');
+  if (tab) tab.opener = null;
+  // Check authorization/quota on our API before navigating through any storage redirect.
+  try { await api(`${url}${url.includes('?') ? '&' : '?'}prepare=1`); }
+  catch (error) { tab?.close(); throw error; }
+  if (tab) { tab.location.href = `${API_URL}${url}`; return; }
   const a = document.createElement('a');
   a.href = `${API_URL}${url}`;
   a.download = filename;

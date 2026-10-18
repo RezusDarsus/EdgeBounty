@@ -21,6 +21,7 @@ import { ChainService } from '../../apps/api/src/chain.js';
 import { buildApp } from '../../apps/api/src/app.js';
 import { seed } from '../../apps/api/src/seed.js';
 import { signDownloadToken } from '../../apps/api/src/lib/tokens.js';
+import * as yauzl from 'yauzl';
 import { issueSession } from '../../apps/api/src/auth/siws.js';
 import {
   applyPaidInvoice,
@@ -127,6 +128,91 @@ async function entitlement(buyer: { id: string; wallet: string }, versionId: str
 
 const token = (ent: { id: string; buyerWallet: string }, fileId: string) => signDownloadToken(ctx.cfg.DOWNLOAD_TOKEN_SECRET, { s: 'delivery', g: ent.id, f: fileId, w: ent.buyerWallet, x: Math.floor(Date.now() / 1000) + 600 });
 const served = async (id: string) => (await ctx.db.select().from(schema.deliveryEntitlements).where(eq(schema.deliveryEntitlements.id, id)))[0].bytesServed;
+
+it('serializes unpaid hosting purchases and releases the quote after payment', async () => {
+  const seller = await account(), buyer = await account(), buyer2 = await account();
+  const d = await dataset(seller.id, 100);
+  const l = await listing(seller, d.version.id, d.asset.id);
+  const first = await createCheckout(ctx, { orderId: (await order(buyer, l)).id, listingId: l.id, buyerId: buyer.id, assetVersionId: d.version.id, priceLamports: l.priceMicro, months: 1 });
+  const args = { orderId: (await order(buyer2, l)).id, listingId: l.id, buyerId: buyer2.id, assetVersionId: d.version.id, priceLamports: l.priceMicro, months: 1 as const };
+  await expect(createCheckout(ctx, args)).rejects.toMatchObject({ code: 'conflict' });
+  await pay(first.invoice!.id);
+  const second = await createCheckout(ctx, args);
+  expect(second.quote.usd.hosting).toBeLessThan(100n);
+});
+
+it('starts a full access term once after settlement and checkout payment', async () => {
+  const seller = await account(), buyer = await account();
+  const d = await dataset(seller.id, 100), l = await listing(seller, d.version.id, d.asset.id);
+  const checkout = await createCheckout(ctx, { orderId: (await order(buyer, l)).id, listingId: l.id, buyerId: buyer.id, assetVersionId: d.version.id, priceLamports: l.priceMicro, months: 1 });
+  const ent = await entitlement(buyer, d.version.id, { allowance: 100n, quoteId: checkout.row.id });
+  await ctx.db.update(schema.deliveryEntitlements).set({ accessStartsAt: null, accessEndsAt: null }).where(eq(schema.deliveryEntitlements.id, ent.id));
+  ent.accessStartsAt = null; ent.accessEndsAt = null;
+  await expect(deliveryAccess(ctx, ent)).rejects.toMatchObject({ code: 'checkout_unpaid' });
+  await pay(checkout.invoice!.id);
+  await ctx.db.update(schema.checkoutQuotes).set({ accessStartsAt: new Date(Date.now() - 60 * 86400_000), accessEndsAt: new Date(Date.now() - 30 * 86400_000) }).where(eq(schema.checkoutQuotes.id, checkout.row.id));
+  await deliveryAccess(ctx, ent);
+  expect(ent.accessStartsAt!.getTime()).toBeGreaterThan(Date.now() - 5000);
+  expect(ent.accessEndsAt!.getTime() - ent.accessStartsAt!.getTime()).toBe(Number(MONTH_SECS) * 1000);
+  const ends = ent.accessEndsAt!.getTime();
+  await deliveryAccess(ctx, ent);
+  expect(ent.accessEndsAt!.getTime()).toBe(ends);
+});
+
+it('does not charge ZIP preflight or failed preparation and produces intact purchased files', async () => {
+  const buyer = await account();
+  const d = await dataset(buyer.id, 4096);
+  const ent = await entitlement(buyer, d.version.id, { allowance: 4096n });
+  const url = `/download-archive/${token(ent, 'archive')}`;
+  expect((await app.inject({ url: `${url}?prepare=1` })).statusCode).toBe(200);
+  expect(await served(ent.id)).toBe(0n);
+  const broken = vi.spyOn(ctx.storage, 'get').mockRejectedValueOnce(new Error('storage unavailable'));
+  try { expect((await app.inject({ url })).statusCode).toBe(500); }
+  finally { broken.mockRestore(); }
+  expect(await served(ent.id)).toBe(0n);
+  const res = await app.inject({ url });
+  expect(res.statusCode).toBe(200);
+  await new Promise<void>((resolve, reject) => yauzl.fromBuffer(res.rawPayload, { lazyEntries: true }, (error, zip) => {
+    if (error || !zip) return reject(error);
+    let seen = 0;
+    zip.on('error', reject);
+    zip.on('entry', entry => zip.openReadStream(entry, (error, stream) => {
+      if (error || !stream) return reject(error);
+      const chunks: Buffer[] = [];
+      stream.on('error', reject); stream.on('data', chunk => chunks.push(chunk));
+      stream.on('end', () => { try { expect(entry.fileName).toBe('data.bin'); expect(Buffer.concat(chunks)).toEqual(d.body); seen++; zip.readEntry(); } catch (e) { reject(e); } });
+    }));
+    zip.on('end', () => { try { expect(seen).toBe(1); resolve(); } catch (e) { reject(e); } });
+    zip.readEntry();
+  }));
+  expect(await served(ent.id)).toBe(4096n);
+  expect((await app.inject({ url: `${url}?prepare=1` })).statusCode).toBe(402);
+});
+
+it('refunds the untransferred source-byte equivalent after an interrupted ZIP', async () => {
+  const buyer = await account();
+  const size = 4 * 1024 * 1024;
+  const d = await dataset(buyer.id, size);
+  const ent = await entitlement(buyer, d.version.id, { allowance: BigInt(size) });
+  const zipApp = await buildApp(ctx);
+  const address = await zipApp.listen({ host: '127.0.0.1', port: 0 });
+  await new Promise<void>((resolve, reject) => {
+    const request = httpGet(`${address}/download-archive/${token(ent, 'archive')}`, response => {
+      if (response.statusCode !== 200) return reject(new Error(`ZIP HTTP ${response.statusCode}`));
+      response.once('data', () => { response.destroy(); resolve(); });
+      response.on('error', () => {});
+    });
+    request.on('error', reject);
+  });
+  let charged = await served(ent.id);
+  for (let i = 0; i < 100 && charged >= BigInt(size); i++) {
+    await new Promise(resolve => setTimeout(resolve, 20));
+    charged = await served(ent.id);
+  }
+  expect(charged).toBeLessThan(BigInt(size));
+  expect(charged).toBeGreaterThanOrEqual(0n);
+  await zipApp.close();
+});
 
 it('only sells download credits while the buyer has usable delivery access', async () => {
   const buyer = await account();

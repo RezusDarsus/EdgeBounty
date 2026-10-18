@@ -25,6 +25,28 @@ AI teams need trustworthy datasets, specialized annotations, independent model e
 
 **EdgeBounty connects them:** an AI-native marketplace where buyers commission or purchase AI assets, contributors fulfill requests, verification produces inspectable evidence, and Solana smart contracts enforce agreed payment conditions.
 
+## Three-minute judge walkthrough: five contributors, one dataset
+
+**Start with the [recorded live hackathon demo](https://13-61-207-211.sslip.io/#hackathon).** Orbital Vision Lab is a demo company; its buyer and five seller accounts are operated by the project maintainer. They are not independent customers.
+
+1. **0:00 — Inspect the actual files and evidence.** Open the [NASA photo dataset](https://13-61-207-211.sslip.io/listings/31fa1848-5287-49b2-b370-77d65b5c4c54). The recorded run contains six submitted photos, one exact duplicate, and five accepted unique photos. NASA source links and attribution identify the photographs; verification does not establish ownership or prove that an image is not AI-generated.
+2. **1:00 — Follow collaboration and AI assistance.** The homepage records the duplicate replacement, accepted contribution totals, and completed NVIDIA assistant/agent responses. The [published evidence snapshot](https://13-61-207-211.sslip.io/hackathon-evidence.json) contains the run identifiers. The [company workspace](https://13-61-207-211.sslip.io/orders/1ddb90e8-cd3d-4cb3-9901-e58a1676f220) requires participant sign-in. Its frozen 500 mock-USDC allocation is accounting evidence; it does not demonstrate completed seller payouts.
+3. **2:00 — Inspect models and the purchase flow.** Open the [red/blue ONNX classifier](https://13-61-207-211.sslip.io/listings/a2ace96b-f591-431b-b2b7-f60ad4fe9cac) or [color-dominance baseline](https://13-61-207-211.sslip.io/listings/5f7907af-1a0a-4254-a819-b87841a4a23b). These are small inspection examples, not space-image recognition models. A purchase demonstration requires your own test-wallet session, explicit transaction signatures, checkout payment, and settlement before licensed downloads become available. No private wallet credentials are shared in this README.
+
+![EdgeBounty marketplace interface recorded on October 18, 2026](docs/evidence/assistant-final-2026-10-18/desktop-home.png)
+
+*Recorded MVP interface. The live hackathon section and evidence links above contain the contributor demonstration; the screenshot is not proof of a completed purchase.*
+
+### What each AI component actually does
+
+| Component | Responsibility | Human authority |
+| --- | --- | --- |
+| Marketplace assistant | Catalog suggestions, bounty drafts, owner-authorized metadata suggestions, report explanations | Users review/apply content; the model has no payment-signing tools |
+| Contributor agents | Scoped work proposals, duplicate-replacement suggestions, progress coordination | Contributors supply files; buyers approve contributions and sign financial actions |
+| Verification AI | Bounded sampled relevance checks with report scope and limitations | A report is evidence, not a guarantee of rights, truth, or downstream model quality |
+
+Assistant responses use schema validation, authorized listing citations, account/global daily caps, and private context consent. Failed attempts still count toward those caps. Users can explicitly resend a failed request after 30 seconds; interrupted server requests become retryable after three minutes. No provider retry runs automatically. These controls do not eliminate hallucinations; review factual statements against the linked reports and source material.
+
 ## What makes EdgeBounty different?
 
 | Capability | What it changes | Status |
@@ -108,6 +130,10 @@ The business model separates **marketplace economics** from **usage-based infras
 | **Solana network fees** | Paid in SOL to the network; not EdgeBounty revenue |
 
 A buyer is **not charged twice for an already funded hosting interval**. Provider costs and some proposed future AI pricing are not the same as active customer charges.
+
+Download access begins when both settlement and checkout payment are confirmed, rather than when the initial quote is created. Access terms are 1, 3 or 6 months, with respectively 1, 2 or 3 dataset-sized download allowances. Individual files and ZIPs share that allowance. Remaining bytes and extra-credit quotes are visible on the order page; additional capacity requires explicit wallet payment and does not extend the access end date. ZIP preparation failures consume no quota; interrupted ZIP transfers refund the untransferred proportional source-byte equivalent. ZIPs are limited to 2 GiB and two concurrent archive transfers per API process; larger assets use individual-file delivery. These are MVP limits, not large-dataset performance claims.
+
+Hosting checkouts for the same version wait while an overlapping hosting quote is unpaid. The full download term is honored at activation, including settlement delays; any additional interval needed to honor that promise is currently absorbed by the platform. Existing purchased access windows are preserved rather than silently reset.
 
 [Full fees, refunds and service limitations →](docs/PRICING_AND_FEES.md)
 
