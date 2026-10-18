@@ -77,7 +77,9 @@ export async function grantFreeCoverage(ctx: AppContext, accountId: string, vers
 
 /** Sellers pay for listing storage up front: a listing needs LISTING_MIN_COVERAGE_DAYS of funded hosting. */
 export async function ensureListingCoverage(ctx: AppContext, accountId: string, versionId: string) {
-  const need = nowSecs() + BigInt(ctx.cfg.LISTING_MIN_COVERAGE_DAYS) * 86_400n;
+  // A freshly purchased 30-day interval must remain publishable after wallet confirmation.
+  // This tolerance only affects admission; it never extends the paid storage/access interval.
+  const need = nowSecs() + BigInt(ctx.cfg.LISTING_MIN_COVERAGE_DAYS) * 86_400n - 300n;
   if (coveredUntil(await versionCoverage(ctx, versionId), nowSecs()) >= need) return { source: 'existing' as const };
   if (await grantFreeCoverage(ctx, accountId, versionId)) {
     if (coveredUntil(await versionCoverage(ctx, versionId), nowSecs()) >= need) return { source: 'free_tier' as const };

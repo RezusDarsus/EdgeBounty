@@ -1,5 +1,6 @@
 import { paymentMint } from './lib/payments.js';
 import { agentRoutes } from './routes/agents.js';
+import { collaborationRoutes } from './routes/collaboration.js';
 import type { AssistantProvider } from './services/assistant.js';
 import { infringementRoutes } from './routes/infringement.js';
 import { growthRoutes } from './routes/growth.js';
@@ -78,6 +79,7 @@ export async function buildApp(ctx: AppContext, opts: { logger?: boolean; assist
   });
 
   app.get('/health', async () => ({ ok: true, chain: await ctx.chain.healthy(), programId: ctx.chain.client.programId.toBase58() }));
+  app.get('/health/release',async()=>({revision:ctx.cfg.RELEASE_GIT_SHA,collaborativeBounties:ctx.cfg.COLLABORATIVE_BOUNTIES_ENABLED==='1',settlement:'designated_contributor_escrows'}));
   app.get('/health/ready', async (_req, reply) => {
     try {
       await ctx.db.execute(sql`select 1`);
@@ -123,5 +125,6 @@ export async function buildApp(ctx: AppContext, opts: { logger?: boolean; assist
   infringementRoutes(app, ctx);
   growthRoutes(app, ctx);
   agentRoutes(app, ctx, opts.assistantProvider);
+  collaborationRoutes(app, ctx, opts.assistantProvider);
   return app;
 }

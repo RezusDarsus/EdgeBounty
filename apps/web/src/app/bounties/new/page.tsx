@@ -16,6 +16,8 @@ export default function NewBounty() {
   const { data: licenses } = useApi<any[]>('/licenses');
   const { data: benchmarks } = useApi<any[]>('/benchmarks');
   const [kind, setKind] = useState<Kind>('image_dataset');
+  const [collaborative,setCollaborative]=useState(false);
+  const {data:release}=useApi<{collaborativeBounties:boolean}>('/health/release');
   const [f, setF] = useState({
     title: '', description: '', deliverables: '', licenseId: 'eb-nonexclusive-commercial-v1', budget: '0.1', deadlineDays: '14', maxCorrections: '1', 
     minImages: '1000', minWidth: '640', minHeight: '640', maxExactDuplicates: '0', minReadablePct: '100', minRelevancePct: '', relevancePrompt: '',
@@ -61,6 +63,7 @@ export default function NewBounty() {
           title: f.title, description: f.description, deliverables: [...includedDeliverables, ...f.deliverables.split('\n').map((s) => s.trim()).filter(Boolean)], criteria: criteria(), licenseId: f.licenseId, ipTerms: f.licenseId === 'eb-exclusive-transfer-v1' ? 'assignment' : 'non_exclusive_license',
           budgetMicro: toMicro(f.budget), deadline: new Date(Date.now() + Number(f.deadlineDays) * 86_400_000).toISOString(), maxCorrections: Number(f.maxCorrections),
           verifierWallet,
+          ...(collaborative&&kind==='image_dataset'&&f.structure==='single'?{collaborationTarget:Number(f.minImages)}:{}),
           ...(f.arbitrator ? { arbitratorWallet: f.arbitrator } : {}),
           structure: f.structure,
           ...(f.structure === 'slots' ? { slots: Number(f.slots) } : {}),
@@ -101,6 +104,7 @@ export default function NewBounty() {
         <BountyDraft apply={draft => setF(current => ({ ...current, title: draft.title, description: draft.description, deliverables: draft.deliverables.join('\n') }))} />
         <div className="grid gap-4 lg:grid-cols-2">
           <Card title="Scope and deliverables">
+            {release?.collaborativeBounties&&kind==='image_dataset'&&f.structure==='single'&&<label className="mb-4 flex items-start gap-2 text-sm"><input type="checkbox" checked={collaborative} onChange={e=>setCollaborative(e.target.checked)}/>Allow multiple contributors and independently scoped seller agents. The shared image target below determines progress. Final accepted allocations are settled through designated contributor escrows after the original funding is returned.</label>}
             <div className="space-y-3">
               <Field label="Title">
                 <input className={inputCls} value={f.title} onChange={set('title')} placeholder="Images of broken vehicle windows" />

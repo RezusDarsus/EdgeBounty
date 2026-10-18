@@ -121,6 +121,9 @@ export function storageRoutes(app: FastifyInstance, ctx: AppContext) {
 
 /** Assets referenced by live commitments must survive storage expiry. */
 export async function assetProtected(ctx: AppContext, assetId: string): Promise<boolean> {
+  // Collaboration records remain protected even when new collaborative actions are disabled.
+  const collaborative = await ctx.db.execute(sql`select 1 from collaboration_submissions s join asset_versions v on v.id=s.asset_version_id join orders o on o.id=s.bounty_id where v.asset_id=${assetId} and s.status<>'verification_failed' and o.chain_state not in ('refunded','cancelled') limit 1`);
+  if (((collaborative as any).rows ?? collaborative).length) return true;
   const versions = await ctx.db.select().from(schema.assetVersions).where(eq(schema.assetVersions.assetId, assetId));
   const ids = versions.map((v) => v.id);
   if (!ids.length) return false;

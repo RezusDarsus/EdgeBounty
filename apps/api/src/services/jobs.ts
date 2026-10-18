@@ -27,8 +27,9 @@ import { VERIFICATION_POLICY_VERSION } from '../lib/verification-policy.js';
 import { scanMaterialized, MALWARE_POLICY } from './malware.js';
 import { checkImageDuplicates, checkTextDuplicates, IMAGE_DUPLICATE_SAMPLES } from './semantic.js';
 import { assessMedia, mediaKind, MEDIA_PROMPT_VERSION } from './media-review.js';
+import { drainCollaboration } from './collaboration-worker.js';
 
-export const DATASET_VALIDATOR = { name: 'edgebounty-dataset-validator', version: '1.4.0' };
+export const DATASET_VALIDATOR = { name: 'edgebounty-dataset-validator', version: '1.5.0' };
 type Job = typeof schema.verificationJobs.$inferSelect;
 
 /** Spec hash = what exactly was promised to be evaluated (level, criteria, tool versions, benchmark). */
@@ -298,6 +299,11 @@ async function runDatasetJob(ctx: AppContext, job: Job, version: typeof schema.a
   if (r.timedOut) throw new Error('validator exceeded the job time budget');
   if (r.code !== 0) throw new Error(`validator failed (${r.code}): ${r.stderr.slice(-1500)}`);
   const doc = JSON.parse(await readFile(join(outDir, 'result.json'), 'utf8'));
+  if (ctx.cfg.COLLABORATIVE_BOUNTIES_ENABLED === '1' && Array.isArray(doc.collaborationItems)) {
+    await ctx.db.execute(sql`insert into collaboration_verifier_evidence(job_id,asset_version_id,evidence,complete)
+      values(${job.id},${version.id},${JSON.stringify(doc.collaborationItems)}::jsonb,${!doc.truncated})
+      on conflict(job_id) do update set evidence=excluded.evidence,complete=excluded.complete`);
+  }
   const findings: Finding[] = doc.findings;
   const limitations: string[] = [...doc.limitations];
   const metrics = DatasetMetrics.parse(doc.metrics);
@@ -518,6 +524,7 @@ export function startOrchestrator(ctx: AppContext, opts: { intervalMs?: number; 
     try {
       await reclaimStaleJobs(ctx);
       for (let job = await claimNextJob(ctx, workerId); job && !stopped; job = await claimNextJob(ctx, workerId)) await runJob(ctx, job);
+      if (ctx.cfg.COLLABORATIVE_BOUNTIES_ENABLED === '1') await drainCollaboration(ctx);
     } catch (e) {
       console.error('[orchestrator]', e);
     } finally {
@@ -539,6 +546,7 @@ export async function drainJobs(ctx: AppContext, workerId = 'drain') {
     await runJob(ctx, job);
     n++;
   }
+  if (ctx.cfg.COLLABORATIVE_BOUNTIES_ENABLED === '1') await drainCollaboration(ctx);
   return n;
 }
 

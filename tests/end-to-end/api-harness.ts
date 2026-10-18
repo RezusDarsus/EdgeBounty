@@ -142,6 +142,7 @@ export async function send(h: Harness, who: Actor | Keypair, ixs: TransactionIns
 
 /** Uploads files through the multipart API and finalizes the version. */
 export async function uploadAsset(h: Harness, who: Actor, kind: 'dataset' | 'model', purpose: string, files: { path: string; data: Buffer; mediaType: string }[], name = 'asset') {
+  if(['listing','benchmark','storage'].includes(purpose))await paidTestCapacity(h,who,files.reduce((n,f)=>n+f.data.length,0));
   const { asset, version } = await ok(h, who, 'POST', '/assets', { kind, name, purpose, category: 'object_detection' });
   for (const f of files) {
     const up = await ok(h, who, 'POST', `/versions/${version.id}/uploads`, { path: f.path, size: f.data.length, sha256: sha256(f.data), mediaType: f.mediaType });
@@ -154,6 +155,14 @@ export async function uploadAsset(h: Harness, who: Actor, kind: 'dataset' | 'mod
   }
   const fin = await ok(h, who, 'POST', `/versions/${version.id}/finalize`);
   return { assetId: asset.id as string, versionId: version.id as string, commitment: fin.commitment as string };
+}
+
+/** Fixtures pay the current storage policy rather than depending on the removed default free tier. */
+export async function paidTestCapacity(h:Harness,who:Actor,needed=1){
+  const usage=await ok(h,who,'GET','/storage');
+  if(usage.quotaBytes-usage.usedBytes>=needed)return;
+  const plan=await ok(h,who,'POST','/storage/allocations',{gb:10,termDays:30});
+  await payInvoice(h,who,plan.invoice);
 }
 
 export const hex = (s: string) => Uint8Array.from(Buffer.from(s, 'hex'));

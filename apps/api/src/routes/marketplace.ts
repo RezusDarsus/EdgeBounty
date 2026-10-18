@@ -17,6 +17,8 @@ import { runSandboxed } from '../services/sandbox.js';
 import { audit } from '../lib/audit.js';
 import { requireListingVerification, requestVerificationQuote } from '../lib/verification-policy.js';
 import { syncOrder } from '../services/indexer.js';
+import {assertCollaborationSettlementVersion} from '../services/collaboration-settlement.js';
+import {collaborationReservation,CollaborationService} from '../services/collaboration.js';
 
 export const randomU63 = () => randomBytes(8).readBigUInt64LE() & 0x7fff_ffff_ffff_ffffn;
 const pk = (s: string) => new PublicKey(s);
@@ -31,7 +33,7 @@ async function license(ctx: AppContext, id: string) {
 export async function orderAccess(ctx: AppContext, orderId: string, s: { accountId: string; wallet: string; roles: string[] } | undefined) {
   const [o] = await ctx.db.select().from(schema.orders).where(eq(schema.orders.id, orderId));
   if (!o) throw notFound('order');
-  const role = !s ? null : s.wallet === o.buyerWallet ? 'buyer' : s.wallet === o.sellerWallet ? 'seller' : s.wallet === o.verifierWallet ? 'verifier' : isAdmin(ctx, s as any) ? 'admin' : null;
+  const role = !s ? null : s.wallet === o.buyerWallet ? 'buyer' : s.wallet === o.sellerWallet || s.wallet === o.designatedSeller ? 'seller' : s.wallet === o.verifierWallet ? 'verifier' : isAdmin(ctx, s as any) ? 'admin' : null;
   return { order: o, role };
 }
 
@@ -281,6 +283,7 @@ export function marketplaceRoutes(app: FastifyInstance, ctx: AppContext) {
         verifierWallet: zWallet.optional(),
         verifierFeeMicro: zMicro.default(0n),
         public: z.boolean().default(true),
+        collaborationTarget: z.number().int().positive().max(1000000).optional(),
         /** Phase 5: independent arbitrator agreed by the buyer (the seller agrees by accepting). */
         arbitratorWallet: zWallet.optional(),
         /** Phase 5: split into sequential milestones (same developer) or parallel seller slots. */
@@ -296,6 +299,7 @@ export function marketplaceRoutes(app: FastifyInstance, ctx: AppContext) {
     b.verifierWallet = platformVerifier;
     b.verifierFeeMicro = requestVerificationQuote(b.criteria, b.maxCorrections, ctx.cfg).fee;
     if (b.budgetMicro <= 0n) throw badRequest('budget must be positive');
+    if(b.collaborationTarget&&(ctx.cfg.COLLABORATIVE_BOUNTIES_ENABLED!=='1'||b.structure!=='single'||b.criteria.kind!=='image_dataset'))throw badRequest('Collaborative image bounties must be enabled and use a single shared target');
     if (b.deadline.getTime() < Date.now() + 3600_000) throw badRequest('deadline must be at least 1h in the future');
     if (b.arbitratorWallet && [s.wallet, b.verifierWallet].includes(b.arbitratorWallet)) throw badRequest('arbitrator must be independent of buyer and verifier');
     const lic = await license(ctx, b.licenseId);
@@ -329,9 +333,11 @@ export function marketplaceRoutes(app: FastifyInstance, ctx: AppContext) {
           amountMicro: part.amount, verifierWallet: b.verifierWallet ?? null, verifierFeeMicro: b.verifierWallet ? b.verifierFeeMicro : 0n, deadline: part.deadline,
           maxCorrections: b.maxCorrections, public: b.public, arbitratorWallet: b.arbitratorWallet ?? null,
           groupId, groupKind: groupId ? (b.structure === 'milestones' ? 'milestone' : 'slot') : null, groupIndex: groupId ? i : null,
+          designatedSeller:b.collaborationTarget?collaborationReservation(ctx.chain.client.programId,s.wallet,orderIdOnchain):null,
         })
         .returning();
       rows.push(o);
+      if(b.collaborationTarget)await new CollaborationService(db).enable(o.id,s.accountId,b.collaborationTarget,86400,6);
     }
     // milestones are funded one at a time (later ones bind the same developer); slots are all funded now
     const fundNow = b.structure === 'milestones' ? rows.slice(0, 1) : rows;
@@ -409,6 +415,7 @@ export function marketplaceRoutes(app: FastifyInstance, ctx: AppContext) {
     return {
       ...order,
       role,
+      collaborationSettlement: (await db.execute(sql`select bounty_id as "bountyId",expected_count as "expectedCount",manifest_hash as "manifestHash" from collaboration_settlements where order_id=${id}`) as any).rows?.[0] ?? null,
       submissions: subs.map((x) => ({ index: x.index, commitment: x.commitment, status: x.status, createdAt: x.createdAt, ...(role !== 'buyer' ? { assetVersionId: x.assetVersionId } : {}) })),
       verifications: jobs.map((j) => {
         const r = results.find((x) => x.jobId === j.id);
@@ -455,6 +462,7 @@ export function marketplaceRoutes(app: FastifyInstance, ctx: AppContext) {
     const { version, asset } = await getOwnedVersion(ctx, assetVersionId, s.accountId);
     if (version.status !== 'finalized') throw conflict('finalize the asset version first');
     if (asset.purpose !== 'submission') throw badRequest('asset was not uploaded as a submission');
+    await assertCollaborationSettlementVersion(ctx,id,s.accountId,assetVersionId);
     if ((version.metadata as any)?.encrypted && o.verifierWallet === ctx.chain.platformVerifier?.publicKey.toBase58()) {
       throw badRequest('client-side encrypted submissions cannot be verified automatically; this order uses the automated verifier');
     }

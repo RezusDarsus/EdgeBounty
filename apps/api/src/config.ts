@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import { existsSync } from 'node:fs';
 
 const Env = z.object({
+  RELEASE_GIT_SHA: z.string().regex(/^(development|[0-9a-f]{40})$/).default('development'),
   COLLABORATIVE_BOUNTIES_ENABLED: z.enum(['0', '1']).default('0'),
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   PORT: z.coerce.number().default(4000),

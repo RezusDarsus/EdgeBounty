@@ -24,7 +24,9 @@ describe.skipIf(!up)('Phase 3 — model marketplace (localnet)', () => {
     fx = mkdtempSync(join(tmpdir(), 'eb-models-'));
     execFileSync(h.ctx.cfg.pythonBin, [join(ROOT, 'services', 'model-validator', 'fixtures.py'), fx], { cwd: join(ROOT, 'services', 'model-validator') });
     // curated benchmark registered by an admin (versioned, separate from seller data)
-    const admin = { kp: h.p.admin, wallet: h.p.admin.publicKey.toBase58(), token: await login(h, h.p.admin) };
+    // A benchmark operator is distinct from the treasury and pays current storage invoices.
+    const admin = await actor(h,0n);
+    h.ctx.cfg.ADMIN_WALLETS+=`,${admin.wallet}`;
     const bdir = join(fx, 'benchmark');
     const files = [
       ...['benchmark.json', 'labels.csv', 'classes.txt'].map((f) => ({ path: f, data: readFileSync(join(bdir, f)), mediaType: f.endsWith('.json') ? 'application/json' : f.endsWith('.csv') ? 'text/csv' : 'text/plain' })),
@@ -46,6 +48,7 @@ describe.skipIf(!up)('Phase 3 — model marketplace (localnet)', () => {
     const asset = await uploadAsset(h, seller, 'model', 'listing', [{ path: file.split(/[\\/]/).pop()!, data: readFileSync(file), mediaType: 'application/onnx' }], title);
     await drainJobs(h.ctx);
     await paidVerification(h, seller, asset.versionId);
+    await payInvoice(h,seller,(await ok(h,seller,'POST',`/versions/${asset.versionId}/hosting`,{months:1})).invoice);
     const prep = await ok(h, seller, 'POST', '/listings', {
       assetVersionId: asset.versionId, title, description: 'Tiny ONNX classifier for colour dominance (demo).', category: 'image_classification', formats: ['onnx'], licenseId: 'eb-nonexclusive-commercial-v1', priceMicro: String(30n * UNIT),
       details: { task: 'image_classification', inference: { size: [8, 8], scale: 255, mean: [0, 0, 0], std: [1, 1, 1], layout: 'NCHW', classes: ['red', 'blue'] } },
@@ -106,20 +109,18 @@ describe.skipIf(!up)('Phase 3 — model marketplace (localnet)', () => {
     expect(await h.p.client.tokenBalance(h.p.client.ata(seller.kp.publicKey, h.p.mint))).toBe(285_000_000n);
   });
 
-  it('a model with custom operators is never executed; a failed independent verdict lets the buyer refund', async () => {
-    const seller = await actor(h, 0n);
-    const buyer = await actor(h, 100n * UNIT);
-    const { listingId } = await listModel(seller, join(fx, 'model_bad', 'custom_op.onnx'), 'Suspicious model');
-    const trial = await h.app.inject({ method: 'POST', url: `/listings/${listingId}/inference-trial`, headers: { authorization: `Bearer ${buyer.token}`, 'content-type': 'application/octet-stream' }, payload: readFileSync(join(fx, 'benchmark', 'images', '001.png')) });
-    expect(trial.json().error).toMatch(/safety/);
-    const { orderId, address } = await buyWithBenchmark(buyer, listingId, 9000);
-    const order = await ok(h, buyer, 'GET', `/orders/${orderId}`);
-    const rep = order.verifications[0].report;
-    expect(rep.passed).toBe(false);
-    expect(rep.modelMetrics.disallowedOperators).toContain('EvilOp');
-    expect(rep.criteria.find((c: any) => c.criterion === 'allowed_operators').status).toBe('fail');
-    await send(h, buyer, await h.p.client.refundOrder(buyer.kp.publicKey, address));
-    expect((await ok(h, buyer, 'POST', `/orders/${orderId}/sync`)).state).toBe('refunded');
-    expect(await h.p.client.tokenBalance(h.p.client.ata(buyer.kp.publicKey, h.p.mint))).toBe(98n * UNIT);
+  it('rejects a model with custom operators before publication or buyer payment', async () => {
+    const seller=await actor(h,0n),buyer=await actor(h,100n*UNIT);
+    const path=join(fx,'model_bad','custom_op.onnx');
+    const asset=await uploadAsset(h,seller,'model','listing',[{path:'custom_op.onnx',data:readFileSync(path),mediaType:'application/onnx'}]);
+    const request=await ok(h,seller,'POST','/verification/jobs',{assetVersionId:asset.versionId,level:'L2'});
+    if(request.invoice)await payInvoice(h,seller,request.invoice);
+    await drainJobs(h.ctx);
+    const job=await ok(h,seller,'GET',`/verification/jobs/${request.job.id}`);
+    expect(job.status).toBe('completed');expect(job.result.report.passed).toBe(false);
+    expect(job.result.report.modelMetrics.disallowedOperators).toContain('EvilOp');
+    const listing=await api(h,seller,'POST','/listings',{assetVersionId:asset.versionId,title:'Suspicious model',description:'Custom operator safety rejection fixture.',category:'image_classification',licenseId:'eb-nonexclusive-commercial-v1',priceMicro:String(30n*UNIT)});
+    expect(listing.status).toBe(409);
+    expect(await h.p.client.tokenBalance(h.p.client.ata(buyer.kp.publicKey,h.p.mint))).toBe(100n*UNIT);
   });
 });

@@ -10,6 +10,8 @@ import { ENC_CHUNK, ENC_SCHEME, decryptBytes, encryptBytes, keyFingerprint, newC
 import { drainJobs } from '../../apps/api/src/services/jobs.js';
 import { crank, syncAll } from '../../apps/api/src/services/indexer.js';
 import { failureVerifierTick } from '../../apps/api/src/services/failure.js';
+import {schema} from '../../apps/api/src/db/index.js';
+import {eq} from 'drizzle-orm';
 import { ROOT, UNIT, localnetAvailable } from './helpers.js';
 import { actor, api, hex, ok, pk, png, send, sha256, startHarness, uploadAsset, type Actor, type Harness } from './api-harness.js';
 
@@ -111,19 +113,24 @@ describe.skipIf(!up)('Phase 5 — advanced marketplace (localnet)', () => {
     const asset = await uploadAsset(h, seller, 'dataset', 'submission', [{ path: 'y.png', data: png(20, 20, 31337), mediaType: 'image/png' }]);
     const prep = await ok(h, seller, 'POST', `/orders/${r.order.id}/submissions`, { assetVersionId: asset.versionId });
     await send(h, seller, await h.p.client.submitDeliverable(seller.kp.publicKey, addr, hex(prep.onchain.commitment), 1));
+    await ok(h,seller,'POST',`/orders/${r.order.id}/sync`);
+    await drainJobs(h.ctx); // A platform-verified order must reach review before a buyer can dispute it.
     const d = await ok(h, buyer, 'POST', `/orders/${r.order.id}/disputes`, { reason: 'Only one image delivered; brief asked for a set.' });
     await send(h, buyer, await h.p.client.openDispute(buyer.kp.publicKey, addr, hex(d.onchain.reasonHash)));
     await send(h, arbiter, await h.p.client.resolveDispute(arbiter.kp.publicKey, addr, 'split', 6_000));
     await ok(h, buyer, 'POST', `/orders/${r.order.id}/sync`);
     await crank(h.ctx);
     expect(await h.p.client.tokenBalance(h.p.client.ata(seller.kp.publicKey, h.p.mint))).toBe(285_000_000n); // 30 - 5%
-    expect(await h.p.client.tokenBalance(h.p.client.ata(buyer.kp.publicKey, h.p.mint))).toBe(470n * UNIT);
+    expect(await h.p.client.tokenBalance(h.p.client.ata(buyer.kp.publicKey, h.p.mint))).toBe(470n * UNIT-BigInt(r.onchain.verifierFee));
   });
 
   it('encrypted delivery: the platform only ever holds ciphertext and a key sealed to the buyer', async () => {
     const buyer = await actor(h, 100n * UNIT);
     const seller = await actor(h, 0n);
     const r = await ok(h, buyer, 'POST', '/bounties', base({ budgetMicro: String(20n * UNIT) }));
+    // Legacy/manual escrow compatibility fixture. New automatic-verifier requests deliberately reject ciphertext.
+    r.onchain.verifier=null;r.onchain.verifierFee='0';
+    await h.ctx.db.update(schema.orders).set({verifierWallet:null,verifierFeeMicro:0n}).where(eq(schema.orders.id,r.order.id));
     await fund(buyer, r.onchain);
     await ok(h, buyer, 'POST', `/orders/${r.order.id}/confirm`);
     const addr = pk(r.onchain.address);

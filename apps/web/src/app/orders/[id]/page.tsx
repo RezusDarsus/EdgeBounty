@@ -1,5 +1,7 @@
 'use client';
 import { use, useState } from 'react';
+import { CollaborationWorkspace } from '@/components/collaboration';
+import { SettlementBundleVerification } from '@/components/settlement-bundle-verification';
 import Link from 'next/link';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { api, downloadFile } from '@/lib/api';
@@ -19,11 +21,16 @@ export default function OrderWorkspace({ params }: { params: Promise<{ id: strin
   const wallet = useWallet();
   const [err, setErr] = useState<unknown>(null);
   const [msg, setMsg] = useState<string | null>(null);
+  const [collaborative, setCollaborative] = useState(false);
 
   async function act(label: string, build: () => Promise<any[]>) {
     setErr(null);
     setMsg(null);
     try {
+      if (o?.kind === 'bounty' && !['Refunded', 'Cancelled'].includes(label)) {
+        const mode = await api<{ enabled: boolean }>(`/bounties/${id}/collaboration-status`);
+        if (mode.enabled) throw new Error('This collaboration pilot supports accounting only. Multi-recipient escrow settlement requires a reviewed contract integration.');
+      }
       const sig = await sendWithWallet(wallet, await build());
       await api(`/orders/${id}/sync`, { method: 'POST' });
       setMsg(`${label}: ${sig.slice(0, 16)}…`);
@@ -48,6 +55,7 @@ export default function OrderWorkspace({ params }: { params: Promise<{ id: strin
 
   return (
     <Page kicker="Order" title={o.title} subtitle={<span className="flex flex-wrap items-center gap-2"><StateBadge state={state} /> {o.kind === 'bounty' ? 'Custom request' : 'Purchase'} · {sol(o.amountMicro)} · {role ? `you are the ${role}` : 'public view'}</span>}>
+      {o.kind === 'bounty' && <div className="mb-8"><CollaborationWorkspace id={id} buyerId={o.buyerId} criteria={o.criteria} onEnabled={setCollaborative} /></div>}
       <div className="grid gap-4 lg:grid-cols-[2fr_1fr]">
         <div className="min-w-0 space-y-4">
           <EscrowTrack state={state} kind={o.kind} />
@@ -55,7 +63,7 @@ export default function OrderWorkspace({ params }: { params: Promise<{ id: strin
           <ErrorNote error={err} />
 
           {/* ------------------------------------------------ seller: accept */}
-          {state === 'funded' && me && me !== o.buyerWallet && me !== o.verifierWallet && (
+          {!collaborative && state === 'funded' && me && me !== o.buyerWallet && me !== o.verifierWallet && (
             <Card title="Take this request">
               <p className="mb-3 text-sm">The budget is already escrowed. Accepting assigns the contract to your wallet; deliver before {date(o.deadline)}.</p>
               <Button onClick={() => act('Accepted', async () => (await chainClient()).acceptBounty(wallet.publicKey!, addr))}>Accept on-chain</Button>
@@ -63,13 +71,13 @@ export default function OrderWorkspace({ params }: { params: Promise<{ id: strin
           )}
 
           {/* ------------------------------------------------ seller: submit */}
-          {role === 'seller' && (state === 'assigned' || state === 'correction_required') && <SubmitPanel orderId={id} address={o.onchainAddress} kind={o.criteria?.kind === 'model' ? 'model' : 'dataset'} allowEncryption={!!platform && o.verifierWallet !== platform.platformVerifier} onDone={reload} onError={setErr} />}
+          {!collaborative && role === 'seller' && (state === 'assigned' || state === 'correction_required') && <SubmitPanel orderId={id} address={o.onchainAddress} settlementBundle={!!o.collaborationSettlement} kind={o.criteria?.kind === 'model' ? 'model' : 'dataset'} allowEncryption={!!platform && o.verifierWallet !== platform.platformVerifier} onDone={reload} onError={setErr} />}
 
           {/* ------------------------------------------------ verifier (third-party) */}
-          {role === 'verifier' && state === 'submitted' && latest && <VerifierPanel job={latest} address={o.onchainAddress} orderId={id} onDone={reload} onError={setErr} />}
+          {!collaborative && role === 'verifier' && state === 'submitted' && latest && <VerifierPanel job={latest} address={o.onchainAddress} orderId={id} onDone={reload} onError={setErr} />}
 
           {/* ------------------------------------------------ buyer review */}
-          {role === 'buyer' && state === 'under_review' && (
+          {!collaborative && role === 'buyer' && state === 'under_review' && (
             <Card title="Your review" right={<span className="text-xs text-muted">window closes {dateTime(chain.reviewDeadline)}</span>}>
               <div className="flex flex-wrap gap-2">
                 <Button onClick={() => act('Approved', async () => (await chainClient()).acceptDeliverable(wallet.publicKey!, addr))}>Approve &amp; release payment</Button>
@@ -93,7 +101,7 @@ export default function OrderWorkspace({ params }: { params: Promise<{ id: strin
           {role === 'buyer' && (state === 'funded' || state === 'created') && (
             <Card title="Cancel"><p className="mb-2 text-sm text-muted">No seller has accepted yet; cancelling refunds everything.</p><Button variant="ghost" onClick={() => act('Cancelled', async () => (await chainClient()).cancelOrder(wallet.publicKey!, addr))}>Cancel request</Button></Card>
           )}
-          {me && (state === 'approved' || (state === 'under_review' && now > chain.reviewDeadline)) && (
+          {!collaborative && me && (state === 'approved' || (state === 'under_review' && now > chain.reviewDeadline)) && (
             <Card title="Ready to settle"><Button onClick={() => act('Settled', async () => (await chainClient()).settleOrder(wallet.publicKey!, addr))}>Settle now</Button></Card>
           )}
 
@@ -184,7 +192,7 @@ export default function OrderWorkspace({ params }: { params: Promise<{ id: strin
   );
 }
 
-function SubmitPanel({ orderId, address, kind, allowEncryption, onDone, onError }: { orderId: string; address: string; kind: 'dataset' | 'model'; allowEncryption: boolean; onDone: () => void; onError: (e: unknown) => void }) {
+function SubmitPanel({ orderId, address, kind, allowEncryption, settlementBundle=false, onDone, onError }: { orderId: string; address: string; kind: 'dataset' | 'model'; allowEncryption: boolean; settlementBundle?: boolean; onDone: () => void; onError: (e: unknown) => void }) {
   const wallet = useWallet();
   const [uploadKey, setUploadKey] = useState(0);
   const [asset, setAsset] = useState<UploadedAsset | null>(null);
@@ -204,7 +212,8 @@ function SubmitPanel({ orderId, address, kind, allowEncryption, onDone, onError 
     <Card title="Deliver your work">
       <p className="mb-3 text-sm text-muted">Files stay private. Only a salted commitment to the exact file manifest goes on-chain; the buyer sees previews and reports until settlement.</p>
       {!allowEncryption && <p className="mb-3 text-sm text-muted">Automated verification requires readable files. Upload the originals without browser encryption; storage and buyer delivery remain private. If a previous encrypted upload was rejected, choose replacement files below.</p>}
-      <AssetUploader key={uploadKey} kind={kind} purpose="submission" name={`submission ${orderId.slice(0, 8)}`} onDone={setAsset} allowEncryption={allowEncryption} />
+      <AssetUploader key={uploadKey} kind={kind} purpose="submission" name={`submission ${orderId.slice(0, 8)}`} onDone={setAsset} allowEncryption={allowEncryption && !settlementBundle} />
+      {settlementBundle && asset && <SettlementBundleVerification key={asset.versionId} versionId={asset.versionId}/>}
       {asset && <Button variant="ghost" className="mt-3 mr-2" onClick={() => { setAsset(null); setUploadKey((n) => n + 1); onError(null); }}>Choose replacement files</Button>}
       <Button className="mt-3" onClick={submit} disabled={!asset}>Submit commitment on-chain</Button>
     </Card>

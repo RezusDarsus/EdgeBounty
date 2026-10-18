@@ -92,6 +92,11 @@ export function deliveryRoutes(app: FastifyInstance, ctx: AppContext) {
       const wallet = job?.providerWallet ?? pj?.providerWallet;
       if (versionId !== f.versionId || wallet !== c.w) throw forbidden();
       entitlementId = c.g;
+    } else if (c.s === 'collaboration_review') {
+      // Explicit contributor-granted, revocable inspection permission. This is not a purchase/license receipt.
+      const result=await db.execute(sql`select s.*,o.buyer_wallet,a.wallet as owner_wallet from collaboration_submissions s join orders o on o.id=s.bounty_id join accounts a on a.id=s.contributor_id join asset_versions v on v.id=s.asset_version_id join assets asset on asset.id=v.asset_id where s.id=${c.g} and s.asset_version_id=${f.versionId} and s.status='verified' and asset.deleted_at is null and a.deleted_at is null and exists(select 1 from accounts recipient where recipient.wallet=${c.w} and recipient.deleted_at is null) and (a.wallet=${c.w} or (s.review_access_granted and o.buyer_wallet=${c.w})) and exists(select 1 from submission_items i where i.submission_id=s.id and i.file_path=${f.path} and i.exact_hash=${f.sha256} and i.verification_status in ('review','accepted'))`);
+      if(!((result as any).rows??result).length)throw forbidden('Image review permission is unavailable or revoked');
+      if(cfg.COLLABORATIVE_BOUNTIES_ENABLED!=='1')throw forbidden('Collaboration is disabled');
     } else if (c.s === 'review') {
       // dispute reviewer access (admin-issued) or a failure-bounty verifier reading a pending example
       const [d] = await db.select().from(schema.disputes).where(eq(schema.disputes.id, c.g));

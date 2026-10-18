@@ -30,7 +30,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))  # sandbox runs `python -I`
 import media  # noqa: E402
 
-VERSION = "1.4.0"
+VERSION = "1.5.0"
 IMAGE_EXT = {".jpg": "jpeg", ".jpeg": "jpeg", ".png": "png", ".webp": "webp", ".bmp": "bmp", ".gif": "gif", ".tif": "tiff", ".tiff": "tiff"}
 TABULAR_EXT = {".csv", ".parquet", ".jsonl", ".ndjson"}
 ANNOTATION_EXT = {".txt", ".json", ".xml"}
@@ -347,6 +347,15 @@ def analyze_images(root: Path, files: list[Path], level: str, args, budget: Budg
         outliers=outliers,
     )
 
+    # Private per-file evidence consumed by the collaboration coordinator, never public reports.
+    out['_collaborationItems'] = [
+        {'path': path, 'sha256': digest,
+         'dhash': format(phash[path], '016x') if path in phash else None,
+         'valid': path in readable and path not in below and path not in mismatched_ext
+                  and (root / path).suffix.lower() in ('.jpg', '.jpeg', '.png', '.webp')}
+        for digest, paths in sha_groups.items() for path in paths
+    ]
+
     # controlled previews: few images, small, watermarked
     if args.previews and readable:
         prev_dir = Path(args.previews)
@@ -632,11 +641,13 @@ def main(argv=None) -> int:
         limitations.append(f"Processing stopped at the job budget after {budget.items} items; results cover a prefix of the dataset.")
     previews = out.pop("_previews", [])
     samples = out.pop("_samples", [])
+    collaboration_items = out.pop('_collaborationItems', [])
     doc = {
         "metrics": out,
         "findings": findings,
         "previews": previews,
         "samples": samples,
+        "collaborationItems": collaboration_items,
         "tools": [{"name": "edgebounty-dataset-validator", "version": VERSION}, {"name": "python", "version": sys.version.split()[0]}] + pil_version(),
         "limitations": limitations,
         "itemsProcessed": budget.items,

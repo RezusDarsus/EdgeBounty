@@ -2,7 +2,7 @@ import { createHmac, timingSafeEqual } from 'node:crypto';
 
 export interface DownloadClaims {
   /** scope: delivery (buyer), eval (verifier), review (dispute reviewer) */
-  s: 'delivery' | 'eval' | 'review';
+  s: 'delivery' | 'eval' | 'review' | 'collaboration_review';
   /** grant id: entitlement / job / dispute */
   g: string;
   /** file id */

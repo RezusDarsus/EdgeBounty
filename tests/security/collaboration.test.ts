@@ -1,0 +1,115 @@
+import { beforeAll,afterAll,it,expect,vi } from 'vitest';
+import { NATIVE_MINT } from '@solana/spl-token';
+import { createDb,schema } from '../../apps/api/src/db/index.js';
+import { loadConfig } from '../../apps/api/src/config.js';
+import { ChainService } from '../../apps/api/src/chain.js';
+import { LocalStorage } from '../../apps/api/src/storage/index.js';
+import { buildApp } from '../../apps/api/src/app.js';
+import { issueSession,hashApiKey } from '../../apps/api/src/auth/siws.js';
+import { collaborationFixture,evidence } from '../fixtures/collaboration.js';
+import {createHash} from 'node:crypto';
+import {sql} from 'drizzle-orm';
+import {rows} from '../../apps/api/src/services/collaboration.js';
+
+let store:Awaited<ReturnType<typeof createDb>>,app:Awaited<ReturnType<typeof buildApp>>,f:Awaited<ReturnType<typeof collaborationFixture>>;
+const cfg=loadConfig({NODE_ENV:'test',WORKERS:'off',COLLABORATIVE_BOUNTIES_ENABLED:'1',PAYMENT_CURRENCY:'SOL'});
+const complete=vi.fn(async(_cfg:unknown,_input:unknown)=>({value:{answer:'Offer a small replacement contribution for human approval.',listingIds:[],suggestions:[],warnings:[]},inputTokens:20,outputTokens:10}));
+let seller:Record<string,string>,buyer:Record<string,string>,outsider:Record<string,string>;
+beforeAll(async()=>{
+  store=await createDb({memory:true});f=await collaborationFixture(store.db,10);
+  const chain=new ChainService(cfg);vi.spyOn(chain.client,'config').mockResolvedValue({paymentMint:NATIVE_MINT,feeBps:600} as any);
+  app=await buildApp({cfg,db:store.db,chain,storage:new LocalStorage('.data/test-collaboration'),events:{}},{assistantProvider:{complete}});
+  const headers=async(u:typeof f.buyer)=>({authorization:`Bearer ${await issueSession(cfg.JWT_SECRET,{accountId:u.id,wallet:u.wallet,roles:[]})}`});
+  seller=await headers(f.giorgi);buyer=await headers(f.buyer);outsider=await headers(f.outsider);
+});
+afterAll(async()=>{await app?.close();await store?.close();});
+const url=(path:string)=>`/bounties/${f.id}${path}`;
+it('requires authentication and bounty membership; validates claims and UUIDs',async()=>{
+  expect((await app.inject({url:url('/progress')})).statusCode).toBe(401);
+  expect((await app.inject({url:url('/collaboration'),headers:outsider})).statusCode).toBe(403);
+  expect((await app.inject({url:'/bounties/not-a-uuid/progress',headers:seller})).statusCode).toBe(400);
+  expect((await app.inject({method:'POST',url:url('/work-claims'),headers:seller,payload:{count:-1,idempotencyKey:'invalid-count'}})).statusCode).toBe(400);
+  expect((await app.inject({method:'POST',url:url('/work-claims'),headers:seller,payload:{count:2,idempotencyKey:'valid-claim',actorUserId:f.nika.id}})).statusCode).toBe(400);
+  expect((await app.inject({method:'POST',url:url('/collaboration/enable'),headers:seller,payload:{target:10}})).statusCode).toBe(403);
+});
+it('prevents API keys and sellers from impersonating financial or human approval',async()=>{
+  await store.db.insert(schema.apiKeys).values({accountId:f.giorgi.id,name:'read agent',prefix:'eb_test',keyHash:hashApiKey('eb_test-collaboration'),scopes:['read','upload','verify']});
+  const headers={'x-api-key':'eb_test-collaboration'};
+  expect((await app.inject({url:url('/progress'),headers})).statusCode).toBe(200);
+  expect((await app.inject({method:'POST',url:url('/work-claims'),headers,payload:{count:1,idempotencyKey:'key-attempt'}})).statusCode).toBe(403);
+  expect((await app.inject({method:'POST',url:url('/payout-manifest'),headers:seller})).statusCode).toBe(403);
+  expect((await app.inject({method:'POST',url:url('/payout-manifest'),headers:buyer})).statusCode).toBe(409);
+});
+it('does not reveal private hashes, paths, URLs or another seller duplicate references',async()=>{
+  const s=await f.submission(f.giorgi);await f.service.applyEvidence(f.id,s.id,evidence('private-secret-path',1),'test',true);
+  const response=await app.inject({url:url('/collaboration?limit=200'),headers:seller});
+  expect(response.statusCode).toBe(200);
+  for(const privateField of ['private-secret-path','sha256','exact_hash','duplicate_reference','objectKey'])expect(response.body).not.toContain(privateField);
+  const events=response.json().events;
+  expect(events.map((e:any)=>Number(e.sequence))).toEqual(events.map((e:any)=>Number(e.sequence)).sort((a:number,b:number)=>a-b));
+  const cursor=events[0].sequence;
+  const next=await app.inject({url:url(`/agent-events?after=${cursor}&limit=1`),headers:seller});
+  expect(next.json()).toHaveLength(1);expect(Number(next.json()[0].sequence)).toBeGreaterThan(Number(cursor));
+});
+it('rejects attaching another seller’s assets or unrelated verification',async()=>{
+  const s=await f.submission(f.nika);
+  const response=await app.inject({method:'POST',url:url('/contributions'),headers:seller,payload:{assetVersionId:s.version.id,verificationJobId:s.job.id,licenseDeclaration:'I declare that I own these photos and grant the requested license.'}});
+  expect(response.statusCode).toBe(403);
+  const retained=await f.submission(f.giorgi);
+  expect((await app.inject({method:'DELETE',url:`/assets/${retained.version.assetId}`,headers:seller})).statusCode).toBe(409);
+});
+it('keeps the feature unavailable when disabled without changing ordinary orders',async()=>{
+  cfg.COLLABORATIVE_BOUNTIES_ENABLED='0';
+  expect((await app.inject({url:url('/collaboration-status'),headers:buyer})).json()).toEqual({available:false,enabled:false});
+  expect((await app.inject({url:url('/progress'),headers:seller})).statusCode).toBe(404);
+  expect((await app.inject({url:`/orders/${f.id}`,headers:buyer})).statusCode).toBe(200);
+  cfg.COLLABORATIVE_BOUNTIES_ENABLED='1';
+});
+it('uses bounded cached NVIDIA enrichment with consent, without reserving work or changing progress',async()=>{
+  cfg.AI_DRAFTS_ENABLED='1';cfg.NVIDIA_API_KEY='fixture-never-network';
+  const view=await f.service.snapshot(f.id,f.giorgi.id);
+  const agent=view.contributors.find(c=>c.userId===f.giorgi.id)!.agentId;
+  const endpoint=url(`/agents/${agent}/propose`);
+  expect((await app.inject({method:'POST',url:endpoint,headers:seller,payload:{consent:false}})).statusCode).toBe(400);
+  expect((await app.inject({method:'POST',url:endpoint,headers:outsider,payload:{consent:true}})).statusCode).toBe(403);
+  const response=await app.inject({method:'POST',url:endpoint,headers:seller,payload:{consent:true}});
+  expect(response.statusCode,response.body).toBe(200);
+  const replay=await app.inject({method:'POST',url:endpoint,headers:seller,payload:{consent:true}});
+  expect(replay.json().proposalId).toBe(response.json().proposalId);expect(complete).toHaveBeenCalledTimes(1);
+  const after=await f.service.snapshot(f.id,f.buyer.id);
+  expect(after.progress.accepted).toBe(view.progress.accepted);expect(after.claims).toEqual(view.claims);
+  const transmitted=JSON.stringify(complete.mock.calls[0]?.[1]);
+  expect(transmitted).not.toContain('private-secret-path');expect(transmitted).not.toContain('objectKey');
+  cfg.AI_DRAFTS_ENABLED='0';
+});
+it('requires explicit review permission, revokes outstanding tokens, and invalidates withdrawn progress',async()=>{
+  const baseline=(await f.service.snapshot(f.id,f.buyer.id)).progress.accepted;
+  const s=await f.submission(f.giorgi),body=Buffer.from('private-image-fixture'),hash=createHash('sha256').update(body).digest('hex');
+  const key=`tenants/${f.giorgi.id}/workflow/${s.version.id}`;
+  await new LocalStorage('.data/test-collaboration').put(key,body);
+  await store.db.insert(schema.assetFiles).values({versionId:s.version.id,path:'review.png',size:body.length,sha256:hash,mediaType:'image/png',objectKey:key});
+  await f.service.applyEvidence(f.id,s.id,[{path:'review.png',sha256:hash,dhash:null,valid:true}],'review-test',false);
+  const [item]=await rows(store.db,sql`select id from submission_items where submission_id=${s.id}`);
+  const content=url(`/review-items/${item.id}/content`);
+  expect((await app.inject({url:content,headers:buyer})).statusCode).toBe(403);
+  expect((await app.inject({method:'POST',url:url(`/contributions/${s.id}/review-access`),headers:buyer,payload:{granted:true}})).statusCode).toBe(404);
+  expect((await app.inject({method:'POST',url:url(`/contributions/${s.id}/review-access`),headers:seller,payload:{granted:true}})).statusCode).toBe(200);
+  const grant=await app.inject({url:content,headers:buyer});expect(grant.statusCode).toBe(307);
+  const download=String(grant.headers.location);
+  expect((await app.inject({url:download,headers:buyer})).rawPayload).toEqual(body);
+  await f.service.reviewAccess(f.id,f.giorgi.id,s.id,false);
+  expect((await app.inject({url:download,headers:buyer})).statusCode).toBe(403);
+  await f.service.review(f.id,f.buyer.id,item.id,true,'Owner-authorized inspection and licensing reviewed.');
+  expect((await f.service.snapshot(f.id,f.buyer.id)).progress.accepted).toBe(baseline+1);
+  await f.service.withdraw(f.id,f.giorgi.id,s.id);
+  expect((await f.service.snapshot(f.id,f.buyer.id)).progress.accepted).toBe(baseline);
+  expect((await app.inject({url:download,headers:buyer})).statusCode).toBe(403);
+});
+it('allows private participation only after a buyer invitation',async()=>{
+  const privateBounty=await collaborationFixture(store.db,10);
+  await store.db.execute(sql`update orders set public=false where id=${privateBounty.id}`);
+  await expect(privateBounty.service.join(privateBounty.id,privateBounty.outsider.id)).rejects.toThrow('invitations');
+  await expect(privateBounty.service.invite(privateBounty.id,privateBounty.nika.id,privateBounty.outsider.id)).rejects.toThrow('buyer');
+  await privateBounty.service.invite(privateBounty.id,privateBounty.buyer.id,privateBounty.outsider.id);
+  await expect(privateBounty.service.join(privateBounty.id,privateBounty.outsider.id)).resolves.toHaveProperty('agentId');
+});

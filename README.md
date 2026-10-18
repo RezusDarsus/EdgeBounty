@@ -1,69 +1,67 @@
 # EdgeBounty
 
-Solana-native marketplace for AI datasets, models, funded development work and independent
-verification. Buyers escrow USDC, sellers deliver privately against fixed criteria, verifiers
-sign attestations, and a Solana program settles exactly once — while the assets stay private.
+**A marketplace for AI data and work, built on Solana.**
 
-**Status:** October 17 master-plan update implemented and tested in parts, including 6% commission,
-R2 direct uploads, gateway source, and isolated mock-USDC settlement. See
-[implementation evidence and remaining work](docs/MASTER_PLAN_IMPLEMENTATION.md).
-The full production roadmap is not live. Not audited; not for mainnet funds.
+EdgeBounty helps people who need useful data or AI work meet the people who can provide it. A buyer can purchase a dataset or model, or fund a request for new work. Sellers publish what they offer and its terms. The platform checks files and records delivery and review steps, while payment is held until the order is completed under its agreed rules.
 
-## Layout
+Think of Solana as a shared public record book that many independent computers keep in sync. Apps such as EdgeBounty use it to record payments and agreements. It is one part of a much larger ecosystem that includes wallets, digital currencies, marketplaces, games, finance apps and payment services.
 
-```
-programs/edgebounty-marketplace   Anchor 1.1 program (escrow, orders, disputes, attestations, …) + LiteSVM tests
-packages/blockchain-client        typed TS client (PDAs, instruction builders, decoders)
-packages/verification-schemas     zod schemas, canonical hashing, criteria evaluation, client-side crypto
-packages/pricing-engine           integer-only pricing (mirrors on-chain payout math)
-packages/shared-types             enums & constants
-apps/api                          Fastify API: auth, uploads, marketplace, delivery, verification, indexer
-apps/web                          Next.js app
-services/dataset-validator        Python L1/L2 dataset checks (images, tabular, audio, video, archives)
-services/model-validator          Python ONNX inspection, sandboxed benchmarks, inference trials
-tests/                            end-to-end (localnet), security
-docs/                             protocol spec, threat model, pricing, privacy, runbook
-```
+## Solana, in a few words
 
-## Run it locally (Windows + WSL, or Linux)
+- **SOL** is Solana's main digital currency. A wallet needs a small amount of SOL to pay the network for actions such as approving a purchase.
+- **USDC** is a digital currency designed to track the US dollar. EdgeBounty's current demo uses *mock USDC* on a private test network; it has no real-world cash value.
+- **Wallets** such as Phantom, Solflare and Backpack let a person connect to an app and approve a transaction. The wallet owner reviews and signs each payment.
+- **Apps and programs** provide services on Solana. EdgeBounty uses its on-chain program for agreed payment and escrow steps; its website and private file storage handle the rest.
+- **Validators** are independent computers that check and record network activity. Their work is supported by network fees paid in SOL.
 
-The earlier wallet, publishing, request, and SOL payment flows are documented in
-[approved-marketplace-flows](docs/approved-marketplace-flows.md). Those historical flows require a
-wrapped-SOL platform. Keep its ledger and database with its matching release. The new USDC mode uses
-a separate environment and refuses to relabel existing financial data.
+Solana supports many independent projects. EdgeBounty is one small project in that ecosystem, focused on AI datasets, models and funded work.
 
-For the new USDC demo, use `bash scripts/localnet-usdc.sh`, then `npx tsx scripts/usdc-bootstrap.ts`.
-This creates a separate mock-USDC chain/database and preserves the SOL environment. Run
-`npx tsx scripts/usdc-e2e.ts` to verify 94/6 bounty settlement and replay rejection. Runtime private
-configuration stays in ignored `apps/api/.env`; Cloudflare deployment credentials stay in ignored
-`.data/cloudflare-admin.env`. Deploy the Worker before enabling metered R2 downloads.
+## What you can do with EdgeBounty
 
-Prerequisites: Node 26+, Python 3.12+, Rust/Solana 3.x/Anchor 1.1 (in WSL on Windows).
+- **Buy or sell AI assets:** browse datasets and models with descriptions, version details, license declarations and available checks.
+- **Fund a request:** post a bounty for work you need, agree on what counts as complete, and fund it through the order flow.
+- **Check a delivery:** the platform can run technical checks and bounded reviews. A check report is useful evidence, but it cannot prove that a seller owns the content or that it will work for every purpose.
+- **Work together:** the newest collaborative bounty pilot lets multiple contributors coordinate on one request. It tracks accepted contributions and proposes how the reward could be divided. The existing Solana escrow pays one seller at a time: after buyer approval, a settlement plan creates designated contributor contracts funded and settled with explicit wallet signatures. The feature is opt-in and defaults off in local configuration.
+- **Get help from the assistant:** the assistant can help discover listings, plan a bounty, and review or draft metadata. People remain responsible for decisions and wallet approvals.
+
+## Fees, simply explained
+
+The checkout page shows the quote and terms before you approve a wallet transaction. The exact quote is the one to follow.
+
+| Charge | How it works |
+| --- | --- |
+| Marketplace commission | 6% of the completed sale or bounty reward. On a 100 USDC reward, the seller receives 94 USDC and EdgeBounty receives 6 USDC. |
+| Storage and hosting | Paid in advance. The current rate is $0.045 per started GiB for each 30-day month, with a $0.30 monthly minimum per asset. |
+| Downloads | The quote depends on file size and access period. Included download capacity is $0.15 per started GiB for each included copy. |
+| Verification | Basic technical checks are included within their limits. More extensive sampled or human reviews may have a separate quoted charge. |
+| Solana network fee | A small, variable fee paid in SOL for network actions. It is separate from EdgeBounty's charges and is not refunded by EdgeBounty. |
+
+The marketplace commission is separate from any quoted storage, download or verification charge. For example, a 100 USDC bounty reward is still 100 USDC funded by the buyer; after settlement, 94 USDC goes to the seller and 6 USDC is the platform commission. Network fees still require SOL in the wallet.
+
+## Current status
+
+This project includes a working marketplace, a Solana payment program, private file storage, verification tools and a web app. The recent work also adds a collaborative bounty pilot. Some features and integrations are still limited to local or controlled demonstrations.
+
+**The current USDC demo runs on a private test network and uses mock USDC. It is not a public Solana Mainnet service, and it is not ready for real funds.** The project has not completed an independent security audit. Verification reports and seller license statements are not guarantees of ownership, quality or legal rights.
+
+## Try the demo
+
+The demo is intended for someone setting up the project, rather than a public signup. It uses a local Solana test network and test tokens.
+
+Requirements: Node.js 26 or newer, Python 3.12 or newer, and Rust/Solana/Anchor tools. On Windows, the Solana program build and test steps run in WSL with Ubuntu.
 
 ```bash
 npm install
-python -m venv .venv && .venv/Scripts/pip install pillow numpy pyarrow onnx onnxruntime
 ```
 
-```bash
-wsl -d Ubuntu -- bash -l scripts/build-program.sh all
-```
+In a separate terminal, start the private test network and create its mock-USDC setup:
 
 ```bash
-node scripts/sync-idl.mjs
-```
-
-Start the validator (keep it running in its own terminal):
-
-```bash
-wsl -d Ubuntu -- bash -l scripts/localnet-usdc.sh
-```
-
-Bootstrap the platform (mock USDC, treasury, approved platform verifier, env files):
-
-```bash
+bash scripts/localnet-usdc.sh
 npx tsx scripts/usdc-bootstrap.ts
 ```
+
+Then start the API and website in separate terminals:
 
 ```bash
 npx tsx apps/api/src/server.ts
@@ -73,28 +71,14 @@ npx tsx apps/api/src/server.ts
 npm run dev -w @edgebounty/web
 ```
 
-Open http://localhost:3000, click **Sign in with wallet**, choose **Dev Burner (localnet)**,
-then *Get test funds* for 2 test SOL and 1,000 mock USDC. Real wallets (Phantom, Solflare, Backpack) work through
-Wallet Standard. The burner exists only when `NEXT_PUBLIC_DEV_BURNER=1`.
+Open [http://localhost:3000](http://localhost:3000), connect the local demo wallet, and use the test faucet. Never put a wallet recovery phrase or private key in the project or share it with anyone.
 
-## Tests
+For an isolated collaborative bounty walkthrough, run `npm run demo:collaboration -- --serve` and open [http://127.0.0.1:4010](http://127.0.0.1:4010). This uses demonstration data and does not move funds.
 
-```bash
-wsl -d Ubuntu -- bash -l scripts/build-program.sh test
-```
+## Learn more
 
-```bash
-npx vitest run
-```
-
-```bash
-cd services/dataset-validator && ../../.venv/Scripts/python -m unittest
-```
-
-End-to-end suites (`tests/end-to-end`) run against the local validator and skip when it is down.
-
-## What is (and isn't) trustless
-
-The program enforces escrow, deadlines, exactly-once payouts, bounded dispute power and fee caps.
-Delivery of private files is done by an accountable off-chain service; attestations prove *who said
-what about which commitment*, not that it is true. See `docs/threat-model/threat-model.md`.
+- [Fees and checkout details](docs/PRICING_AND_FEES.md)
+- [Collaborative bounties: pilot, demo and limitations](docs/COLLABORATIVE_BOUNTIES.md)
+- [How the platform works](docs/PRODUCT.md)
+- [Project implementation status and evidence](docs/MASTER_PLAN_IMPLEMENTATION.md)
+- [Security and trust limitations](docs/threat-model/threat-model.md)

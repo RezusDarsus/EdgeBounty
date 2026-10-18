@@ -2,7 +2,7 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { crank, syncAll } from '../../apps/api/src/services/indexer.js';
 import { UNIT, localnetAvailable } from './helpers.js';
-import { actor, api, hex, ok, paidVerification, payInvoice, pk, png, send, sha256, startHarness, uploadAsset, type Harness } from './api-harness.js';
+import { actor, api, hex, ok, paidVerification, payInvoice, paidTestCapacity, pk, png, send, sha256, startHarness, uploadAsset, type Harness } from './api-harness.js';
 
 const up = await localnetAvailable();
 
@@ -18,6 +18,7 @@ describe.skipIf(!up)('review-pass regressions', () => {
     const buyer = await actor(h, 100n * UNIT);
     const v1 = await uploadAsset(h, seller, 'dataset', 'listing', [{ path: 'v1.png', data: png(20, 20, 11), mediaType: 'image/png' }]);
     await paidVerification(h, seller, v1.versionId);
+    await payInvoice(h,seller,(await ok(h,seller,'POST',`/versions/${v1.versionId}/hosting`,{months:1})).invoice);
     const prep = await ok(h, seller, 'POST', '/listings', { assetVersionId: v1.versionId, title: 'Versioned set', description: 'Version safety regression test.', category: 'image_classification', licenseId: 'cc-by-4.0', priceMicro: String(5n * UNIT) });
     const a = prep.onchain;
     await send(h, seller, (await h.p.client.createListing(seller.kp.publicKey, BigInt(a.listingId), 'dataset', { assetCommitment: hex(a.assetCommitment), termsHash: hex(a.termsHash), licenseHash: hex(a.licenseHash), price: BigInt(a.price) })).ixs);
@@ -37,6 +38,7 @@ describe.skipIf(!up)('review-pass regressions', () => {
     await ok(h, seller, 'POST', `/uploads/${upl.uploadId}/complete`, {});
     const fin2 = await ok(h, seller, 'POST', `/versions/${v2ver.id}/finalize`);
     await paidVerification(h, seller, v2ver.id);
+    await payInvoice(h,seller,(await ok(h,seller,'POST',`/versions/${v2ver.id}/hosting`,{months:1})).invoice);
     const nv = await ok(h, seller, 'POST', `/listings/${prep.listing.id}/versions`, { assetVersionId: v2ver.id });
     expect((await ok(h, null, 'GET', `/listings/${prep.listing.id}`)).asset.commitment).toBe(v1.commitment);
     await syncAll(h.ctx);
@@ -58,6 +60,7 @@ describe.skipIf(!up)('review-pass regressions', () => {
 
   it('uploads resume from the parts storage actually holds; parallel uploads to one path are refused', async () => {
     const u = await actor(h, 0n);
+    await paidTestCapacity(h,u,1024*1024);
     const { version } = await ok(h, u, 'POST', '/assets', { kind: 'dataset', name: 'resume', purpose: 'listing' });
     const data = png(200, 200, 5); // > 64 KiB test part size → several parts
     const upl = await ok(h, u, 'POST', `/versions/${version.id}/uploads`, { path: 'big.png', size: data.length, sha256: sha256(data), mediaType: 'image/png' });

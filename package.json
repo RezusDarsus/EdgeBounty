@@ -12,6 +12,7 @@
     "services/delivery-service"
   ],
   "scripts": {
+    "demo:collaboration": "tsx scripts/collaboration-demo.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "dev:api": "npm run dev -w @edgebounty/api",

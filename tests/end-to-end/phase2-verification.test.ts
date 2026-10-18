@@ -10,6 +10,8 @@ import { DOMAIN, bytesToHex, hashDocument, type VerificationReport } from '@edge
 import { drainJobs, platformProviderTick } from '../../apps/api/src/services/jobs.js';
 import { crank, syncAll } from '../../apps/api/src/services/indexer.js';
 import { wilson } from '../../apps/api/src/services/l3.js';
+import {schema} from '../../apps/api/src/db/index.js';
+import {eq} from 'drizzle-orm';
 import { UNIT, localnetAvailable } from './helpers.js';
 import { actor, api, hex, login, ok, pk, png, send, sha256, startHarness, uploadAsset, type Harness } from './api-harness.js';
 
@@ -54,12 +56,18 @@ describe.skipIf(!up)('Phase 2 — independent verification (localnet)', () => {
 
     const buyer = await actor(h, 300n * UNIT);
     const seller = await actor(h, 0n);
-    const created = await ok(h, buyer, 'POST', '/bounties', {
+    const request = {
       title: 'Street sign photos', description: 'Photos of damaged street signs for a classifier.', deliverables: ['10+ images'],
       criteria: { kind: 'image_dataset', minImages: 10, minWidth: 32, minHeight: 32, maxExactDuplicates: 0 },
       licenseId: 'cc-by-4.0', budgetMicro: String(50n * UNIT), deadline: new Date(Date.now() + 7200_000).toISOString(), maxCorrections: 0,
       verifierWallet: verifier.wallet, verifierFeeMicro: String(3n * UNIT),
-    });
+    };
+    // Current product policy only creates platform-verified funded requests. Preserve legacy
+    // third-party escrow compatibility through an explicit test fixture, not a production bypass.
+    expect((await api(h,buyer,'POST','/bounties',request)).status).toBe(400);
+    const created=await ok(h,buyer,'POST','/bounties',{...request,verifierWallet:h.platformVerifier.publicKey.toBase58()});
+    created.onchain.verifier=verifier.wallet;created.onchain.verifierFee=String(3n*UNIT);
+    await h.ctx.db.update(schema.orders).set({verifierWallet:verifier.wallet,verifierFeeMicro:3n*UNIT}).where(eq(schema.orders.id,created.order.id));
     const a = created.onchain;
     const addr = pk(a.address);
     await send(h, buyer, (await h.p.client.createAndFundBounty(buyer.kp.publicKey, BigInt(a.orderId), { amount: BigInt(a.amount), verifier: pk(a.verifier), verifierFee: BigInt(a.verifierFee), verifierCapability: CAPABILITIES.dataset_image, termsHash: hex(a.termsHash), criteriaHash: hex(a.criteriaHash), licenseHash: hex(a.licenseHash), deadline: a.deadline, maxCorrections: 0 })).ixs);
@@ -110,7 +118,7 @@ describe.skipIf(!up)('Phase 2 — independent verification (localnet)', () => {
     await crank(h.ctx);
     const c = h.p.client;
     expect(await c.tokenBalance(c.ata(verifier.kp.publicKey, h.p.mint))).toBe(3n * UNIT);
-    expect(await c.tokenBalance(c.ata(seller.kp.publicKey, h.p.mint))).toBe(47_500_000n);
+    expect(await c.tokenBalance(c.ata(seller.kp.publicKey, h.p.mint))).toBe(50n*UNIT-50n*UNIT*BigInt((await c.config())!.feeBps)/10000n);
     expect((await c.provider(verifier.kp.publicKey))?.jobsCompleted).toBe(1);
   });
 
