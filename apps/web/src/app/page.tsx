@@ -2,9 +2,11 @@ import Link from 'next/link';
 import { CatalogDiscovery } from '@/components/catalog-discovery';
 import { RecentListings } from '@/components/recent-listings';
 import { DatasheetFigure } from '@/components/datasheet-figure';
+import { HackathonEvidence } from '@/components/hackathon-evidence';
 
+const PAYMENT_CURRENCY = process.env.NEXT_PUBLIC_PAYMENT_CURRENCY === 'USDC' ? 'USDC' : 'SOL';
 const ESCROW: [string, string, string][] = [
-  ['Funded', 'The buyer signs a transaction that places USDC in a vault controlled by the EdgeBounty program.', 'funded'],
+  ['Funded', `The buyer signs a transaction that places ${PAYMENT_CURRENCY} in a vault controlled by the EdgeBounty program.`, 'funded'],
   ['Delivered', 'The seller uploads the files to private storage. The chain records a fingerprint of that specific version, not the files themselves.', 'submitted'],
   ['Reviewed', 'Checks run against the delivered version. The buyer can approve it, request a correction or open a dispute.', 'under_review'],
   ['Settled', 'Funds are released once: 94% to the seller and 6% as the platform fee. Full downloads become available after settlement.', 'settled'],
@@ -20,8 +22,8 @@ const INDEX: [string, string, string][] = [
 
 const LEVELS: [string, string, string, string][] = [
   ['L1', 'Technical checks', 'Files are opened and parsed within the verification budget. Reports identify detected corruption, exact duplicates, image dimensions and null values.', 'Free within limits'],
-  ['L2', 'Structural and sample checks', 'Budgeted file and schema checks report detected corruption, duplicates and structural findings. Review the report for its scope and any untested requirements.', 'Paid by seller'],
-  ['L3', 'Advanced review', 'Sampled AI analysis within a defined budget, supplemented by text-similarity checks against the seller’s previous uploads.', 'Paid by seller'],
+  ['L2', 'Full-dataset quality checks', 'Budgeted structural and quality checks inspect the files and report detected corruption, duplicates and other findings.', 'Paid by seller'],
+  ['L3', 'Sampled AI review', 'A budgeted AI review estimates relevance from a sample and reports its sample size, confidence range and limitations.', 'Paid by seller'],
   ['L4', 'Human review', 'A reviewer assesses the delivery against the stated criteria. The service is quoted individually.', 'Quoted individually'],
 ];
 
@@ -34,14 +36,14 @@ export default function Home() {
       <section className="mx-auto max-w-6xl px-4 pb-20 pt-12 sm:px-6 md:pt-20">
         <div className="rise grid items-end gap-x-16 gap-y-8 lg:grid-cols-[1.3fr_1fr]">
           <div>
-            <p className="kicker mb-6">Datasets · models · funded requests · USDC settlement on Solana</p>
+            <p className="kicker mb-6">Datasets · models · funded requests · {PAYMENT_CURRENCY} escrow on Solana</p>
             <h1 className="display text-[42px] sm:text-[54px] lg:text-[62px]">
               Find the data your AI needs. <em className="text-ink-2">Commission what does not exist yet.</em>
             </h1>
           </div>
           <div className="lg:pb-2">
             <p className="max-w-[46ch] text-[17px] leading-relaxed text-ink-2">
-              Each listing distinguishes checks performed on the exact files offered from claims made by the seller. Your USDC remains in Solana escrow until delivery.
+              Each listing distinguishes checks performed on the exact files offered from claims made by the seller. Your payment remains in Solana escrow until delivery; the network and payment token are shown beside funding actions.
             </p>
             <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3">
               <Link href="/datasets" className="inline-flex h-11 items-center gap-2 rounded-md bg-accent px-5 text-[15px] font-medium text-accent-ink transition-colors hover:bg-[color-mix(in_oklab,var(--accent),var(--ink)_18%)]">
@@ -50,6 +52,7 @@ export default function Home() {
               <Link href="/bounties/new" className={more}>
                 Create a funded request
               </Link>
+              <a href="#hackathon" className={more}>See the hackathon demo</a>
             </div>
           </div>
         </div>
@@ -58,6 +61,7 @@ export default function Home() {
         </div>
       </section>
 
+      <HackathonEvidence />
       <CatalogDiscovery />
       <RecentListings />
       <section className="mx-auto max-w-6xl border-t border-line px-4 py-10 sm:px-6"><h2 className="display text-3xl">Turn your requirements into a clear plan with AI.</h2><p className="mt-3 max-w-[65ch] text-ink-2">Search published listings, prepare a funded request, draft metadata for an upload or review a verification report. You approve all content before publishing and authorize every payment.</p><Link href="/assistant" className="mt-5 inline-flex min-h-11 items-center rounded-md bg-accent px-5 text-sm font-medium text-accent-ink">Open the AI assistant</Link></section>
@@ -173,7 +177,7 @@ export default function Home() {
             <p className="kicker mb-5">Explore EdgeBounty</p>
             <h2 className="display text-[30px] md:text-[34px]">Choose where to begin.</h2>
             <p className="mt-4 max-w-[42ch] text-ink-2">
-              To sell an asset, publish its listing after the exact version passes an L2 or L3 check. L1 technical checks are free within the monthly allowance.
+              To sell an asset, publish its listing after the exact version passes an L2 or L3 check. L1 technical checks are free within the allowance, but do not qualify a listing for publication. L2 and L3 costs are quoted before the check starts.
             </p>
             <Link href="/sell" className="mt-6 inline-flex h-10 items-center rounded-md bg-ink px-4 text-sm font-medium text-paper transition-colors hover:bg-ink-2">
               List a dataset or a model

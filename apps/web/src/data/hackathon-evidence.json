@@ -1,0 +1,1972 @@
+{
+  "schema": "edgebounty.hackathon-evidence/1",
+  "createdAt": "2026-10-18T00:44:26.088Z",
+  "network": "Private validator \u00c2\u00b7 mock USDC",
+  "disclosure": "All six accounts are operator-created demo identities, not independent people or real customers. Uploaded NASA photos are real images. Verification reports and NVIDIA responses below were produced by the live services. No seller payments are claimed.",
+  "company": "Orbital Vision Lab (demo company)",
+  "bountyId": "1ddb90e8-cd3d-4cb3-9901-e58a1676f220",
+  "bountyFundingSignature": "2M6QtmsxAa5zbqvi6vtBQLBzTds7Jaa93A1KkDY83gzg2un5dT5xiYTxWFEjaFYCcqrZs4SZmfLtsiFtBfVJt8Jm",
+  "progress": {
+    "target": 5,
+    "submitted": 6,
+    "accepted": 5,
+    "duplicates": 1,
+    "rejected": 0,
+    "pending": 0,
+    "remaining": 0,
+    "percent": 100,
+    "contributors": [
+      {
+        "userId": "3a35b537-75d6-46cb-9787-a22f467d6fc7",
+        "submitted": 1,
+        "accepted": 1,
+        "duplicates": 0,
+        "rejected": 0,
+        "pending": 0
+      },
+      {
+        "userId": "40209650-5482-4848-a2b0-2ffed9b7b786",
+        "submitted": 1,
+        "accepted": 1,
+        "duplicates": 0,
+        "rejected": 0,
+        "pending": 0
+      },
+      {
+        "userId": "4e231627-3a40-4d50-b8fe-2d5e67b11394",
+        "submitted": 1,
+        "accepted": 1,
+        "duplicates": 0,
+        "rejected": 0,
+        "pending": 0
+      },
+      {
+        "userId": "685148cf-8208-4bd4-a59f-fd4305546dd5",
+        "submitted": 1,
+        "accepted": 1,
+        "duplicates": 0,
+        "rejected": 0,
+        "pending": 0
+      },
+      {
+        "userId": "a14dbacd-46d6-4156-bac9-65a60b8028cb",
+        "submitted": 2,
+        "accepted": 1,
+        "duplicates": 1,
+        "rejected": 0,
+        "pending": 0
+      }
+    ]
+  },
+  "contributors": [
+    {
+      "name": "hackathon-giorgi",
+      "agentId": "925c62f7-6b17-41ae-ba08-7bf6c727ccf9",
+      "submitted": 1,
+      "accepted": 1,
+      "duplicates": 0,
+      "agentStatus": "observing"
+    },
+    {
+      "name": "hackathon-nika",
+      "agentId": "5c23c8af-d7f6-479e-a58e-9efa3a0b25aa",
+      "submitted": 2,
+      "accepted": 1,
+      "duplicates": 1,
+      "agentStatus": "observing"
+    },
+    {
+      "name": "hackathon-mariam",
+      "agentId": "a8da870c-0115-4c11-9c10-7cec9763cf2e",
+      "submitted": 1,
+      "accepted": 1,
+      "duplicates": 0,
+      "agentStatus": "observing"
+    },
+    {
+      "name": "hackathon-ana",
+      "agentId": "4cd20c0f-9202-4095-acb6-a67f591bbcd8",
+      "submitted": 1,
+      "accepted": 1,
+      "duplicates": 0,
+      "agentStatus": "observing"
+    },
+    {
+      "name": "hackathon-luka",
+      "agentId": "08e5e88f-cd97-4b20-bbac-132279d01cd2",
+      "submitted": 1,
+      "accepted": 1,
+      "duplicates": 0,
+      "agentStatus": "observing"
+    }
+  ],
+  "events": [
+    {
+      "sequence": "1",
+      "id": "e69f17b9-eeaf-4272-b386-53dc7e609ffe",
+      "agentId": "925c62f7-6b17-41ae-ba08-7bf6c727ccf9",
+      "actorUserId": "4e231627-3a40-4d50-b8fe-2d5e67b11394",
+      "type": "SHARED_PLAN_UPDATED",
+      "payload": {
+        "action": "joined",
+        "userId": "4e231627-3a40-4d50-b8fe-2d5e67b11394"
+      },
+      "createdAt": "2026-10-18 00:39:00.168676+00",
+      "correlationId": "e946a0b8-0725-44bc-9771-ace82e87e192",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "2",
+      "id": "d0851895-4874-44ef-9120-7bc751221b62",
+      "agentId": "5c23c8af-d7f6-479e-a58e-9efa3a0b25aa",
+      "actorUserId": "a14dbacd-46d6-4156-bac9-65a60b8028cb",
+      "type": "SHARED_PLAN_UPDATED",
+      "payload": {
+        "action": "joined",
+        "userId": "a14dbacd-46d6-4156-bac9-65a60b8028cb"
+      },
+      "createdAt": "2026-10-18 00:39:00.28684+00",
+      "correlationId": "f05b6856-0577-4b28-8b00-00ee7bcfbb1c",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "3",
+      "id": "a78c9d06-43d1-49ea-8392-fca912aade31",
+      "agentId": "a8da870c-0115-4c11-9c10-7cec9763cf2e",
+      "actorUserId": "40209650-5482-4848-a2b0-2ffed9b7b786",
+      "type": "SHARED_PLAN_UPDATED",
+      "payload": {
+        "action": "joined",
+        "userId": "40209650-5482-4848-a2b0-2ffed9b7b786"
+      },
+      "createdAt": "2026-10-18 00:39:00.39517+00",
+      "correlationId": "bb9d3f88-a91f-45b4-850d-b16d615466b9",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "4",
+      "id": "2d3ba309-07fe-49d2-bca2-9a44d709fb32",
+      "agentId": "4cd20c0f-9202-4095-acb6-a67f591bbcd8",
+      "actorUserId": "685148cf-8208-4bd4-a59f-fd4305546dd5",
+      "type": "SHARED_PLAN_UPDATED",
+      "payload": {
+        "action": "joined",
+        "userId": "685148cf-8208-4bd4-a59f-fd4305546dd5"
+      },
+      "createdAt": "2026-10-18 00:39:00.514213+00",
+      "correlationId": "0b284907-41ac-4c8d-8eff-5f290c39ba2e",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "5",
+      "id": "feb3eeb8-a8e3-4db3-9171-40820d08fb46",
+      "agentId": "08e5e88f-cd97-4b20-bbac-132279d01cd2",
+      "actorUserId": "3a35b537-75d6-46cb-9787-a22f467d6fc7",
+      "type": "SHARED_PLAN_UPDATED",
+      "payload": {
+        "action": "joined",
+        "userId": "3a35b537-75d6-46cb-9787-a22f467d6fc7"
+      },
+      "createdAt": "2026-10-18 00:39:00.628064+00",
+      "correlationId": "ad05d9b5-53c7-416a-bb60-f55361327bb8",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "6",
+      "id": "e0d0b23e-b92f-48e4-924f-309ac89010d5",
+      "agentId": null,
+      "actorUserId": "4e231627-3a40-4d50-b8fe-2d5e67b11394",
+      "type": "WORK_CLAIM_ACCEPTED",
+      "payload": {
+        "count": 1,
+        "userId": "4e231627-3a40-4d50-b8fe-2d5e67b11394",
+        "claimId": "f4da63de-1bfa-412d-b1a4-f3193c2c962a"
+      },
+      "createdAt": "2026-10-18 00:39:53.781943+00",
+      "correlationId": "404a2062-aaff-4162-ade1-87d49334da06",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "7",
+      "id": "510ba6c6-05fe-4275-a303-ad2619ec8bd1",
+      "agentId": null,
+      "actorUserId": "a14dbacd-46d6-4156-bac9-65a60b8028cb",
+      "type": "WORK_CLAIM_ACCEPTED",
+      "payload": {
+        "count": 1,
+        "userId": "a14dbacd-46d6-4156-bac9-65a60b8028cb",
+        "claimId": "3a8e760a-5e8e-490a-8e95-78cd409a9519"
+      },
+      "createdAt": "2026-10-18 00:39:53.907248+00",
+      "correlationId": "63168dba-f91f-4cb5-ab5d-7680852b4dae",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "8",
+      "id": "d0c92be5-1fcc-42bd-b8ec-6acdfa757974",
+      "agentId": null,
+      "actorUserId": "40209650-5482-4848-a2b0-2ffed9b7b786",
+      "type": "WORK_CLAIM_ACCEPTED",
+      "payload": {
+        "count": 1,
+        "userId": "40209650-5482-4848-a2b0-2ffed9b7b786",
+        "claimId": "0cb097b8-a481-48f6-b9e9-c3c5b69898f4"
+      },
+      "createdAt": "2026-10-18 00:39:54.036797+00",
+      "correlationId": "e7f0e328-b176-437e-ac4d-05b8c7105aa9",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "9",
+      "id": "8403ec1c-7aba-4b4c-bdf4-db1c8a8495a9",
+      "agentId": null,
+      "actorUserId": "685148cf-8208-4bd4-a59f-fd4305546dd5",
+      "type": "WORK_CLAIM_ACCEPTED",
+      "payload": {
+        "count": 1,
+        "userId": "685148cf-8208-4bd4-a59f-fd4305546dd5",
+        "claimId": "f90763cf-4e3e-408d-b466-02ae4d67a568"
+      },
+      "createdAt": "2026-10-18 00:39:54.163566+00",
+      "correlationId": "e91e5e53-6b78-46d1-b265-cfbe94fb26af",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "10",
+      "id": "d0d5c964-05e1-4327-a973-edea886a3fdd",
+      "agentId": null,
+      "actorUserId": "3a35b537-75d6-46cb-9787-a22f467d6fc7",
+      "type": "WORK_CLAIM_ACCEPTED",
+      "payload": {
+        "count": 1,
+        "userId": "3a35b537-75d6-46cb-9787-a22f467d6fc7",
+        "claimId": "b8f14972-4649-4d49-abc5-4d05efc5d9dd"
+      },
+      "createdAt": "2026-10-18 00:39:54.288582+00",
+      "correlationId": "91786728-1280-4d26-b6f5-5bc5c78f24f2",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "11",
+      "id": "54339ec6-cc30-46df-a586-274bf2fc0f3d",
+      "agentId": null,
+      "actorUserId": "4e231627-3a40-4d50-b8fe-2d5e67b11394",
+      "type": "SHARED_PLAN_UPDATED",
+      "payload": {
+        "action": "submission_pending",
+        "submissionId": "502210d6-65d8-4497-b05e-758a6bb0c828"
+      },
+      "createdAt": "2026-10-18 00:40:13.704424+00",
+      "correlationId": "3b805db9-f48e-42b0-97a4-d5baba0f76f2",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "12",
+      "id": "9fcc54e0-5e76-4b2c-b077-20574a308a6c",
+      "agentId": null,
+      "actorUserId": "4e231627-3a40-4d50-b8fe-2d5e67b11394",
+      "type": "VERIFICATION_COMPLETED",
+      "payload": {
+        "review": 1,
+        "accepted": 0,
+        "duplicates": 0,
+        "submissionId": "502210d6-65d8-4497-b05e-758a6bb0c828"
+      },
+      "createdAt": "2026-10-18 00:40:14.549239+00",
+      "correlationId": "fe420457-5715-438d-98bd-c91ede0c3d67",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "13",
+      "id": "68f15b54-d6d5-4c8a-bb83-fc7af6fada83",
+      "agentId": "925c62f7-6b17-41ae-ba08-7bf6c727ccf9",
+      "actorUserId": "4e231627-3a40-4d50-b8fe-2d5e67b11394",
+      "type": "CONTRIBUTION_COMPLETED",
+      "payload": {
+        "accepted": 0,
+        "submissionId": "502210d6-65d8-4497-b05e-758a6bb0c828"
+      },
+      "createdAt": "2026-10-18 00:40:14.549239+00",
+      "correlationId": "2f8db50b-4e3a-4557-afa3-f835240892d6",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "14",
+      "id": "f258b56f-64ff-43aa-b86b-891c6e9a5a74",
+      "agentId": null,
+      "actorUserId": null,
+      "type": "WORK_SHORTFALL_DETECTED",
+      "payload": {
+        "accepted": 0,
+        "remaining": 5
+      },
+      "createdAt": "2026-10-18 00:40:14.549239+00",
+      "correlationId": "3d408867-1696-4d4c-852c-e94255fd3590",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "15",
+      "id": "5e668cbf-4c98-4062-8795-5c225df5ebfa",
+      "agentId": "08e5e88f-cd97-4b20-bbac-132279d01cd2",
+      "actorUserId": "3a35b537-75d6-46cb-9787-a22f467d6fc7",
+      "type": "WORK_OFFERED",
+      "payload": {
+        "count": 5,
+        "proposalId": "f8c6cd61-e057-43fb-a59c-10e688a0a03c",
+        "explanation": "Offer additional unique photographs; approval required."
+      },
+      "createdAt": "2026-10-18 00:40:14.549239+00",
+      "correlationId": "615b09cc-8d14-47b4-b53d-b4d58c838c4b",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "16",
+      "id": "9f522024-d005-45ee-a749-288c5406245f",
+      "agentId": "4cd20c0f-9202-4095-acb6-a67f591bbcd8",
+      "actorUserId": "685148cf-8208-4bd4-a59f-fd4305546dd5",
+      "type": "WORK_OFFERED",
+      "payload": {
+        "count": 5,
+        "proposalId": "43f058a2-e20f-4d21-ad1d-97ff841326c2",
+        "explanation": "Offer additional unique photographs; approval required."
+      },
+      "createdAt": "2026-10-18 00:40:14.549239+00",
+      "correlationId": "067c1d8e-1b66-4b89-8ade-7999fdea6872",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "17",
+      "id": "4adaa8d3-55ee-4bf7-954c-22eb8496c7a5",
+      "agentId": "5c23c8af-d7f6-479e-a58e-9efa3a0b25aa",
+      "actorUserId": "a14dbacd-46d6-4156-bac9-65a60b8028cb",
+      "type": "WORK_OFFERED",
+      "payload": {
+        "count": 5,
+        "proposalId": "417a7842-278f-4fb7-a9c3-351b07ba2b83",
+        "explanation": "Offer additional unique photographs; approval required."
+      },
+      "createdAt": "2026-10-18 00:40:14.549239+00",
+      "correlationId": "36231672-a2f0-4364-b564-0a61e457bf1c",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "18",
+      "id": "bff5b1a0-9488-41b5-b7ba-c9857f017723",
+      "agentId": "925c62f7-6b17-41ae-ba08-7bf6c727ccf9",
+      "actorUserId": "4e231627-3a40-4d50-b8fe-2d5e67b11394",
+      "type": "WORK_OFFERED",
+      "payload": {
+        "count": 5,
+        "proposalId": "d7285e48-9eb5-4b62-bc91-aa1f2b4f33f1",
+        "explanation": "Offer additional unique photographs; approval required."
+      },
+      "createdAt": "2026-10-18 00:40:14.549239+00",
+      "correlationId": "e1384337-0f28-4f31-aeae-ca79ba158843",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "19",
+      "id": "db05369a-da16-4edf-bfab-aea4a32a0cbd",
+      "agentId": "a8da870c-0115-4c11-9c10-7cec9763cf2e",
+      "actorUserId": "40209650-5482-4848-a2b0-2ffed9b7b786",
+      "type": "WORK_OFFERED",
+      "payload": {
+        "count": 5,
+        "proposalId": "a41ad356-8f7e-47fd-8bcc-2df905a787b0",
+        "explanation": "Offer additional unique photographs; approval required."
+      },
+      "createdAt": "2026-10-18 00:40:14.549239+00",
+      "correlationId": "d8154e59-dccc-4546-8297-ee3c38f7819b",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "20",
+      "id": "40f23f4c-d762-489c-b5fe-fcc9db37e44a",
+      "agentId": null,
+      "actorUserId": null,
+      "type": "SHARED_PLAN_UPDATED",
+      "payload": {
+        "remaining": 5,
+        "approvalRequired": true
+      },
+      "createdAt": "2026-10-18 00:40:14.549239+00",
+      "correlationId": "260b19d2-215e-43bb-8525-344a3cd0ba1c",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "21",
+      "id": "398fcf96-31c7-46ca-9d47-48d1d8b17dac",
+      "agentId": null,
+      "actorUserId": "a14dbacd-46d6-4156-bac9-65a60b8028cb",
+      "type": "SHARED_PLAN_UPDATED",
+      "payload": {
+        "action": "submission_pending",
+        "submissionId": "d6678b47-27f3-43e1-8840-a84e7268a535"
+      },
+      "createdAt": "2026-10-18 00:40:32.78548+00",
+      "correlationId": "ed83bbdd-43ea-4402-b3a9-eb04ba44fa09",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "22",
+      "id": "e33151ac-b69c-48d6-91d6-269f954e93a6",
+      "agentId": null,
+      "actorUserId": "a14dbacd-46d6-4156-bac9-65a60b8028cb",
+      "type": "VERIFICATION_COMPLETED",
+      "payload": {
+        "review": 0,
+        "accepted": 0,
+        "duplicates": 1,
+        "submissionId": "d6678b47-27f3-43e1-8840-a84e7268a535"
+      },
+      "createdAt": "2026-10-18 00:40:34.563928+00",
+      "correlationId": "6c7654a8-1389-4fc8-a90c-4415e69fdd47",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "23",
+      "id": "13a6ea62-6184-4c1d-a0b2-cba311bb1d15",
+      "agentId": "5c23c8af-d7f6-479e-a58e-9efa3a0b25aa",
+      "actorUserId": "a14dbacd-46d6-4156-bac9-65a60b8028cb",
+      "type": "CONTRIBUTION_COMPLETED",
+      "payload": {
+        "accepted": 0,
+        "submissionId": "d6678b47-27f3-43e1-8840-a84e7268a535"
+      },
+      "createdAt": "2026-10-18 00:40:34.563928+00",
+      "correlationId": "6dac376b-e3fb-4f07-bdca-95b89dbb09e2",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "24",
+      "id": "35e4972c-038b-42b1-806a-bfe09735e70c",
+      "agentId": "5c23c8af-d7f6-479e-a58e-9efa3a0b25aa",
+      "actorUserId": "a14dbacd-46d6-4156-bac9-65a60b8028cb",
+      "type": "DUPLICATES_DETECTED",
+      "payload": {
+        "count": 1
+      },
+      "createdAt": "2026-10-18 00:40:34.563928+00",
+      "correlationId": "07769d9c-b5e5-4694-a642-930d0c169270",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "25",
+      "id": "5bd45d2c-5a9e-4e02-b797-3fd19ce9c4a3",
+      "agentId": null,
+      "actorUserId": null,
+      "type": "WORK_SHORTFALL_DETECTED",
+      "payload": {
+        "accepted": 0,
+        "remaining": 5
+      },
+      "createdAt": "2026-10-18 00:40:34.563928+00",
+      "correlationId": "5fb83c4d-00a7-41df-b122-58a51732b51f",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "26",
+      "id": "ed591b9d-de18-4638-bf40-28d0bf6b1180",
+      "agentId": null,
+      "actorUserId": null,
+      "type": "SHARED_PLAN_UPDATED",
+      "payload": {
+        "remaining": 5,
+        "approvalRequired": true
+      },
+      "createdAt": "2026-10-18 00:40:34.563928+00",
+      "correlationId": "13c04c08-193e-4cec-9503-c74ebfa92645",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "27",
+      "id": "57b12c8e-1b1f-43ef-8a44-942205ca3e38",
+      "agentId": "5c23c8af-d7f6-479e-a58e-9efa3a0b25aa",
+      "actorUserId": "a14dbacd-46d6-4156-bac9-65a60b8028cb",
+      "type": "WORK_OFFERED",
+      "payload": {
+        "count": 1,
+        "provider": "nvidia",
+        "proposalId": "d3ee30b3-db47-4a07-ad9c-836a1f372d30",
+        "explanation": "The remaining dataset work consists of 5 items requiring correction, with 1 duplicate already accepted by you. Propose a contribution to resolve the duplicate and other remaining items by submitting a corrected version of the duplicate dataset and addressing the other 4 items through validation and re-submission. This ensures dataset integrity and meets bounty requirements.",
+        "requiresHumanApproval": true
+      },
+      "createdAt": "2026-10-18 00:40:40.917699+00",
+      "correlationId": "1337a53e-23d3-4439-8b4a-08c6b09c4235",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "28",
+      "id": "bc049807-ac8f-4745-b396-0e485f0a9968",
+      "agentId": null,
+      "actorUserId": "a14dbacd-46d6-4156-bac9-65a60b8028cb",
+      "type": "SHARED_PLAN_UPDATED",
+      "payload": {
+        "action": "submission_pending",
+        "submissionId": "6875f37e-be56-4bde-8459-9962456694dc"
+      },
+      "createdAt": "2026-10-18 00:41:20.931791+00",
+      "correlationId": "2d17dcb3-b681-47dd-b59f-c19ad4a1edf3",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "29",
+      "id": "a52f0470-76f0-4315-bf2d-819121851395",
+      "agentId": null,
+      "actorUserId": "a14dbacd-46d6-4156-bac9-65a60b8028cb",
+      "type": "VERIFICATION_COMPLETED",
+      "payload": {
+        "review": 1,
+        "accepted": 0,
+        "duplicates": 0,
+        "submissionId": "6875f37e-be56-4bde-8459-9962456694dc"
+      },
+      "createdAt": "2026-10-18 00:41:23.582149+00",
+      "correlationId": "db3ffd6b-e173-4ac7-a566-cb2692d6bf0d",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "30",
+      "id": "be957cd5-f4bc-403b-a280-e403ba57dc66",
+      "agentId": "5c23c8af-d7f6-479e-a58e-9efa3a0b25aa",
+      "actorUserId": "a14dbacd-46d6-4156-bac9-65a60b8028cb",
+      "type": "CONTRIBUTION_COMPLETED",
+      "payload": {
+        "accepted": 0,
+        "submissionId": "6875f37e-be56-4bde-8459-9962456694dc"
+      },
+      "createdAt": "2026-10-18 00:41:23.582149+00",
+      "correlationId": "ce1f35f6-79fe-443d-ad93-2e1fc7bd1b5d",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "31",
+      "id": "d556b58c-2b59-41e4-8d13-5cfc83fe537b",
+      "agentId": null,
+      "actorUserId": null,
+      "type": "WORK_SHORTFALL_DETECTED",
+      "payload": {
+        "accepted": 0,
+        "remaining": 5
+      },
+      "createdAt": "2026-10-18 00:41:23.582149+00",
+      "correlationId": "1d05d409-adb5-4b8b-8b64-fb8a0b8b695d",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "32",
+      "id": "030022ac-64cd-40c1-9978-2e88fda616b9",
+      "agentId": null,
+      "actorUserId": null,
+      "type": "SHARED_PLAN_UPDATED",
+      "payload": {
+        "remaining": 5,
+        "approvalRequired": true
+      },
+      "createdAt": "2026-10-18 00:41:23.582149+00",
+      "correlationId": "f197114a-bcb5-4475-9ece-69915c6005f1",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "33",
+      "id": "825421f6-3408-4207-8438-e8566a9aa046",
+      "agentId": null,
+      "actorUserId": "40209650-5482-4848-a2b0-2ffed9b7b786",
+      "type": "SHARED_PLAN_UPDATED",
+      "payload": {
+        "action": "submission_pending",
+        "submissionId": "d832c992-c87a-40c3-a12e-a6359cf82c8c"
+      },
+      "createdAt": "2026-10-18 00:41:39.896163+00",
+      "correlationId": "aea51d20-cec9-41a6-91e8-eb649c7a23cf",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "34",
+      "id": "a8e2524e-f61c-45c3-921c-165f6f21063d",
+      "agentId": null,
+      "actorUserId": "40209650-5482-4848-a2b0-2ffed9b7b786",
+      "type": "VERIFICATION_COMPLETED",
+      "payload": {
+        "review": 1,
+        "accepted": 0,
+        "duplicates": 0,
+        "submissionId": "d832c992-c87a-40c3-a12e-a6359cf82c8c"
+      },
+      "createdAt": "2026-10-18 00:41:40.624367+00",
+      "correlationId": "1183ccdc-735d-4c80-80fe-2f50421e8598",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "35",
+      "id": "f112088b-b58f-467d-871e-df0597ef1fd0",
+      "agentId": "a8da870c-0115-4c11-9c10-7cec9763cf2e",
+      "actorUserId": "40209650-5482-4848-a2b0-2ffed9b7b786",
+      "type": "CONTRIBUTION_COMPLETED",
+      "payload": {
+        "accepted": 0,
+        "submissionId": "d832c992-c87a-40c3-a12e-a6359cf82c8c"
+      },
+      "createdAt": "2026-10-18 00:41:40.624367+00",
+      "correlationId": "9006603a-e134-4def-bd6f-7414079a347b",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "36",
+      "id": "51565663-e5d5-42fb-99a9-9fca26454a12",
+      "agentId": null,
+      "actorUserId": null,
+      "type": "WORK_SHORTFALL_DETECTED",
+      "payload": {
+        "accepted": 0,
+        "remaining": 5
+      },
+      "createdAt": "2026-10-18 00:41:40.624367+00",
+      "correlationId": "a8593374-1cc7-48f6-802a-b69cbab07edf",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "37",
+      "id": "3fafab85-767e-4e4b-9752-db5d8988ea4a",
+      "agentId": null,
+      "actorUserId": null,
+      "type": "SHARED_PLAN_UPDATED",
+      "payload": {
+        "remaining": 5,
+        "approvalRequired": true
+      },
+      "createdAt": "2026-10-18 00:41:40.624367+00",
+      "correlationId": "179223d3-c9b0-425b-a4df-90e6fb44d30c",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "38",
+      "id": "c8e9cf53-6fa1-4a1d-842e-58c9c185c577",
+      "agentId": null,
+      "actorUserId": "685148cf-8208-4bd4-a59f-fd4305546dd5",
+      "type": "SHARED_PLAN_UPDATED",
+      "payload": {
+        "action": "submission_pending",
+        "submissionId": "95265699-4552-4a84-bc42-a2489b0b3355"
+      },
+      "createdAt": "2026-10-18 00:41:58.820115+00",
+      "correlationId": "99a4b120-cccb-48d7-8f88-6514e1dcd4b5",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "39",
+      "id": "b4505b7c-4517-48e6-a2a5-a5da83bbc223",
+      "agentId": null,
+      "actorUserId": "685148cf-8208-4bd4-a59f-fd4305546dd5",
+      "type": "VERIFICATION_COMPLETED",
+      "payload": {
+        "review": 1,
+        "accepted": 0,
+        "duplicates": 0,
+        "submissionId": "95265699-4552-4a84-bc42-a2489b0b3355"
+      },
+      "createdAt": "2026-10-18 00:42:01.516952+00",
+      "correlationId": "d5ece9f0-977c-415a-9561-c8bdd0646d4f",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "40",
+      "id": "7b6dba44-1219-4bc6-8d93-6ff5b672dcc0",
+      "agentId": "4cd20c0f-9202-4095-acb6-a67f591bbcd8",
+      "actorUserId": "685148cf-8208-4bd4-a59f-fd4305546dd5",
+      "type": "CONTRIBUTION_COMPLETED",
+      "payload": {
+        "accepted": 0,
+        "submissionId": "95265699-4552-4a84-bc42-a2489b0b3355"
+      },
+      "createdAt": "2026-10-18 00:42:01.516952+00",
+      "correlationId": "6e584713-13bc-41bd-91cf-85c114516281",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "41",
+      "id": "02ebb5a7-5827-41eb-a843-3d72fa7248c4",
+      "agentId": null,
+      "actorUserId": null,
+      "type": "WORK_SHORTFALL_DETECTED",
+      "payload": {
+        "accepted": 0,
+        "remaining": 5
+      },
+      "createdAt": "2026-10-18 00:42:01.516952+00",
+      "correlationId": "81399d08-6461-40df-8e96-2605a8a96d9d",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "42",
+      "id": "7af7d6dc-da3e-49f5-8c22-aa9583a62058",
+      "agentId": null,
+      "actorUserId": null,
+      "type": "SHARED_PLAN_UPDATED",
+      "payload": {
+        "remaining": 5,
+        "approvalRequired": true
+      },
+      "createdAt": "2026-10-18 00:42:01.516952+00",
+      "correlationId": "a6c42cdd-0cbf-44ac-9647-e8793688097a",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "43",
+      "id": "ffe3b03f-c18e-4ffb-ab1f-a3f071f83b76",
+      "agentId": null,
+      "actorUserId": "3a35b537-75d6-46cb-9787-a22f467d6fc7",
+      "type": "SHARED_PLAN_UPDATED",
+      "payload": {
+        "action": "submission_pending",
+        "submissionId": "7edbd69e-b79e-46ae-b53e-a3c9786223ca"
+      },
+      "createdAt": "2026-10-18 00:42:17.647881+00",
+      "correlationId": "b3a3140a-1fac-4c0d-b3a7-96f60dd9f669",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "44",
+      "id": "bd9452c4-6573-47ae-903b-65872884db45",
+      "agentId": null,
+      "actorUserId": "3a35b537-75d6-46cb-9787-a22f467d6fc7",
+      "type": "VERIFICATION_COMPLETED",
+      "payload": {
+        "review": 1,
+        "accepted": 0,
+        "duplicates": 0,
+        "submissionId": "7edbd69e-b79e-46ae-b53e-a3c9786223ca"
+      },
+      "createdAt": "2026-10-18 00:42:18.657618+00",
+      "correlationId": "1e01d4a9-c341-4f22-a470-0666db055952",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "45",
+      "id": "c11394b6-2282-476c-beb8-634ce4d1e14a",
+      "agentId": "08e5e88f-cd97-4b20-bbac-132279d01cd2",
+      "actorUserId": "3a35b537-75d6-46cb-9787-a22f467d6fc7",
+      "type": "CONTRIBUTION_COMPLETED",
+      "payload": {
+        "accepted": 0,
+        "submissionId": "7edbd69e-b79e-46ae-b53e-a3c9786223ca"
+      },
+      "createdAt": "2026-10-18 00:42:18.657618+00",
+      "correlationId": "251f4a62-2451-41c5-97d9-3daa7ad8909a",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "46",
+      "id": "8406091d-a377-4f86-9504-308e70e4664a",
+      "agentId": null,
+      "actorUserId": null,
+      "type": "WORK_SHORTFALL_DETECTED",
+      "payload": {
+        "accepted": 0,
+        "remaining": 5
+      },
+      "createdAt": "2026-10-18 00:42:18.657618+00",
+      "correlationId": "aeb06334-1679-4200-94d0-503570df41aa",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "47",
+      "id": "17424cad-f25e-46ab-b36c-2f88bb4701c3",
+      "agentId": null,
+      "actorUserId": null,
+      "type": "SHARED_PLAN_UPDATED",
+      "payload": {
+        "remaining": 5,
+        "approvalRequired": true
+      },
+      "createdAt": "2026-10-18 00:42:18.657618+00",
+      "correlationId": "f9c84d08-286c-48eb-90a3-a0d3b64c8ea9",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "48",
+      "id": "1dfde773-7189-4c7f-9242-51f1bf826687",
+      "agentId": null,
+      "actorUserId": "7c949c5f-92f0-4b52-be5e-3791ac3650ad",
+      "type": "VERIFICATION_COMPLETED",
+      "payload": {
+        "itemId": "1ffc2808-4a39-4a9d-bd66-96fa34a901e6",
+        "reason": "Demo operator reviewed the NASA source photograph, readability, distinct image content and source-credit declaration.",
+        "decision": "accepted"
+      },
+      "createdAt": "2026-10-18 00:42:19.76555+00",
+      "correlationId": "57b36a60-5516-4873-81f2-ef3672b7e01f",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "49",
+      "id": "c5a092e6-0d99-40ba-93e9-d712ccf4cacd",
+      "agentId": null,
+      "actorUserId": null,
+      "type": "WORK_SHORTFALL_DETECTED",
+      "payload": {
+        "accepted": 1,
+        "remaining": 4
+      },
+      "createdAt": "2026-10-18 00:42:19.76555+00",
+      "correlationId": "769184a6-b24a-44d2-9f49-d55d4d1ce93c",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "50",
+      "id": "6bff08bc-01ad-453e-a799-a5c0fc5b651e",
+      "agentId": null,
+      "actorUserId": null,
+      "type": "SHARED_PLAN_UPDATED",
+      "payload": {
+        "remaining": 4,
+        "approvalRequired": true
+      },
+      "createdAt": "2026-10-18 00:42:19.76555+00",
+      "correlationId": "084404e9-0012-42d2-9962-692ac307a5f8",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "51",
+      "id": "f7b208dd-65e4-46c5-a4f3-fe2f97993555",
+      "agentId": null,
+      "actorUserId": "7c949c5f-92f0-4b52-be5e-3791ac3650ad",
+      "type": "VERIFICATION_COMPLETED",
+      "payload": {
+        "itemId": "27a5af49-9850-48f7-9ea8-dadef3e643a4",
+        "reason": "Demo operator reviewed the NASA source photograph, readability, distinct image content and source-credit declaration.",
+        "decision": "accepted"
+      },
+      "createdAt": "2026-10-18 00:42:20.73674+00",
+      "correlationId": "a73cc8d8-f2b0-487f-8876-71748f53f826",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "52",
+      "id": "02e9a710-6c4c-4e1f-8f8d-b2fd20974358",
+      "agentId": null,
+      "actorUserId": null,
+      "type": "WORK_SHORTFALL_DETECTED",
+      "payload": {
+        "accepted": 2,
+        "remaining": 3
+      },
+      "createdAt": "2026-10-18 00:42:20.73674+00",
+      "correlationId": "ac34b345-5afe-4c4e-bc07-c0f23ee73d12",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "53",
+      "id": "6bda293d-8ef6-466d-902b-abedc0e1a3cd",
+      "agentId": null,
+      "actorUserId": null,
+      "type": "SHARED_PLAN_UPDATED",
+      "payload": {
+        "remaining": 3,
+        "approvalRequired": true
+      },
+      "createdAt": "2026-10-18 00:42:20.73674+00",
+      "correlationId": "8c2365be-d644-4d15-8584-2117cf712dde",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "54",
+      "id": "4275d22b-0574-4920-b181-de0013a46904",
+      "agentId": null,
+      "actorUserId": "7c949c5f-92f0-4b52-be5e-3791ac3650ad",
+      "type": "VERIFICATION_COMPLETED",
+      "payload": {
+        "itemId": "d0b1306e-205f-4cfc-b4e6-bba1d1535c69",
+        "reason": "Demo operator reviewed the NASA source photograph, readability, distinct image content and source-credit declaration.",
+        "decision": "accepted"
+      },
+      "createdAt": "2026-10-18 00:42:21.404652+00",
+      "correlationId": "af5988c7-08fe-4aa6-83b8-108b292c7ba9",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "55",
+      "id": "8140c8e1-e99b-4213-b460-cabfe37bde99",
+      "agentId": null,
+      "actorUserId": null,
+      "type": "WORK_SHORTFALL_DETECTED",
+      "payload": {
+        "accepted": 3,
+        "remaining": 2
+      },
+      "createdAt": "2026-10-18 00:42:21.404652+00",
+      "correlationId": "85232e49-0af8-4f5e-8818-6273bd1cd1fe",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "56",
+      "id": "7280dae7-038a-4f76-834f-48313a656cc4",
+      "agentId": null,
+      "actorUserId": null,
+      "type": "SHARED_PLAN_UPDATED",
+      "payload": {
+        "remaining": 2,
+        "approvalRequired": true
+      },
+      "createdAt": "2026-10-18 00:42:21.404652+00",
+      "correlationId": "69908043-0204-47f5-acff-b568550c727b",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "57",
+      "id": "7c9e3fad-3c83-4cf6-8673-a9e21413c741",
+      "agentId": null,
+      "actorUserId": "7c949c5f-92f0-4b52-be5e-3791ac3650ad",
+      "type": "VERIFICATION_COMPLETED",
+      "payload": {
+        "itemId": "ee2b7f98-f527-4142-8071-7c5060f01f0a",
+        "reason": "Demo operator reviewed the NASA source photograph, readability, distinct image content and source-credit declaration.",
+        "decision": "accepted"
+      },
+      "createdAt": "2026-10-18 00:42:22.095652+00",
+      "correlationId": "464e18ff-587e-4ff0-ac94-cd7657ea18b2",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "58",
+      "id": "63732592-ab0d-4a3c-8715-5ecc44def687",
+      "agentId": null,
+      "actorUserId": null,
+      "type": "WORK_SHORTFALL_DETECTED",
+      "payload": {
+        "accepted": 4,
+        "remaining": 1
+      },
+      "createdAt": "2026-10-18 00:42:22.095652+00",
+      "correlationId": "ac7ed428-c3df-46d2-9a81-cd34788be3a2",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "59",
+      "id": "48bf949b-3eaa-4ed1-9ab4-3f053f588fc4",
+      "agentId": null,
+      "actorUserId": null,
+      "type": "SHARED_PLAN_UPDATED",
+      "payload": {
+        "remaining": 1,
+        "approvalRequired": true
+      },
+      "createdAt": "2026-10-18 00:42:22.095652+00",
+      "correlationId": "21a1b7e4-9488-4a57-988c-ecaea142b0b6",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "60",
+      "id": "edf5cc59-9027-41ad-b1c6-fbd4819ce2a7",
+      "agentId": null,
+      "actorUserId": "7c949c5f-92f0-4b52-be5e-3791ac3650ad",
+      "type": "VERIFICATION_COMPLETED",
+      "payload": {
+        "itemId": "0f63081d-49a8-4b4b-b485-5360d475bb4c",
+        "reason": "Demo operator reviewed the NASA source photograph, readability, distinct image content and source-credit declaration.",
+        "decision": "accepted"
+      },
+      "createdAt": "2026-10-18 00:42:25.033699+00",
+      "correlationId": "18826d0b-074f-4a3c-b7ea-3ad1e769e705",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "61",
+      "id": "9573b3ff-e40e-4b13-a102-13dcecc802d5",
+      "agentId": null,
+      "actorUserId": null,
+      "type": "BOUNTY_TARGET_REACHED",
+      "payload": {
+        "accepted": 5,
+        "remaining": 0
+      },
+      "createdAt": "2026-10-18 00:42:25.033699+00",
+      "correlationId": "30b44bbd-5784-491e-ba2c-961a65871ee8",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "62",
+      "id": "706bd524-e60d-41cd-acb3-b37224a8318b",
+      "agentId": null,
+      "actorUserId": null,
+      "type": "SHARED_PLAN_UPDATED",
+      "payload": {
+        "remaining": 0,
+        "finalApprovalRequired": true
+      },
+      "createdAt": "2026-10-18 00:42:25.033699+00",
+      "correlationId": "092b6b9f-be48-456a-bec5-99131ef06e9c",
+      "status": "processed",
+      "visibility": "workspace"
+    },
+    {
+      "sequence": "63",
+      "id": "5674b57a-3213-411b-96a6-5e480d4bbbb2",
+      "agentId": null,
+      "actorUserId": "7c949c5f-92f0-4b52-be5e-3791ac3650ad",
+      "type": "SHARED_PLAN_UPDATED",
+      "payload": {
+        "hash": "edc2727f4b47d2a025cfb7e2fbbda228731d1f8aa58b4edc98d0aa52d8780dbc",
+        "action": "manifest_frozen"
+      },
+      "createdAt": "2026-10-18 00:42:25.500226+00",
+      "correlationId": "ad20c201-3c5c-4698-aef8-4c4d65a24c96",
+      "status": "processed",
+      "visibility": "workspace"
+    }
+  ],
+  "manifest": {
+    "hash": "edc2727f4b47d2a025cfb7e2fbbda228731d1f8aa58b4edc98d0aa52d8780dbc",
+    "allocations": [
+      {
+        "userId": "3a35b537-75d6-46cb-9787-a22f467d6fc7",
+        "wallet": "3LsYwqaCQ1jCxnbpMNAFN5yhTGQ7iu8DHaVfvdaP763M",
+        "count": 1,
+        "grossMicro": "100000000"
+      },
+      {
+        "userId": "40209650-5482-4848-a2b0-2ffed9b7b786",
+        "wallet": "4NH4HQQdFB4uxLRuf4RpoFJkVV1pNTbrFBUXKqThjgT7",
+        "count": 1,
+        "grossMicro": "100000000"
+      },
+      {
+        "userId": "4e231627-3a40-4d50-b8fe-2d5e67b11394",
+        "wallet": "D1YTB1Yj4kxhNqBSiZkJeVjdy4aPrB1QLX2ZmHNeFEX9",
+        "count": 1,
+        "grossMicro": "100000000"
+      },
+      {
+        "userId": "685148cf-8208-4bd4-a59f-fd4305546dd5",
+        "wallet": "5c2nVS8SSW2hP883SB6vM5wSK3yZdbHXcTidAJhDGowu",
+        "count": 1,
+        "grossMicro": "100000000"
+      },
+      {
+        "userId": "a14dbacd-46d6-4156-bac9-65a60b8028cb",
+        "wallet": "EJNFnBqQm7zqDGPLjm8tMzwVAyTt2WXyceVdkQ4aqzgE",
+        "count": 1,
+        "grossMicro": "100000000"
+      }
+    ],
+    "settlementStatus": "blocked_contract_requires_single_seller"
+  },
+  "assistant": {
+    "answer": "Orbital Vision Lab needs five unique NASA space photos for demo. Five contributors each provide one photo. Duplicate photos are replaced before listing. Buyers review photos for uniqueness and quality. Human approval confirms authenticity and replacement. Only then payment triggers. Checks verify process, not rights or model performance. Fees: 6% of settled reward, plus storage/verification costs. Mock USDC on test network. No real customers or funds implied. Next: confirm contributor photos meet uniqueness criteria.",
+    "provider": "nvidia",
+    "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+    "cached": false,
+    "limitations": [
+      "AI suggestions require human review. No financial action was taken.",
+      "AI explanations do not change verification outcomes or establish legal ownership, accuracy or real-world performance."
+    ]
+  },
+  "contributions": [
+    {
+      "seller": "Giorgi",
+      "versionId": "d66b9a32-18c2-4369-84b7-a4344068cfa5",
+      "jobId": "50cb07fb-e0d0-47be-96a7-d4dd38247a7f",
+      "report": {
+        "level": "L2",
+        "tools": [
+          {
+            "name": "edgebounty-dataset-validator",
+            "version": "1.5.0"
+          },
+          {
+            "name": "python",
+            "version": "3.13.16"
+          },
+          {
+            "name": "pillow",
+            "version": "12.3.0"
+          },
+          {
+            "name": "ClamAV signature scan",
+            "version": "ClamAV 1.5.4/28156/Sat Oct 17 06:25:46 2026"
+          }
+        ],
+        "passed": true,
+        "schema": "edgebounty.report/1",
+        "assetId": "fb417d9b-52a3-4b7c-bea8-3417dce67e40",
+        "criteria": [
+          {
+            "actual": 1,
+            "status": "pass",
+            "required": 1,
+            "criterion": "min_images"
+          },
+          {
+            "actual": 10000,
+            "status": "pass",
+            "required": 10000,
+            "criterion": "min_readable_bps"
+          },
+          {
+            "actual": "0 below",
+            "status": "pass",
+            "required": "64x64",
+            "criterion": "min_resolution"
+          },
+          {
+            "actual": 0,
+            "status": "pass",
+            "required": 0,
+            "criterion": "max_exact_duplicates"
+          }
+        ],
+        "findings": [],
+        "sampling": "all items",
+        "specHash": "be9bf7667945e488716f2fbc23266d134908b10b8f845a91591b0e30e4788251",
+        "untested": [],
+        "verifier": "edgebounty-platform",
+        "createdAt": "2026-10-18T00:40:12.724Z",
+        "limitations": [
+          "Relevance to the task is not assessed below Level 3 (AI review).",
+          "Licensing and provenance are not machine-verifiable; they require human review (Level 4).",
+          "Known-signature scan within bounded archive/file/time limits; not proof of safety, legal ownership or content quality."
+        ],
+        "assetVersion": "d66b9a32-18c2-4369-84b7-a4344068cfa5",
+        "modelMetrics": null,
+        "datasetMetrics": {
+          "rows": null,
+          "media": null,
+          "labels": null,
+          "columns": null,
+          "formats": {
+            "jpeg": 1
+          },
+          "minWidth": 851,
+          "outliers": 0,
+          "dataFiles": 1,
+          "minHeight": 1280,
+          "nullCells": null,
+          "relevance": null,
+          "totalSize": 84522,
+          "totalFiles": 1,
+          "labelIssues": null,
+          "labeledFiles": null,
+          "duplicateRows": null,
+          "readableFiles": 1,
+          "corruptedFiles": 0,
+          "nearDuplicates": 0,
+          "belowResolution": 0,
+          "exactDuplicates": 0
+        },
+        "assetCommitment": "8eba2af7b51dfff63fadd0eae47dcc377f6548c6f572d6ed9547de6340413a0a"
+      },
+      "reportHash": "804febc4f59092906e5acbad4048338372be8c8839ca241944943c0733eecbc2",
+      "source": {
+        "id": "KSC-07PD-2256",
+        "title": "Launch of Space Shuttle Endeavour as it leaps free of Launch Pad",
+        "credit": "NASA",
+        "source": "https://images.nasa.gov/details/KSC-07PD-2256",
+        "image": "https://images-assets.nasa.gov/image/KSC-07PD-2256/KSC-07PD-2256~medium.jpg",
+        "file": "photo-1.jpg"
+      }
+    },
+    {
+      "seller": "Nika",
+      "versionId": "e5e9c155-0d46-4316-8f42-84bbabfd8d6c",
+      "jobId": "8aef2587-5baf-4e90-a273-70b81c00f418",
+      "report": {
+        "level": "L2",
+        "tools": [
+          {
+            "name": "edgebounty-dataset-validator",
+            "version": "1.5.0"
+          },
+          {
+            "name": "python",
+            "version": "3.13.16"
+          },
+          {
+            "name": "pillow",
+            "version": "12.3.0"
+          },
+          {
+            "name": "ClamAV signature scan",
+            "version": "ClamAV 1.5.4/28156/Sat Oct 17 06:25:46 2026"
+          }
+        ],
+        "passed": true,
+        "schema": "edgebounty.report/1",
+        "assetId": "ccd71d0b-8d26-4927-90b6-aa687d6d2926",
+        "criteria": [
+          {
+            "actual": 1,
+            "status": "pass",
+            "required": 1,
+            "criterion": "min_images"
+          },
+          {
+            "actual": 10000,
+            "status": "pass",
+            "required": 10000,
+            "criterion": "min_readable_bps"
+          },
+          {
+            "actual": "0 below",
+            "status": "pass",
+            "required": "64x64",
+            "criterion": "min_resolution"
+          },
+          {
+            "actual": 0,
+            "status": "pass",
+            "required": 0,
+            "criterion": "max_exact_duplicates"
+          }
+        ],
+        "findings": [],
+        "sampling": "all items",
+        "specHash": "be9bf7667945e488716f2fbc23266d134908b10b8f845a91591b0e30e4788251",
+        "untested": [],
+        "verifier": "edgebounty-platform",
+        "createdAt": "2026-10-18T00:41:19.734Z",
+        "limitations": [
+          "Relevance to the task is not assessed below Level 3 (AI review).",
+          "Licensing and provenance are not machine-verifiable; they require human review (Level 4).",
+          "Known-signature scan within bounded archive/file/time limits; not proof of safety, legal ownership or content quality."
+        ],
+        "assetVersion": "e5e9c155-0d46-4316-8f42-84bbabfd8d6c",
+        "modelMetrics": null,
+        "datasetMetrics": {
+          "rows": null,
+          "media": null,
+          "labels": null,
+          "columns": null,
+          "formats": {
+            "jpeg": 1
+          },
+          "minWidth": 1280,
+          "outliers": 0,
+          "dataFiles": 1,
+          "minHeight": 821,
+          "nullCells": null,
+          "relevance": null,
+          "totalSize": 121303,
+          "totalFiles": 1,
+          "labelIssues": null,
+          "labeledFiles": null,
+          "duplicateRows": null,
+          "readableFiles": 1,
+          "corruptedFiles": 0,
+          "nearDuplicates": 0,
+          "belowResolution": 0,
+          "exactDuplicates": 0
+        },
+        "assetCommitment": "90120e9e4fedb1ce45316db5b44aa901e8f2fcc5fdb23daf39c57c3a62b108a9"
+      },
+      "reportHash": "5e8adc7e29389523fab0a1c1e534c9d43c1eafc1f7ea89f64759e64bd097e2c1",
+      "source": {
+        "id": "08pd1567",
+        "title": "Space Shuttle Discovery Launch",
+        "credit": "Bill Ingalls",
+        "source": "https://images.nasa.gov/details/08pd1567",
+        "image": "https://images-assets.nasa.gov/image/08pd1567/08pd1567~medium.jpg",
+        "file": "photo-2.jpg"
+      }
+    },
+    {
+      "seller": "Mariam",
+      "versionId": "3d35492b-a5ae-4532-951f-f0fab71dab05",
+      "jobId": "f8baf74b-e989-4bed-901f-3c55d498b45a",
+      "report": {
+        "level": "L2",
+        "tools": [
+          {
+            "name": "edgebounty-dataset-validator",
+            "version": "1.5.0"
+          },
+          {
+            "name": "python",
+            "version": "3.13.16"
+          },
+          {
+            "name": "pillow",
+            "version": "12.3.0"
+          },
+          {
+            "name": "ClamAV signature scan",
+            "version": "ClamAV 1.5.4/28156/Sat Oct 17 06:25:46 2026"
+          }
+        ],
+        "passed": true,
+        "schema": "edgebounty.report/1",
+        "assetId": "2d55e59d-4c71-4079-9aae-434ba3125454",
+        "criteria": [
+          {
+            "actual": 1,
+            "status": "pass",
+            "required": 1,
+            "criterion": "min_images"
+          },
+          {
+            "actual": 10000,
+            "status": "pass",
+            "required": 10000,
+            "criterion": "min_readable_bps"
+          },
+          {
+            "actual": "0 below",
+            "status": "pass",
+            "required": "64x64",
+            "criterion": "min_resolution"
+          },
+          {
+            "actual": 0,
+            "status": "pass",
+            "required": 0,
+            "criterion": "max_exact_duplicates"
+          }
+        ],
+        "findings": [],
+        "sampling": "all items",
+        "specHash": "be9bf7667945e488716f2fbc23266d134908b10b8f845a91591b0e30e4788251",
+        "untested": [],
+        "verifier": "edgebounty-platform",
+        "createdAt": "2026-10-18T00:41:38.599Z",
+        "limitations": [
+          "Relevance to the task is not assessed below Level 3 (AI review).",
+          "Licensing and provenance are not machine-verifiable; they require human review (Level 4).",
+          "Known-signature scan within bounded archive/file/time limits; not proof of safety, legal ownership or content quality."
+        ],
+        "assetVersion": "3d35492b-a5ae-4532-951f-f0fab71dab05",
+        "modelMetrics": null,
+        "datasetMetrics": {
+          "rows": null,
+          "media": null,
+          "labels": null,
+          "columns": null,
+          "formats": {
+            "jpeg": 1
+          },
+          "minWidth": 851,
+          "outliers": 0,
+          "dataFiles": 1,
+          "minHeight": 1280,
+          "nullCells": null,
+          "relevance": null,
+          "totalSize": 73668,
+          "totalFiles": 1,
+          "labelIssues": null,
+          "labeledFiles": null,
+          "duplicateRows": null,
+          "readableFiles": 1,
+          "corruptedFiles": 0,
+          "nearDuplicates": 0,
+          "belowResolution": 0,
+          "exactDuplicates": 0
+        },
+        "assetCommitment": "9e8aad2769f4a09fec26e45024e3ecdb0415ee353c8fba911e4c603018b10cd7"
+      },
+      "reportHash": "ee520f2a10b24cbdf55c40787f40e977bbbb985e9ae3415bbe15c3cc2da24b9e",
+      "source": {
+        "id": "KSC-07PD-2949",
+        "title": "STS-120 Space shuttle Discovery launches from Pad 39A",
+        "credit": "NASA",
+        "source": "https://images.nasa.gov/details/KSC-07PD-2949",
+        "image": "https://images-assets.nasa.gov/image/KSC-07PD-2949/KSC-07PD-2949~medium.jpg",
+        "file": "photo-3.jpg"
+      }
+    },
+    {
+      "seller": "Ana",
+      "versionId": "a1c92dab-348c-488e-8267-126b1e9e1050",
+      "jobId": "d0972283-1a22-4a11-8dc6-6d66ec3c53d0",
+      "report": {
+        "level": "L2",
+        "tools": [
+          {
+            "name": "edgebounty-dataset-validator",
+            "version": "1.5.0"
+          },
+          {
+            "name": "python",
+            "version": "3.13.16"
+          },
+          {
+            "name": "pillow",
+            "version": "12.3.0"
+          },
+          {
+            "name": "ClamAV signature scan",
+            "version": "ClamAV 1.5.4/28156/Sat Oct 17 06:25:46 2026"
+          }
+        ],
+        "passed": true,
+        "schema": "edgebounty.report/1",
+        "assetId": "7c4b203a-291d-4544-9d32-9ddedb793701",
+        "criteria": [
+          {
+            "actual": 1,
+            "status": "pass",
+            "required": 1,
+            "criterion": "min_images"
+          },
+          {
+            "actual": 10000,
+            "status": "pass",
+            "required": 10000,
+            "criterion": "min_readable_bps"
+          },
+          {
+            "actual": "0 below",
+            "status": "pass",
+            "required": "64x64",
+            "criterion": "min_resolution"
+          },
+          {
+            "actual": 0,
+            "status": "pass",
+            "required": 0,
+            "criterion": "max_exact_duplicates"
+          }
+        ],
+        "findings": [],
+        "sampling": "all items",
+        "specHash": "be9bf7667945e488716f2fbc23266d134908b10b8f845a91591b0e30e4788251",
+        "untested": [],
+        "verifier": "edgebounty-platform",
+        "createdAt": "2026-10-18T00:41:57.672Z",
+        "limitations": [
+          "Relevance to the task is not assessed below Level 3 (AI review).",
+          "Licensing and provenance are not machine-verifiable; they require human review (Level 4).",
+          "Known-signature scan within bounded archive/file/time limits; not proof of safety, legal ownership or content quality."
+        ],
+        "assetVersion": "a1c92dab-348c-488e-8267-126b1e9e1050",
+        "modelMetrics": null,
+        "datasetMetrics": {
+          "rows": null,
+          "media": null,
+          "labels": null,
+          "columns": null,
+          "formats": {
+            "jpeg": 1
+          },
+          "minWidth": 1280,
+          "outliers": 0,
+          "dataFiles": 1,
+          "minHeight": 914,
+          "nullCells": null,
+          "relevance": null,
+          "totalSize": 165975,
+          "totalFiles": 1,
+          "labelIssues": null,
+          "labeledFiles": null,
+          "duplicateRows": null,
+          "readableFiles": 1,
+          "corruptedFiles": 0,
+          "nearDuplicates": 0,
+          "belowResolution": 0,
+          "exactDuplicates": 0
+        },
+        "assetCommitment": "bc701bc026e1346d18cf23d418658bef915db4d735396ac86a3a9f05075abb13"
+      },
+      "reportHash": "3b98168ce0c518522a126154332d437d0ffa4fd6dc44cc552de68ec1fbc49ea5",
+      "source": {
+        "id": "08pd1568",
+        "title": "Space Shuttle Discovery Launch",
+        "credit": "Bill Ingalls",
+        "source": "https://images.nasa.gov/details/08pd1568",
+        "image": "https://images-assets.nasa.gov/image/08pd1568/08pd1568~medium.jpg",
+        "file": "photo-4.jpg"
+      }
+    },
+    {
+      "seller": "Luka",
+      "versionId": "173778fb-026a-4015-93ec-908454340a2d",
+      "jobId": "4ebe02a9-fa45-4244-a629-9e20c4b54809",
+      "report": {
+        "level": "L2",
+        "tools": [
+          {
+            "name": "edgebounty-dataset-validator",
+            "version": "1.5.0"
+          },
+          {
+            "name": "python",
+            "version": "3.13.16"
+          },
+          {
+            "name": "pillow",
+            "version": "12.3.0"
+          },
+          {
+            "name": "ClamAV signature scan",
+            "version": "ClamAV 1.5.4/28156/Sat Oct 17 06:25:46 2026"
+          }
+        ],
+        "passed": true,
+        "schema": "edgebounty.report/1",
+        "assetId": "6b2c8e0d-22b7-4fc0-8074-053af8542731",
+        "criteria": [
+          {
+            "actual": 1,
+            "status": "pass",
+            "required": 1,
+            "criterion": "min_images"
+          },
+          {
+            "actual": 10000,
+            "status": "pass",
+            "required": 10000,
+            "criterion": "min_readable_bps"
+          },
+          {
+            "actual": "0 below",
+            "status": "pass",
+            "required": "64x64",
+            "criterion": "min_resolution"
+          },
+          {
+            "actual": 0,
+            "status": "pass",
+            "required": 0,
+            "criterion": "max_exact_duplicates"
+          }
+        ],
+        "findings": [],
+        "sampling": "all items",
+        "specHash": "be9bf7667945e488716f2fbc23266d134908b10b8f845a91591b0e30e4788251",
+        "untested": [],
+        "verifier": "edgebounty-platform",
+        "createdAt": "2026-10-18T00:42:16.085Z",
+        "limitations": [
+          "Relevance to the task is not assessed below Level 3 (AI review).",
+          "Licensing and provenance are not machine-verifiable; they require human review (Level 4).",
+          "Known-signature scan within bounded archive/file/time limits; not proof of safety, legal ownership or content quality."
+        ],
+        "assetVersion": "173778fb-026a-4015-93ec-908454340a2d",
+        "modelMetrics": null,
+        "datasetMetrics": {
+          "rows": null,
+          "media": null,
+          "labels": null,
+          "columns": null,
+          "formats": {
+            "jpeg": 1
+          },
+          "minWidth": 1280,
+          "outliers": 0,
+          "dataFiles": 1,
+          "minHeight": 851,
+          "nullCells": null,
+          "relevance": null,
+          "totalSize": 150944,
+          "totalFiles": 1,
+          "labelIssues": null,
+          "labeledFiles": null,
+          "duplicateRows": null,
+          "readableFiles": 1,
+          "corruptedFiles": 0,
+          "nearDuplicates": 0,
+          "belowResolution": 0,
+          "exactDuplicates": 0
+        },
+        "assetCommitment": "d4c4ef4d6bd222d327be9e2276238de4d9c7607834f824a1ca54fc7c7fbfba6f"
+      },
+      "reportHash": "a4bbe6cce2189c04df30bedd0b92191a454b7f92c946c191d691ca2b2a2ce0c4",
+      "source": {
+        "id": "KSC-07PD-3159",
+        "title": "Space shuttle Discovery STS-120 touches down on Runway 33",
+        "credit": "NASA",
+        "source": "https://images.nasa.gov/details/KSC-07PD-3159",
+        "image": "https://images-assets.nasa.gov/image/KSC-07PD-3159/KSC-07PD-3159~medium.jpg",
+        "file": "photo-5.jpg"
+      }
+    }
+  ],
+  "duplicate": {
+    "seller": "Nika",
+    "jobId": "67b5ddc5-a050-49ab-9e14-6455de63ad40"
+  },
+  "dataset": {
+    "versionId": "6fb26ce5-ceff-4b0f-92fa-44bfaecb826c",
+    "listingId": "31fa1848-5287-49b2-b370-77d65b5c4c54",
+    "jobId": "b2a46d1b-42b2-4cdc-8c4b-42540d84fe3d",
+    "report": {
+      "level": "L3",
+      "tools": [
+        {
+          "name": "edgebounty-dataset-validator",
+          "version": "1.5.0"
+        },
+        {
+          "name": "python",
+          "version": "3.13.16"
+        },
+        {
+          "name": "pillow",
+          "version": "12.3.0"
+        },
+        {
+          "name": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+          "version": "nvidia"
+        },
+        {
+          "name": "ClamAV signature scan",
+          "version": "ClamAV 1.5.4/28156/Sat Oct 17 06:25:46 2026"
+        }
+      ],
+      "passed": true,
+      "schema": "edgebounty.report/1",
+      "assetId": "407d8dad-8384-49dc-973b-f97db4714160",
+      "summary": "AI-generated explanation (nvidia/nemotron-3.5-lightning-30b-a3b); not evidence: The dataset contains 5 image files totaling 598KB, all in JPEG format with a minimum resolution of 851x821 pixels. All 5 files are readable and no exact duplicates were found. The relevance score is estimated at 56.55% with a 95% confidence interval of 56.55\u00e2\u20ac\u201c100% based on a sample of 5 files. All specified criteria passed, though relevance is noted as an AI-sampled estimate rather than a guaranteed quality measure.",
+      "criteria": [
+        {
+          "actual": 5,
+          "status": "pass",
+          "required": 5,
+          "criterion": "min_images"
+        },
+        {
+          "actual": 10000,
+          "status": "pass",
+          "required": 10000,
+          "criterion": "min_readable_bps"
+        },
+        {
+          "actual": "0 below",
+          "status": "pass",
+          "required": "64x64",
+          "criterion": "min_resolution"
+        },
+        {
+          "actual": 0,
+          "status": "pass",
+          "required": 0,
+          "criterion": "max_exact_duplicates"
+        },
+        {
+          "note": "estimate 10000 (5655-10000), n=5, nvidia/nemotron-3-nano-omni-30b-a3b-reasoning sampled review, 95% Wilson interval",
+          "actual": 5655,
+          "status": "pass",
+          "required": 1000,
+          "criterion": "min_relevance_bps"
+        }
+      ],
+      "findings": [],
+      "sampling": "all items for L1/L2; random sample (seeded) for L3",
+      "specHash": "5db838d2d3c314ca8ab19687a72b8ecf7988dd00e40f917d09ca9a40bd5d8d7f",
+      "untested": [],
+      "verifier": "edgebounty-platform",
+      "createdAt": "2026-10-18T00:43:06.717Z",
+      "limitations": [
+        "Relevance to the task is not assessed below Level 3 (AI review).",
+        "Licensing and provenance are not machine-verifiable; they require human review (Level 4).",
+        "Relevance is a sample-based estimate with a 95% confidence interval, produced by an AI model; it is not proof of quality.",
+        "Image near-duplicate check was unavailable; no image similarity conclusion was made.",
+        "Semantic duplicate check compared at most 8 text prefixes (1380 bytes) within the owner's account using nvidia/nemotron-3-embed-1b. Images, audio and video are excluded.",
+        "Known-signature scan within bounded archive/file/time limits; not proof of safety, legal ownership or content quality."
+      ],
+      "assetVersion": "6fb26ce5-ceff-4b0f-92fa-44bfaecb826c",
+      "modelMetrics": null,
+      "datasetMetrics": {
+        "rows": null,
+        "media": null,
+        "labels": null,
+        "columns": null,
+        "formats": {
+          "jpeg": 5
+        },
+        "minWidth": 851,
+        "outliers": 0,
+        "dataFiles": 5,
+        "minHeight": 821,
+        "nullCells": null,
+        "relevance": {
+          "lowBps": 5655,
+          "method": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning sampled review, 95% Wilson interval",
+          "highBps": 10000,
+          "sampleSize": 5,
+          "estimateBps": 10000
+        },
+        "totalSize": 597791,
+        "totalFiles": 6,
+        "labelIssues": null,
+        "labeledFiles": null,
+        "duplicateRows": null,
+        "readableFiles": 5,
+        "corruptedFiles": 0,
+        "nearDuplicates": 0,
+        "belowResolution": 0,
+        "exactDuplicates": 0
+      },
+      "assetCommitment": "7e47a6bd321b11e0f3dacd9b91db4e7c3207dea17bee1aa837f63ee1b795540a"
+    },
+    "reportHash": "acac6721d157a7323d1ecb881178b7b8ae73d17c295e6294c4b24cc5ae7fa3dd"
+  },
+  "models": [
+    {
+      "name": "Red / blue ONNX classifier",
+      "versionId": "2f813b39-38b5-4012-975c-bd5faeefab36",
+      "listingId": "a2ace96b-f591-431b-b2b7-f60ad4fe9cac",
+      "jobId": "c16de7e8-9bf0-4e5c-9aee-c48cc7655f95",
+      "report": {
+        "level": "L2",
+        "tools": [
+          {
+            "name": "edgebounty-model-validator",
+            "version": "1.0.0"
+          },
+          {
+            "name": "python",
+            "version": "3.13.16"
+          },
+          {
+            "name": "onnx",
+            "version": "1.23.2"
+          },
+          {
+            "name": "onnxruntime",
+            "version": "1.31.0"
+          },
+          {
+            "name": "ClamAV signature scan",
+            "version": "ClamAV 1.5.4/28156/Sat Oct 17 06:25:46 2026"
+          }
+        ],
+        "passed": true,
+        "schema": "edgebounty.report/1",
+        "assetId": "9a40599e-a698-4475-90fe-80b691c29489",
+        "criteria": [],
+        "findings": [],
+        "sampling": "static inspection only",
+        "specHash": "6accfaf73d4860762b63cdd4ead18a4d9b4609ed974647434be8415410dfbdfb",
+        "untested": [],
+        "verifier": "edgebounty-platform",
+        "createdAt": "2026-10-18T00:43:42.330Z",
+        "limitations": [
+          "No benchmark supplied; only static inspection was performed.",
+          "Known-signature scan within bounded archive/file/time limits; not proof of safety, legal ownership or content quality."
+        ],
+        "assetVersion": "2f813b39-38b5-4012-975c-bd5faeefab36",
+        "modelMetrics": {
+          "opset": 17,
+          "format": "onnx",
+          "inputs": [
+            {
+              "name": "input",
+              "dtype": "float",
+              "shape": [
+                1,
+                3,
+                8,
+                8
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "name": "probs",
+              "dtype": "float",
+              "shape": [
+                1,
+                2
+              ]
+            }
+          ],
+          "benchmark": null,
+          "operators": [
+            "Flatten",
+            "Gemm",
+            "Softmax"
+          ],
+          "parameters": 386,
+          "disallowedOperators": []
+        },
+        "datasetMetrics": null,
+        "assetCommitment": "4c5117e432f68d805d2f7cefa87b247df0ffc2e89e9fba793210becc789d2d19"
+      },
+      "reportHash": "7c0d2deec0abb946d3fba11c7286cde350943da7865a4bdefb28d34aefb14028"
+    },
+    {
+      "name": "Color dominance ONNX baseline",
+      "versionId": "87696eab-4a28-4557-8cee-b7da9a595f79",
+      "listingId": "5f7907af-1a0a-4254-a819-b87841a4a23b",
+      "jobId": "485f77c8-d0fb-4be5-8437-d447e48ee43a",
+      "report": {
+        "level": "L2",
+        "tools": [
+          {
+            "name": "edgebounty-model-validator",
+            "version": "1.0.0"
+          },
+          {
+            "name": "python",
+            "version": "3.13.16"
+          },
+          {
+            "name": "onnx",
+            "version": "1.23.2"
+          },
+          {
+            "name": "onnxruntime",
+            "version": "1.31.0"
+          },
+          {
+            "name": "ClamAV signature scan",
+            "version": "ClamAV 1.5.4/28156/Sat Oct 17 06:25:46 2026"
+          }
+        ],
+        "passed": true,
+        "schema": "edgebounty.report/1",
+        "assetId": "97df6807-dae5-401c-8c3a-5c61fc951e69",
+        "criteria": [],
+        "findings": [],
+        "sampling": "static inspection only",
+        "specHash": "6accfaf73d4860762b63cdd4ead18a4d9b4609ed974647434be8415410dfbdfb",
+        "untested": [],
+        "verifier": "edgebounty-platform",
+        "createdAt": "2026-10-18T00:44:02.818Z",
+        "limitations": [
+          "No benchmark supplied; only static inspection was performed.",
+          "Known-signature scan within bounded archive/file/time limits; not proof of safety, legal ownership or content quality."
+        ],
+        "assetVersion": "87696eab-4a28-4557-8cee-b7da9a595f79",
+        "modelMetrics": {
+          "opset": 17,
+          "format": "onnx",
+          "inputs": [
+            {
+              "name": "input",
+              "dtype": "float",
+              "shape": [
+                1,
+                3,
+                8,
+                8
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "name": "probs",
+              "dtype": "float",
+              "shape": [
+                1,
+                2
+              ]
+            }
+          ],
+          "benchmark": null,
+          "operators": [
+            "Flatten",
+            "Gemm",
+            "Softmax"
+          ],
+          "parameters": 386,
+          "disallowedOperators": []
+        },
+        "datasetMetrics": null,
+        "assetCommitment": "0d7c05e429e208b34cd7ac323fcb73490409a486d31a8f261dc99b704b85a96f"
+      },
+      "reportHash": "4a9f472eca311d239eea4fe466cea1af1d83ab993e5c7a1b000a1f63bcb72186"
+    }
+  ],
+  "sources": [
+    {
+      "id": "KSC-07PD-2256",
+      "title": "Launch of Space Shuttle Endeavour as it leaps free of Launch Pad",
+      "credit": "NASA",
+      "source": "https://images.nasa.gov/details/KSC-07PD-2256",
+      "image": "https://images-assets.nasa.gov/image/KSC-07PD-2256/KSC-07PD-2256~medium.jpg",
+      "file": "photo-1.jpg"
+    },
+    {
+      "id": "08pd1567",
+      "title": "Space Shuttle Discovery Launch",
+      "credit": "Bill Ingalls",
+      "source": "https://images.nasa.gov/details/08pd1567",
+      "image": "https://images-assets.nasa.gov/image/08pd1567/08pd1567~medium.jpg",
+      "file": "photo-2.jpg"
+    },
+    {
+      "id": "KSC-07PD-2949",
+      "title": "STS-120 Space shuttle Discovery launches from Pad 39A",
+      "credit": "NASA",
+      "source": "https://images.nasa.gov/details/KSC-07PD-2949",
+      "image": "https://images-assets.nasa.gov/image/KSC-07PD-2949/KSC-07PD-2949~medium.jpg",
+      "file": "photo-3.jpg"
+    },
+    {
+      "id": "08pd1568",
+      "title": "Space Shuttle Discovery Launch",
+      "credit": "Bill Ingalls",
+      "source": "https://images.nasa.gov/details/08pd1568",
+      "image": "https://images-assets.nasa.gov/image/08pd1568/08pd1568~medium.jpg",
+      "file": "photo-4.jpg"
+    },
+    {
+      "id": "KSC-07PD-3159",
+      "title": "Space shuttle Discovery STS-120 touches down on Runway 33",
+      "credit": "NASA",
+      "source": "https://images.nasa.gov/details/KSC-07PD-3159",
+      "image": "https://images-assets.nasa.gov/image/KSC-07PD-3159/KSC-07PD-3159~medium.jpg",
+      "file": "photo-5.jpg"
+    }
+  ]
+}
