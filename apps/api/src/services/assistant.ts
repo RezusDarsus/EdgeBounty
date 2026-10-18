@@ -69,15 +69,16 @@ export async function cachedAgent<T>(ctx: AppContext, accountId: string, mode: s
     return { id: row.id };
   });
   if ('cached' in reserved) return { result: reserved.cached as T, cached: true, calls: 0 };
+  const startedAt = Date.now();
   try {
     const result = await run();
     const usage = result as { inputTokens?: number | null; outputTokens?: number | null; cost?: { inputTokens?: number | null; outputTokens?: number | null } };
-    await ctx.db.update(schema.agentRequests).set({ status: 'completed', response: result as any, inputTokens: usage.inputTokens ?? usage.cost?.inputTokens, outputTokens: usage.outputTokens ?? usage.cost?.outputTokens }).where(eq(schema.agentRequests.id, reserved.id));
+    await ctx.db.update(schema.agentRequests).set({ status: 'completed', response: { ...result as any, latencyMs: Date.now()-startedAt, providerModel: ctx.cfg.AI_ASSISTANT_MODEL }, inputTokens: usage.inputTokens ?? usage.cost?.inputTokens, outputTokens: usage.outputTokens ?? usage.cost?.outputTokens }).where(eq(schema.agentRequests.id, reserved.id));
     return { result, cached: false, calls: 1 };
   } catch (error) {
     // Never log prompts, response bodies, authorization or raw provider error messages.
     console.warn(JSON.stringify({ event: 'assistant_request_failed', errorType: error instanceof Error ? error.name : 'unknown', ...(error instanceof HttpError ? { reason: error.code, status: error.status } : {}), ...(error instanceof z.ZodError ? { invalidFields: error.issues.map(i => i.path.join('.')).slice(0, 10) } : {}) }));
-    await ctx.db.update(schema.agentRequests).set({ status: 'failed', response: { failedAt: new Date().toISOString() } }).where(eq(schema.agentRequests.id, reserved.id));
+    await ctx.db.update(schema.agentRequests).set({ status: 'failed', response: { failedAt: new Date().toISOString(), latencyMs: Date.now()-startedAt, providerModel: ctx.cfg.AI_ASSISTANT_MODEL, failureReason: error instanceof HttpError ? error.code : error instanceof z.ZodError || error instanceof SyntaxError ? 'invalid_output' : error instanceof Error && error.name === 'TimeoutError' ? 'timeout' : 'unknown' } }).where(eq(schema.agentRequests.id, reserved.id));
     if (allowProviderRetry && error instanceof HttpError && error.code === 'ai_provider_busy') {
       // A retry consumes a separate durable reservation, including the daily limits.
       await ctx.db.update(schema.agentRequests).set({ requestHash: `${hash}:attempt:${reserved.id}` }).where(eq(schema.agentRequests.id, reserved.id));

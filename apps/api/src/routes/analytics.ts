@@ -21,6 +21,6 @@ export function analyticsRoutes(app: FastifyInstance,ctx: AppContext) {
   app.addHook('onResponse',async(req,reply)=>{
     const route=req.routeOptions.url;
     if(!route || req.method==='OPTIONS' || /^\/(analytics|health|config)(\/|$)/.test(route))return;
-    emit({kind:'request',route,method:req.method,status:reply.statusCode});
+    emit({kind:'request',route,method:req.method,status:reply.statusCode,durationMs:Math.min(86400000,Math.max(0,reply.elapsedTime)),client:req.session?.scopes?'api_key':req.session?'browser_session':'anonymous_or_automated',accountId:req.session?.accountId??null});
   });
 }

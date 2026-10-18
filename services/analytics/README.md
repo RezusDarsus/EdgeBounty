@@ -38,3 +38,9 @@ Access details are stored on the deployment host at `.data/developer-analytics-a
 `npx vitest run tests/security/analytics.test.ts`
 
 The standalone tests cover authentication, independent outage behavior, deduplication, expiry/retention, identifier hashing and exact financial aggregation. API tests verify identity comes from authenticated sessions, usage uses route templates, and collector failures do not fail the public heartbeat endpoint.
+
+## Operator console upgrade
+
+The ten-section operator console adds live finalized vault checks, transaction/order/job drilldowns, AI failure/model/latency evidence, storage coverage and transfer views, host/dependency probes, explicit test-account labels, anonymous historical rollups, ordered account workflows, and an independent USD invoice-evidence ledger. The current shared operator password is unchanged. See [OPERATIONS.md](OPERATIONS.md) for the full measurement contract, privacy boundaries, unsupported data integrations, upgrade and rollback.
+
+The original aggregate-only description above applies to the initial dashboard. The upgraded console additionally exposes authorized record IDs/public chain addresses through sanitized read-only views. Account identifiers are transformed into keyed tokens before dashboard responses; wallets, prompts, raw provider errors, file paths and object keys remain excluded. Classification and invoice evidence writes affect only the independent SQLite console database. Per-person login/MFA, genuine earned-service recognition, automated provider invoices, full bucket inventory and cross-actor lifecycle attribution remain explicitly unavailable.

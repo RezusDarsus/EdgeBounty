@@ -1,0 +1,43 @@
+# Operator console measurement contract
+
+The independent console is at https://stats.13-61-207-211.sslip.io/. Its ten views are Overview, Visitors & Users, Product Analytics, Marketplace, Solana & Escrow, Revenue & Costs, AI Operations, Storage & Downloads, Infrastructure, and Security & Audit. Existing operator credentials are preserved. The marketplace frontend is unchanged by this release.
+
+## Evidence and accounting
+
+- Token figures are mock USDC on the existing private validator. They are never converted into real USD earnings. Settlement split arithmetic uses each indexed seller allocation and fee basis points. A split equality is not a bank balance or proof of transfer finality.
+- Order details expose public chain addresses and contributor group identifiers, never participant wallets. Each child contributor escrow is an individual order. The cancelled/refunded parent is not counted as a child settlement.
+- Live reconciliation derives each open order's vault PDA and reads up to 100 token accounts at finalized commitment. It validates the SPL owner and configured mint, compares the balance to indexed principal plus verifier fee, records the RPC context slot and explicitly reports unavailable accounts. A mismatch may be index delay or an unsolicited token transfer; investigate before declaring a loss. Terminal vaults normally close and are omitted. This is not a reconstruction of historical token transfers.
+- Transaction details allow live confirmation/finalization checks. The transaction index may contain only API-recorded signatures, not every program transaction. No durable index-slot watermark is available.
+- Paid invoices are receipts. Hosting coverage receipts and elapsed service allocations are displayed separately and must not be added to invoice totals. Elapsed hosting allocation is a linear estimate, not an earned-revenue journal entry. Download/verification recognition, unused monetary credit liabilities and refund allocations remain unavailable without explicit service-recognition entries.
+- `cost_events` distinguishes configured estimates from actual provider billing. Job quotes/charges are token service amounts, not provider USD invoices. Per-job provider usage and cost records are inspectable. Operators can append invoice evidence in a separate SQLite USD ledger; duplicate evidence IDs fail. The operator must verify invoice evidence; the console cannot certify a manual entry. Invoice totals may include prepayments and are not automatically recognized expenses. No margin/profit is calculated across mock tokens and USD.
+
+## Activity and privacy
+
+- Browsers are estimates. Active means a visible heartbeat in five minutes; observed session duration spans heartbeats and can include idle gaps. No country/device/referrer fingerprinting is introduced. Only authenticated sessions show a short keyed account token.
+- DAU/WAU/MAU use distinct signed-in account tokens in UTC calendar windows. Coverage starts with existing telemetry deployment; no account's last-login field is treated as browsing history. Operators label a keyed token test/production/unclassified. The default is unclassified. Look up a marketplace account UUID to map a known fixture identity to its token. Do not infer real customers from names. Classification affects active-account breakdowns; financial/account lifetime totals include test accounts and say so.
+- Browsing identifiers expire after 30 calendar days; presence expires after one day. Anonymous daily browser/account totals persist, without cross-day identifiers. Summed daily counts are not monthly unique visitors. Period comparisons use completed UTC calendar days and require two complete windows after collection started. Missing history yields no comparison data.
+- Workflow stages use successful normalized API route events for the same authenticated account, in order, within one selected UTC window. Returning accounts count once. Preparation/confirmation requests do not prove finalized funding/settlement. These are account-level workflows, not a shared order or multi-actor attribution model. Six workflows cover buyer preparation, seller publication, verification purchasing, bounty preparation, successful assistant answers and obtaining download links. Single-stage workflows are feature adoption, not conversion rates. HTTP failure tables are aggregate context, not individual abandonment causes.
+- Request metrics retain fixed route templates, client class, status and bounded latency buckets. Authenticated sessions can be automated. API-key clients are separate; unauthenticated traffic cannot reliably be divided into people/bots/internal clients. No URLs, queries, prompts, wallets, request bodies or IPs are stored in the activity DB. Search-result counts and click attribution are not collected.
+- The UI's timezone selector formats timestamps in UTC or Asia/Tbilisi. Daily grouping and date-window definitions remain UTC. Financial lifetime totals do not change with the activity window; verification/cost views use their documented rolling window.
+
+## Operations and security
+
+API/database/worker readiness, finalized RPC slot, host RAM/disk/load/uptime, API status classes and latency buckets are measured. These current probes are not an uptime SLA. R2 invoice/inventory/request telemetry, email delivery, slow-query traces, backup age and certificate expiry have no verified data connector and show unavailable. No resources or customer objects are deleted.
+
+Assistant attempts now record a model identifier, safe failure category and elapsed latency; old missing evidence stays unknown. Job queue-to-result latency includes queue time. Job execution, quality pass/fail, cached report reuse and provider usage are separate. L1 jobs may make no AI call. No prompts or provider response bodies enter the console. Assistant cache-hit rate and report sample coverage need additional outcome events.
+
+All console assets/data require a long separate HTTPS Basic credential. Wallet sessions and marketplace API keys grant no access. Ingestion uses a distinct secret. Only SELECT access is granted to explicit sanitized marketplace views. POST labels/invoice evidence require a custom same-origin header and append audit events. Audit records contain actions/section tokens, not IPs or raw request text. Current login is a shared operator identity; MFA and per-person attribution are not configured. The console does not provide signing, refunds, payouts, deletion or other financial administration.
+
+Tables offer sorting, pagination and CSV exports of the loaded data. Record endpoints paginate 50 rows, use parameterized filters and bound accepted record types. Account classification currently loads at most 2,000 accounts and explicitly reports that coverage. Browser CSV cells are escaped against spreadsheet formulas. Draft invoice entries survive refresh/navigation in memory and are never stored in browser persistence.
+
+Threshold warnings: AI failure rate above 20% with at least 20 attempts; API 5xx above 5% with at least 100 collected requests; running verification lock older than 10 minutes; coverage intervals ending within 7 days. Thresholds are dashboard observations, not scheduled alerts.
+
+## Upgrade and rollback
+
+1. Back up services/analytics (including its private .env), the API route/service files, public payment configuration, and a consistent SQLite snapshot. Keep the existing stats credential and financial environment unchanged.
+2. Run `node scripts/upgrade-analytics.mjs` with an ephemeral `ANALYTICS_PROVISION_DATABASE_URL` if the runtime lacks view/GRANT authority. It only installs the checked-in restricted views and grants SELECT to the existing analytics reader; never grant the reader base tables or write privileges. Do not print or persist administrator credentials.
+3. Install the console source/assets and API telemetry/assistant source. Restart developer-analytics and api-usdc; restart verification-usdc when the shared API source changes. Use the full 40-character release SHA. No public frontend rebuild or Caddy route change is needed.
+4. Verify authenticated overview/operations/record/probe endpoints, unauthenticated 401s, denied base-table access, API readiness, unchanged payment configuration, live vault checks, and desktop/mobile rendering.
+5. For rollback restore previous service/API source and restart. Extra read-only views and additive SQLite tables can remain; preserve audit/expense records. No chain/database rewind is necessary.
+
+Checks: `node --test services/analytics/analytics.test.mjs services/analytics/operator.test.mjs`; `npx vitest run tests/security/assistant.test.ts tests/security/analytics.test.ts`; `npm run typecheck`.
