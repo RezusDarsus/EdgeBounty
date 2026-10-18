@@ -21,6 +21,7 @@ import { ChainService } from '../../apps/api/src/chain.js';
 import { buildApp } from '../../apps/api/src/app.js';
 import { seed } from '../../apps/api/src/seed.js';
 import { signDownloadToken } from '../../apps/api/src/lib/tokens.js';
+import { issueSession } from '../../apps/api/src/auth/siws.js';
 import {
   applyPaidInvoice,
   createCheckout,
@@ -126,6 +127,28 @@ async function entitlement(buyer: { id: string; wallet: string }, versionId: str
 
 const token = (ent: { id: string; buyerWallet: string }, fileId: string) => signDownloadToken(ctx.cfg.DOWNLOAD_TOKEN_SECRET, { s: 'delivery', g: ent.id, f: fileId, w: ent.buyerWallet, x: Math.floor(Date.now() / 1000) + 600 });
 const served = async (id: string) => (await ctx.db.select().from(schema.deliveryEntitlements).where(eq(schema.deliveryEntitlements.id, id)))[0].bytesServed;
+
+it('only sells download credits while the buyer has usable delivery access', async () => {
+  const buyer = await account();
+  const d = await dataset(buyer.id, 100);
+  const active = await entitlement(buyer, d.version.id, { allowance: 100n });
+  const expired = await entitlement(buyer, d.version.id, { allowance: 100n, endsAt: new Date(Date.now() - 1000) });
+  const revoked = await entitlement(buyer, d.version.id, { allowance: 100n });
+  await ctx.db.update(schema.deliveryEntitlements).set({ revokedAt: new Date() }).where(eq(schema.deliveryEntitlements.id, revoked.id));
+  const bearer = await issueSession(ctx.cfg.JWT_SECRET, { accountId: buyer.id, wallet: buyer.wallet, roles: [] });
+  for (const [ent, code] of [[expired, 'access_expired'], [revoked, 'revoked']] as const) {
+    const response = await app.inject({ method: 'POST', url: `/entitlements/${ent.id}/download-credits`, headers: { authorization: `Bearer ${bearer}` }, payload: { gb: 1 } });
+    expect(response.statusCode).toBe(403);
+    expect(response.json().error).toBe(code);
+  }
+  expect(await ctx.db.select().from(schema.invoices).where(eq(schema.invoices.accountId, buyer.id))).toHaveLength(0);
+  const response = await app.inject({ method: 'POST', url: `/entitlements/${active.id}/download-credits`, headers: { authorization: `Bearer ${bearer}` }, payload: { gb: 1 } });
+  expect(response.statusCode).toBe(200);
+  await pay(response.json().invoice.id);
+  const [updated] = await ctx.db.select().from(schema.deliveryEntitlements).where(eq(schema.deliveryEntitlements.id, active.id));
+  expect(updated.extraBytes).toBe(GIB);
+  await expect(deliveryAccess(ctx, updated)).resolves.toMatchObject({ remaining: GIB + 100n });
+});
 
 async function signIn() {
   const kp = Keypair.generate();

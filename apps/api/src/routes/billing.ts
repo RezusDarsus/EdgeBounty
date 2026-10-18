@@ -7,7 +7,7 @@ import type { AppContext } from '../context.js';
 import { schema } from '../db/index.js';
 import { forbidden, notFound, parse, requireAdmin, requireSession, zUuid } from '../lib/http.js';
 import { getOwnedVersion } from '../lib/assets.js';
-import { coveredUntil, createDownloadCreditInvoice, createSellerHostingInvoice, marketplacePricing, sellerHostingQuote, versionBytes, versionCoverage } from '../lib/billing.js';
+import { coveredUntil, createDownloadCreditInvoice, createSellerHostingInvoice, deliveryAccess, marketplacePricing, sellerHostingQuote, versionBytes, versionCoverage } from '../lib/billing.js';
 import { costReport } from '../lib/costs.js';
 
 const str = (o: Record<string, bigint>) => Object.fromEntries(Object.entries(o).map(([k, v]) => [k, v.toString()]));
@@ -63,6 +63,7 @@ export function billingRoutes(app: FastifyInstance, ctx: AppContext) {
     const [ent] = await db.select().from(schema.deliveryEntitlements).where(eq(schema.deliveryEntitlements.id, id));
     if (!ent) throw notFound('entitlement');
     if (ent.buyerId !== s.accountId) throw forbidden();
+    await deliveryAccess(ctx, ent);
     const r = await createDownloadCreditInvoice(ctx, s.accountId, id, gb);
     return { bytes: r.bytes.toString(), usdMicro: r.usdMicro.toString(), lamports: r.lamports.toString(), invoice: r.invoice };
   });
