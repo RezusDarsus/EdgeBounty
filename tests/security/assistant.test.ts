@@ -8,6 +8,7 @@ import { ChainService } from '../../apps/api/src/chain.js';
 import { LocalStorage } from '../../apps/api/src/storage/index.js';
 import { buildApp } from '../../apps/api/src/app.js';
 import { issueSession } from '../../apps/api/src/auth/siws.js';
+import { HttpError } from '../../apps/api/src/lib/http.js';
 import { nvidiaAssistant } from '../../apps/api/src/services/assistant.js';
 import type { AppContext } from '../../apps/api/src/context.js';
 
@@ -130,4 +131,31 @@ it('lets a user retry a failed request after cooldown without bypassing daily li
   ctx.cfg.AI_AGENT_DAILY_ACCOUNT = 2;
   expect((await send()).statusCode).toBe(200);
   expect(complete).toHaveBeenCalledTimes(2);
+});
+
+it('recovers one temporary provider outage and accounts for both attempts', async () => {
+  const a = await account();
+  complete.mockRejectedValueOnce(new HttpError(503, 'ai_provider_busy', 'Temporary outage'));
+  const r = await app.inject({ method: 'POST', url: '/agents/chat', headers: a.headers, payload });
+  expect(r.statusCode).toBe(200); expect(r.json().cost.calls).toBe(2);
+  expect(complete).toHaveBeenCalledTimes(2);
+  expect((await app.inject({ url: '/agents/usage', headers: a.headers })).json().callsToday).toBe(2);
+});
+it('does not retry a temporary outage past the wallet daily cap', async () => {
+  const a = await account(); ctx.cfg.AI_AGENT_DAILY_ACCOUNT = 1;
+  complete.mockRejectedValue(new HttpError(503, 'ai_provider_busy', 'Temporary outage'));
+  expect((await app.inject({ method: 'POST', url: '/agents/chat', headers: a.headers, payload })).statusCode).toBe(429);
+  expect(complete).toHaveBeenCalledTimes(1);
+});
+it('stops after one retry when the provider stays unavailable', async () => {
+  const a = await account();
+  complete.mockRejectedValue(new HttpError(503, 'ai_provider_busy', 'Temporary outage'));
+  const r = await app.inject({ method: 'POST', url: '/agents/chat', headers: a.headers, payload });
+  expect(r.statusCode).toBe(503); expect(r.json().error).toBe('ai_provider_busy');
+  expect(complete).toHaveBeenCalledTimes(2);
+});
+it('classifies provider capacity errors without exposing provider response bodies', async () => {
+  const fetcher = vi.fn().mockResolvedValue(new Response('private upstream detail', {status:503}));
+  await expect(nvidiaAssistant(fetcher).complete(ctx.cfg, {})).rejects.toMatchObject({status:503,code:'ai_provider_busy'});
+  expect(fetcher).toHaveBeenCalledTimes(1);
 });

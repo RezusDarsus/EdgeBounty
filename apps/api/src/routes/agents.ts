@@ -94,7 +94,7 @@ export function agentRoutes(app: FastifyInstance, ctx: AppContext, provider: Ass
     const result = answer.result;
     return { ...result, cached: answer.cached, model: ctx.cfg.AI_ASSISTANT_MODEL, provider: 'nvidia', verifierVersion: 'assistant/1', status: 'completed',
       sources: catalog.filter(l => result.listingIds.includes(l.id)).map(l => ({ id: l.id, title: l.title, href: `/listings/${l.id}` })),
-      cost: { calls: answer.cached ? 0 : 1, inputTokens: result.inputTokens, outputTokens: result.outputTokens, billedUsd: null },
+      cost: { calls: answer.calls, inputTokens: result.inputTokens, outputTokens: result.outputTokens, billedUsd: null },
       limitations: ['AI suggestions require human review. No financial action was taken.', b.mode === 'discovery' ? 'Catalog scope: up to 50 recently published listings; no private content checked.' : b.mode === 'metadata' ? (b.includeSample ? 'The selected manifest and at most one 4,096-byte text prefix were shared. Full content and license rights were not verified.' : 'Only the selected manifest was shared; file contents and license rights were not verified.') : 'AI explanations do not change verification outcomes or establish legal ownership, accuracy or real-world performance.'],
     };
   });
