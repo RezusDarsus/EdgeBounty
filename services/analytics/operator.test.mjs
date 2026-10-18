@@ -9,6 +9,8 @@ import {migrate} from 'drizzle-orm/pglite/migrator';
 import {operatorMetrics,operatorRecords} from './operator-metrics.mjs';
 import {AnalyticsStore} from './store.mjs';
 import {buildAnalytics} from './server.mjs';
+import {reconcileVaults} from './operations.mjs';
+import {Keypair} from '@solana/web3.js';
 
 test('restricted views and operator queries work against the real marketplace migrations',async()=>{
  const db=new PGlite();
@@ -63,4 +65,19 @@ test('operator writes require authentication and a same-origin custom header; co
   for(const expected of [200,400])assert.equal((await fetch(root+'/api/costs',{method:'POST',headers:{...auth,'x-operator-action':'1'},body:JSON.stringify(cost)})).status,expected);
   assert.equal(store.operations(7).importedCosts.length,1);assert.ok(store.operations(7).audit.some(e=>e.action==='import_cost'));
  }finally{server.closeAllConnections();await new Promise(r=>server.close(r));store.close();}
+});
+
+test('live reconciliation validates the vault authority and mint at finalized commitment',async()=>{
+ const original=globalThis.fetch,program=Keypair.generate().publicKey.toBase58(),mint=Keypair.generate().publicKey.toBase58(),address=Keypair.generate().publicKey.toBase58();let authority=address,amount='101';
+ globalThis.fetch=async(url,options)=>{
+  if(String(url).endsWith('/config'))return Response.json({programId:program,paymentMint:mint});
+  const rpc=JSON.parse(options.body);assert.equal(rpc.method,'getMultipleAccounts');assert.equal(rpc.params[1].commitment,'finalized');
+  return Response.json({result:{context:{slot:42},value:[{owner:'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA',data:{parsed:{info:{mint,owner:authority,tokenAmount:{amount}}}}}]}});
+ };
+ const pool={query:async()=>({rows:[{id:randomUUID(),onchain_address:address,chain_state:'funded',amount_micro:'100',verifier_fee_micro:'1'}]})};
+ try{
+  const matched=await reconcileVaults(pool);assert.equal(matched.rows[0].status,'matched');assert.equal(matched.finalizedSlot,42);
+  authority=program;assert.equal((await reconcileVaults(pool)).rows[0].status,'unavailable');
+  authority=address;amount='100';assert.equal((await reconcileVaults(pool)).rows[0].status,'mismatch');
+ }finally{globalThis.fetch=original;}
 });
