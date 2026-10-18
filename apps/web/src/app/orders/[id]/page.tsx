@@ -107,7 +107,7 @@ export default function OrderWorkspace({ params }: { params: Promise<{ id: strin
           )}
 
           {/* ------------------------------------------------ delivery */}
-          {role === 'buyer' && state === 'settled' && <DeliveryPanel orderId={id} />}
+          {role === 'buyer' && state === 'settled' && o.deliveryAvailable && <DeliveryPanel orderId={id} checkout={o.checkout} onCheckoutPaid={reload} />}
           <PrivateDeliveryPanel orderId={id} role={role} state={state} />
 
           {/* ------------------------------------------------ phase 5: milestones, arbitration */}
@@ -332,13 +332,37 @@ function SubmissionPreview({ orderId }: { orderId: string }) {
   );
 }
 
-function DeliveryPanel({ orderId }: { orderId: string }) {
+function DeliveryPanel({ orderId, checkout, onCheckoutPaid }: { orderId: string; checkout: any; onCheckoutPaid: () => Promise<void> }) {
+  const wallet = useWallet();
   const [d, setD] = useState<any>(null);
   const [err, setErr] = useState<unknown>(null);
+  const [paying, setPaying] = useState(false);
+  const needsCheckoutPayment = checkout?.status === 'awaiting_payment';
   return (
     <Card title="Download">
-      <p className="mb-2 text-sm text-muted">Settlement is confirmed on-chain. Links are bound to your wallet and expire in 10 minutes; request new ones any time.</p>
-      <Button onClick={async () => setD(await api(`/orders/${orderId}/delivery`).catch((e) => (setErr(e), null)))}>Get download links</Button>
+      <p className="mb-2 text-sm text-muted">Settlement is confirmed on-chain. Hosting and download capacity are separate checkout charges; your selected access period is {checkout?.months ?? '—'} month(s).</p>
+      {needsCheckoutPayment ? (
+        <>
+          {checkout.invoice ? <>
+            <p className="mb-2 text-sm">Checkout invoice: <b>{sol(checkout.invoice.amountMicro)}</b> for hosting and download capacity.</p>
+            <Button disabled={!wallet.publicKey || paying} onClick={async () => {
+              setErr(null); setPaying(true);
+              try {
+                const c = await chainClient();
+                await sendWithWallet(wallet, await c.payService(wallet.publicKey!, hexBytes(checkout.invoice.reference), checkout.invoice.serviceKind, BigInt(checkout.invoice.amountMicro)));
+                await api(`/invoices/${checkout.invoice.id}/confirm`, { method: 'POST' });
+                await onCheckoutPaid();
+              } catch (e) { setErr(e); }
+              finally { setPaying(false); }
+            }}>{paying ? 'Confirming checkout payment…' : `Pay ${sol(checkout.invoice.amountMicro)} checkout invoice`}</Button>
+          </> : <p className="text-sm text-warn">The checkout invoice is {checkout.invoiceStatus ?? 'unavailable'} and cannot be paid from this page. Contact support to restore download access.</p>}
+        </>
+      ) : (
+        <>
+          <p className="mb-2 text-sm text-muted">Download links are bound to your wallet and expire in 10 minutes; request new ones any time.</p>
+          <Button onClick={async () => setD(await api(`/orders/${orderId}/delivery`).catch((e) => (setErr(e), null)))}>Get download links</Button>
+        </>
+      )}
       <ErrorNote error={err} />
       {d && (
         <>

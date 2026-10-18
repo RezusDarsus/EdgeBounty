@@ -7,7 +7,7 @@ import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { randomBytes, randomUUID } from 'node:crypto';
 import { PublicKey } from '@solana/web3.js';
-import { DATASET_CATEGORIES } from '@edgebounty/shared-types';
+import { DATASET_CATEGORIES, SERVICE_KINDS } from '@edgebounty/shared-types';
 import { AcceptanceCriteria, DOMAIN, OrderTerms, bytesToHex, hashDocument } from '@edgebounty/verification-schemas';
 import type { AppContext } from '../context.js';
 import { schema } from '../db/index.js';
@@ -412,6 +412,12 @@ export function marketplaceRoutes(app: FastifyInstance, ctx: AppContext) {
     const results = jobs.length ? await db.select().from(schema.verificationResults).where(inArray(schema.verificationResults.jobId, jobs.map((j) => j.id))) : [];
     const disputes = await db.select().from(schema.disputes).where(eq(schema.disputes.orderId, id));
     const [ent] = await db.select().from(schema.deliveryEntitlements).where(eq(schema.deliveryEntitlements.orderId, id));
+    const [checkout] = role === 'buyer' && order.kind === 'purchase'
+      ? await db.select().from(schema.checkoutQuotes).where(eq(schema.checkoutQuotes.orderId, id))
+      : [];
+    const [checkoutInvoice] = checkout?.invoiceId
+      ? await db.select().from(schema.invoices).where(eq(schema.invoices.id, checkout.invoiceId))
+      : [];
     return {
       ...order,
       role,
@@ -423,6 +429,19 @@ export function marketplaceRoutes(app: FastifyInstance, ctx: AppContext) {
       }),
       disputes,
       deliveryAvailable: !!ent && !ent.revokedAt,
+      checkout: checkout ? {
+        status: checkout.status,
+        months: checkout.months,
+        amountMicro: checkout.extrasMicro.toString(),
+        invoice: checkoutInvoice?.status === 'open' ? {
+          id: checkoutInvoice.id,
+          reference: checkoutInvoice.reference,
+          amountMicro: checkoutInvoice.amountMicro.toString(),
+          serviceKind: SERVICE_KINDS.other,
+          expiresAt: checkoutInvoice.expiresAt,
+        } : null,
+        invoiceStatus: checkoutInvoice?.status ?? null,
+      } : null,
     };
   });
 
