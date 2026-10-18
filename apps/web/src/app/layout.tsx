@@ -7,6 +7,7 @@ import { Providers } from './providers';
 import { Nav } from '@/components/nav';
 import { Mark } from '@/components/brand';
 import { AssistantLink } from '@/components/assistant-link';
+import { ActivityTracker } from '@/components/activity-tracker';
 
 const plexSans = Schibsted_Grotesk({ subsets: ['latin'], weight: ['400', '500', '600'], variable: '--font-plex-sans', display: 'swap' });
 const plexMono = IBM_Plex_Mono({ subsets: ['latin'], weight: ['400', '500'], variable: '--font-plex-mono', display: 'swap' });
@@ -28,6 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" data-theme="dark" className={`${plexSans.variable} ${plexMono.variable} ${newsreader.variable}`}>
       <body className="flex min-h-screen flex-col">
         <Providers>
+          <ActivityTracker />
           <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-3 focus:z-50 focus:rounded-md focus:bg-ink focus:px-3 focus:py-2 focus:text-paper">
             Skip to content
           </a>

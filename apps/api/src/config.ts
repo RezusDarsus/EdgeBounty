@@ -26,6 +26,8 @@ const Env = z.object({
   DISPUTE_AUTHORITY_KEY: z.string().optional(),
   CRANK_KEY: z.string().optional(),
   ADMIN_WALLETS: z.string().default(''),
+  ANALYTICS_INGEST_SECRET: z.string().min(32).optional(),
+  ANALYTICS_INTERNAL_URL: z.string().regex(/^http:\/\/127\.0\.0\.1:\d+$/).default('http://127.0.0.1:4020'),
   STORAGE_DRIVER: z.enum(['local', 's3', 'r2']).default('local'),
   DOWNLOAD_GATEWAY_URL: z.string().url().optional(),
   GATEWAY_SHARED_SECRET: z.string().min(32).optional(),

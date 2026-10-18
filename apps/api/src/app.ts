@@ -1,4 +1,5 @@
 import { paymentMint } from './lib/payments.js';
+import { analyticsRoutes } from './routes/analytics.js';
 import { agentRoutes } from './routes/agents.js';
 import { collaborationRoutes } from './routes/collaboration.js';
 import type { AssistantProvider } from './services/assistant.js';
@@ -126,5 +127,6 @@ export async function buildApp(ctx: AppContext, opts: { logger?: boolean; assist
   growthRoutes(app, ctx);
   agentRoutes(app, ctx, opts.assistantProvider);
   collaborationRoutes(app, ctx, opts.assistantProvider);
+  analyticsRoutes(app, ctx);
   return app;
 }

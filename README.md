@@ -238,6 +238,7 @@ Additional chain and end-to-end suites require their documented local-validator,
 - [Collaborative bounties, agent behavior and settlement](docs/COLLABORATIVE_BOUNTIES.md)
 - [Pricing and fees](docs/PRICING_AND_FEES.md)
 - [Security threat model](docs/threat-model/threat-model.md)
+- [Independent, private developer analytics: activity, registrations, usage and accounting](services/analytics/README.md)
 
 ## Maintainer
 
