@@ -54,20 +54,13 @@ export async function api<T = any>(path: string, init: { method?: string; body?:
 
 /** Authenticated binary download (download tokens are also bound to the session wallet). */
 export async function downloadFile(url: string, filename: string) {
-  const res = await fetch(`${API_URL}${url}`, { headers: token ? { authorization: `Bearer ${token}` } : {} });
-  if (!res.ok) throw new ApiError(res.status, 'download_failed', await res.text());
-  const blob = await res.blob();
   const a = document.createElement('a');
-  const objectUrl = URL.createObjectURL(blob);
-  a.href = objectUrl;
+  a.href = `${API_URL}${url}`;
   a.download = filename;
   a.style.display = 'none';
   document.body.appendChild(a);
   a.click();
   a.remove();
-  // Browsers may start consuming a download only after the click handler returns.
-  // Revoking the blob URL synchronously can therefore produce an empty/failed download.
-  window.setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000);
 }
 
 export function previewUrl(path: string) {
